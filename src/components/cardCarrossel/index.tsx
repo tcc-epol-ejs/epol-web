@@ -6,19 +6,19 @@ interface CardCarrosselProps {
 }
 
 export default function CardCarrossel({
-  width = 398,
-  height = 412,
+  width = 378,
+  height = 392,
   asset,
   borderColor = '#FFA400',
 }: CardCarrosselProps) {
   return (
     <>
       <section
-        className="rounded-[20px] overflow-hidden"
+        className="rounded-[20px] overflow-hidden shrink-0"
         style={{
           width,
           height,
-          border: `2px solid ${borderColor}`,
+          border: `3px solid ${borderColor}`,
         }}
       >
         <img

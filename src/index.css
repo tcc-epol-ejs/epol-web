@@ -12,3 +12,19 @@ body {
   text-transform: uppercase;
   letter-spacing: 0.08em;
 }
+
+.carousel-track {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  animation: scroll-up 25s linear infinite;
+}
+
+@keyframes scroll-up {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(-50%);
+  }
+}
