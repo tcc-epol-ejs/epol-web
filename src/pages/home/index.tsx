@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import BotaoCadastro from '../../components/botoes/botaoCadastro';
 
 function Home() {
   return (
@@ -18,9 +19,7 @@ function Home() {
             </div>
 
             <div className="flex gap-3 w-full items-center ">
-              <button className="rounded-full bg-[#FFA400] text-[#333] font-bold py-[14px] px-[22px] text-[13px] uppercase ">
-                Cadastre-se
-              </button>
+              <BotaoCadastro>Cadastre-se</BotaoCadastro>
 
               <p className="uppercase font-bold text-[#FFA400] text-[13px] tracking-wider">
                 e desenvolva um pensamento político crítico!
