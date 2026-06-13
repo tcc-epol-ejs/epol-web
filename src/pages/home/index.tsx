@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import BotaoCadastro from '../../components/botoes/botaoCadastro';
+import CardCarrossel from '../../components/cardCarrossel';
+import Pipo1 from '../../assets/GIFs/pipo1.gif';
 
 function Home() {
   return (
@@ -27,7 +29,7 @@ function Home() {
             </div>
           </div>
           <div className="w-full flex justify-center items-center">
-            <div className="w-[30px] h-[35px] bg-white" />
+            <CardCarrossel asset={Pipo1} />
           </div>
         </div>
         <div className="w-full h-full bg-[#EAF6FF]">
