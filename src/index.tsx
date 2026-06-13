@@ -1,7 +1,12 @@
 import { useState } from 'react';
+import Home from './pages/home/index';
 
 function App() {
-  return <></>;
+  return (
+    <>
+      <Home />
+    </>
+  );
 }
 
 export default App;

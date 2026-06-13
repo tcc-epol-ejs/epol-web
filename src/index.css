@@ -1,3 +1,14 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+body {
+  font-family: 'Montserrat', sans-serif;
+}
+
+.forced-small-caps {
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
