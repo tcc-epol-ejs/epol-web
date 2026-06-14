@@ -131,9 +131,8 @@ function Home() {
                 política de um jeito fácil e divertido!
               </h1>
               <h2 className=" tracking-wider text-[14px] text-[#333]">
-                Seu site informativo sobre política! Um lugar com informação de
-                qualidade, atualizada e, o mais importante: totalmente
-                imparcial.
+                No EPOL, você encontra funcionalidades diversas que facilitam a
+                compreensão da política no dia a dia.
               </h2>
             </div>
 
@@ -154,9 +153,8 @@ function Home() {
                 entenda sobre como adquirir seu e-título!
               </h1>
               <h2 className=" tracking-wider text-[14px] text-[#472E00]">
-                Seu site informativo sobre política! Um lugar com informação de
-                qualidade, atualizada e, o mais importante: totalmente
-                imparcial.
+                Um guia simples e prático para emitir seu documento digital e
+                acessar os principais serviços eleitorais sem complicação.
               </h2>
             </div>
 
