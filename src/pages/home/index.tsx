@@ -8,6 +8,7 @@ import MapaBrasil from '../../assets/Imagens/mapaBrasil.png';
 import MatchPolitico from '../../assets/Imagens/matchPolitico.png';
 import UrnaEletronica from '../../assets/Imagens/urnaEletronica.png';
 import WidgetsFlutuantes from '../../components/widgetsFlutuantes';
+import Header from '../../components/header';
 
 function Home() {
   const trackRef = useRef<HTMLDivElement>(null);
@@ -44,6 +45,10 @@ function Home() {
   return (
     <>
       <section className="w-full h-[100dvh]">
+        <div className="w-full fixed top-0 z-[1000]">
+          <Header />
+        </div>
+
         {/* PRIMEIRA PARTE SEÇÃO */}
         <div className="w-full h-full bg-[#2A2A72] flex gap-[100px] justify-between overflow-hidden">
           <div className="flex-1 flex flex-col gap-[50px] pl-[65px] items-center justify-center">

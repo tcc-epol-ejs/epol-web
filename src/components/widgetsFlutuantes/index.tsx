@@ -1,5 +1,3 @@
-// components/WidgetsFlutuantes.tsx
-
 export default function WidgetsFlutuantes() {
   return (
     <div className="relative w-full h-full bg-[#FFA400] rounded-[20px] overflow-hidden flex items-center justify-center">
