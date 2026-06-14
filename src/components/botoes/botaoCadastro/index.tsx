@@ -9,7 +9,7 @@ export default function BotaoCadastro({
 }: BotaoCadastroProps) {
   return (
     <button
-      className="rounded-full text-[#333] font-bold py-[14px] px-[22px] text-[13px] uppercase"
+      className="rounded-full text-[#333] font-bold py-[14px] px-[22px] text-[13px] uppercase whitespace-nowrap"
       style={{ backgroundColor: bgColor }}
     >
       {children}

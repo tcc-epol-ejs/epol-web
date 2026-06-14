@@ -4,6 +4,9 @@ import CardCarrossel from '../../components/cardCarrossel';
 import Pipo1 from '../../assets/GIFs/pipo1.gif';
 import Pipo2 from '../../assets/GIFs/pipo2.gif';
 import Pipo3 from '../../assets/GIFs/pipo3.gif';
+import MapaBrasil from '../../assets/Imagens/mapaBrasil.png';
+import MatchPolitico from '../../assets/Imagens/matchPolitico.png';
+import UrnaEletronica from '../../assets/Imagens/urnaEletronica.png';
 
 function Home() {
   const trackRef = useRef<HTMLDivElement>(null);
@@ -40,6 +43,7 @@ function Home() {
   return (
     <>
       <section className="w-full h-[100dvh]">
+        {/* PRIMEIRA PARTE SEÇÃO */}
         <div className="w-full h-full bg-[#2A2A72] flex gap-[100px] justify-between overflow-hidden">
           <div className="flex-1 flex flex-col gap-[50px] pl-[65px] items-center justify-center">
             <div className="w-full flex flex-col gap-[15px]">
@@ -76,7 +80,71 @@ function Home() {
             </div>
           </div>
         </div>
-        <div className="w-full h-full bg-[#EAF6FF]">
+        {/* SEGUNDA PARTE SEÇÃO */}
+        <div className="w-full h-full flex gap-[100px] justify-between overflow-hidden">
+          <div className="flex items-center gap-3 h-full py-[100px] pl-[65px]">
+            {/* Card grande — esquerda */}
+            <div className="flex-1 h-[360px] w-[245px] rounded-[20px] bg-[#FFA400] flex flex-col items-center justify-center gap-4 p-6">
+              <p className="text-white font-black uppercase tracking-wider text-center text-sm">
+                Visualizador Geográfico
+              </p>
+              <img
+                src={MapaBrasil}
+                alt=""
+                className="w-full h-full object-contain"
+              />
+            </div>
+
+            {/* Coluna direita — dois cards empilhados */}
+            <div className="flex flex-col justify-between items gap-3 flex-1 h-[360px]">
+              {/* Card superior direito */}
+              <div className="h-[165px] w-[290px] flex-1 rounded-[20px] bg-[#2A2A72] flex flex-col items-center justify-between gap-3 p-6 pt-11">
+                <img
+                  src={MatchPolitico}
+                  alt=""
+                  className="object-contain h-16"
+                />
+                <p className="text-white font-black uppercase tracking-wider text-center text-sm">
+                  Match Político
+                </p>
+              </div>
+
+              {/* Card inferior direito */}
+              <div className="h-[165px] w-[290px] flex-1 rounded-[20px] bg-[#5BC4F5] flex flex-col items-center justify-between gap-3 p-6">
+                <img
+                  src={UrnaEletronica}
+                  alt=""
+                  className="object-contain h-24"
+                />
+                <p className="text-white font-black uppercase tracking-wider text-center text-sm">
+                  Simulador de Urna
+                </p>
+              </div>
+            </div>
+          </div>
+          <div className="flex-1 flex flex-col gap-[50px] pr-[65px] items-center justify-center">
+            <div className="w-full flex flex-col gap-[15px]">
+              <h1 className="font-black uppercase forced-small-caps leading-10 tracking-wider text-[36px] text-[#333]">
+                política de um jeito fácil e divertido!
+              </h1>
+              <h2 className=" tracking-wider text-[14px] text-[#333]">
+                Seu site informativo sobre política! Um lugar com informação de
+                qualidade, atualizada e, o mais importante: totalmente
+                imparcial.
+              </h2>
+            </div>
+
+            <div className="flex gap-3 w-full items-center ">
+              <BotaoCadastro>Cadastre-se</BotaoCadastro>
+
+              <p className="uppercase font-bold text-[#FFA400] text-[13px] tracking-wider">
+                e obtenha acesso à funcionalidades exclusivas!
+              </p>
+            </div>
+          </div>
+        </div>
+        {/* TERCEIRA PARTE SEÇÃO */}
+        <div className="w-full h-full bg-[#FFA400]">
           <p>OIIII</p>
         </div>
       </section>
