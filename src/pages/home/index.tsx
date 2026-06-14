@@ -7,6 +7,7 @@ import Pipo3 from '../../assets/GIFs/pipo3.gif';
 import MapaBrasil from '../../assets/Imagens/mapaBrasil.png';
 import MatchPolitico from '../../assets/Imagens/matchPolitico.png';
 import UrnaEletronica from '../../assets/Imagens/urnaEletronica.png';
+import WidgetsFlutuantes from '../../components/widgetsFlutuantes';
 
 function Home() {
   const trackRef = useRef<HTMLDivElement>(null);
@@ -95,9 +96,7 @@ function Home() {
               />
             </div>
 
-            {/* Coluna direita — dois cards empilhados */}
             <div className="flex flex-col justify-between items gap-3 flex-1 h-[360px]">
-              {/* Card superior direito */}
               <div className="h-[165px] w-[290px] flex-1 rounded-[20px] bg-[#2A2A72] flex flex-col items-center justify-between gap-3 p-6 pt-11">
                 <img
                   src={MatchPolitico}
@@ -109,7 +108,6 @@ function Home() {
                 </p>
               </div>
 
-              {/* Card inferior direito */}
               <div className="h-[165px] w-[290px] flex-1 rounded-[20px] bg-[#5BC4F5] flex flex-col items-center justify-between gap-3 p-6">
                 <img
                   src={UrnaEletronica}
@@ -144,8 +142,40 @@ function Home() {
           </div>
         </div>
         {/* TERCEIRA PARTE SEÇÃO */}
-        <div className="w-full h-full bg-[#FFA400]">
-          <p>OIIII</p>
+        <div className="w-full h-full bg-[#FFA400] flex gap-[100px] justify-between overflow-hidden">
+          <div className="flex-1 flex flex-col gap-[50px] pl-[65px] items-center justify-center">
+            <div className="w-full flex flex-col gap-[15px]">
+              <h1 className="font-black uppercase forced-small-caps leading-10 tracking-wider text-[36px] text-[#472E00]">
+                entenda sobre como adquirir seu e-título!
+              </h1>
+              <h2 className=" tracking-wider text-[14px] text-[#472E00]">
+                Seu site informativo sobre política! Um lugar com informação de
+                qualidade, atualizada e, o mais importante: totalmente
+                imparcial.
+              </h2>
+            </div>
+
+            <div className="flex gap-3 w-full items-center ">
+              <BotaoCadastro bgColor="#2A2A72" textColor="#eaf6ff">
+                Cadastre-se
+              </BotaoCadastro>
+
+              <p className="uppercase font-bold text-[#2A2A72] text-[13px] tracking-wider">
+                e exerça seu dever de cidadão!
+              </p>
+            </div>
+          </div>
+          <div
+            className="shrink-0 flex justify-end pr-[65px] items-center overflow-hidden h-full relative"
+            style={{ width: 430 + 65 }}
+          >
+            <div
+              className="shrink-0 overflow-hidden w-full h-full"
+              // style={{ width: 450 }}
+            >
+              <WidgetsFlutuantes />
+            </div>
+          </div>
         </div>
       </section>
     </>
