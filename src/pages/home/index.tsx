@@ -108,7 +108,7 @@ function Home() {
                 </p>
               </div>
 
-              <div className="h-[165px] w-[290px] flex-1 rounded-[20px] bg-[#5BC4F5] flex flex-col items-center justify-between gap-3 p-6">
+              <div className="h-[165px] w-[290px] flex-1 rounded-[20px] bg-[#009FFD] flex flex-col items-center justify-between gap-3 p-6">
                 <img
                   src={UrnaEletronica}
                   alt=""

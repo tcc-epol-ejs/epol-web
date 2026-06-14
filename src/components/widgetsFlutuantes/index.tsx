@@ -3,7 +3,6 @@
 export default function WidgetsFlutuantes() {
   return (
     <div className="relative w-full h-full bg-[#FFA400] rounded-[20px] overflow-hidden flex items-center justify-center">
-      {/* Label topo */}
       <div className="absolute top-[110px] left-1/2 -translate-x-1/2 z-10 flex items-center gap-2 border border-[#472E00] rounded-full px-4 py-1.5 whitespace-nowrap">
         <span className="w-2 h-2 rounded-full bg-[#472E00] inline-block" />
         <span className="text-[11px] font-bold tracking-[2px] text-[#472E00] uppercase">
@@ -11,7 +10,6 @@ export default function WidgetsFlutuantes() {
         </span>
       </div>
 
-      {/* Card Partido — atrás esquerda */}
       <div
         className="absolute z-[2] w-[110px] h-[110px] bg-[#1a1a3e] rounded-[20px] shadow-lg flex flex-col items-start justify-end p-[14px] gap-[5px]"
         style={{
@@ -31,7 +29,6 @@ export default function WidgetsFlutuantes() {
         </span>
       </div>
 
-      {/* Card Título Eleitor — central */}
       <div
         className="absolute z-[4] w-[220px] bg-[#2A2A72] rounded-[20px] shadow-2xl p-[16px]"
         style={{
@@ -74,9 +71,8 @@ export default function WidgetsFlutuantes() {
         ))}
       </div>
 
-      {/* Card Urna — direita */}
       <div
-        className="absolute z-[5] w-[130px] bg-[#38C6F4] rounded-[20px] shadow-2xl p-[14px] flex flex-col items-center gap-2"
+        className="absolute z-[5] w-[130px] bg-[#009FFD] rounded-[20px] shadow-2xl p-[14px] flex flex-col items-center gap-2"
         style={{
           left: '50%',
           top: '40%',
@@ -110,34 +106,34 @@ export default function WidgetsFlutuantes() {
         </p>
       </div>
 
-      {/* Badge Vote — baixo */}
       <div
-        className="absolute z-[6] w-[170px] bg-white rounded-[16px] shadow-2xl px-[18px] py-[12px]"
+        className="absolute z-[6] w-[180px] bg-white rounded-[16px] shadow-2xl px-[18px] py-[12px]"
         style={{
           left: '50%',
-          top: '50%',
+          top: '55%',
           transform: 'translate(-60%, 50%) rotate(4deg)',
           animation: 'floatVote 5s ease-in-out infinite',
         }}
       >
-        <p className="m-0 text-[9px] uppercase tracking-[2px] text-[#888]">
+        <p className="m-0 text-[9px] uppercase text-center tracking-[2px] text-[#888]">
           Exerça seu direito
         </p>
-        <p className="m-0 text-[32px] font-black text-[#2A2A72] tracking-[1px] leading-none">
+        <p className="m-0 text-[32px] font-black text-[#2A2A72] text-center tracking-[1px] leading-none">
           VO·TE
         </p>
         <div className="flex gap-[3px] items-end mt-1">
-          {[10, 16, 8, 20, 12, 6, 18].map((h, i) => (
-            <div
-              key={i}
-              className="w-[6px] bg-[#2A2A72] rounded-[2px] opacity-30"
-              style={{ height: h }}
-            />
-          ))}
+          {[10, 16, 8, 20, 12, 6, 18, 10, 16, 8, 20, 12, 6, 18, 10, 16, 8].map(
+            (h, i) => (
+              <div
+                key={i}
+                className="w-[6px] bg-[#2A2A72] rounded-[2px] opacity-30"
+                style={{ height: h }}
+              />
+            ),
+          )}
         </div>
       </div>
 
-      {/* Keyframes */}
       <style>{`
           @keyframes floatCenter {
             0%, 100% { transform: translate(-50%, -50%) rotate(-6deg) translateY(0px); }
