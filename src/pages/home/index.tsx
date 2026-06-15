@@ -14,7 +14,7 @@ function Home() {
   const trackRef = useRef<HTMLDivElement>(null);
   const yRef = useRef(0);
   const rafRef = useRef<number>();
-  const SPEED = 0.6;
+  const SPEED = 0.8;
   const GAP = 40;
 
   useEffect(() => {
