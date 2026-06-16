@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import BotaoCadastro from '../../components/botoes/botaoCadastro';
 import CardCarrossel from '../../components/cardCarrossel';
 import Pipo1 from '../../assets/GIFs/pipo1.gif';
