@@ -5,7 +5,7 @@ interface InputProps {
 export default function Input({ placeholder }: InputProps) {
   return (
     <input
-      className="bg-[#eaf6ff] text-white placeholder-gray-300 px-4 py-2  gap-8 rounded-full outline-none border-none outline-none focus:outline-none focus:ring-0"
+      className="bg-[#A9A9F6] text-white placeholder-gray-600 px-8 py-6  gap-8 rounded-full border-none focus:outline-none focus:ring-0"
       placeholder={placeholder}
     />
   );
