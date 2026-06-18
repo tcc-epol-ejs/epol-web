@@ -28,7 +28,7 @@ function Cadastro() {
           clipPath: "polygon(100% 0, 0 50%, 100% 100%)",
         }}
       ></div>
-      <div className="absolute w-[545px] h-[496px] left-[450px] top-[108px] bg-[#2a2a72] rounded-full"></div>
+      <div className="absolute w-[545px] h-[496px] left-[440px]  top-[150px] bg-[#2a2a72] rounded-full"></div>
       <div className="absolute w-[456.42px] h-[433px] right-[-227.17px] top-[200px] rotate-[118.19deg]">
         <div className="absolute w-[197px] h-[197px] left-[-104.62px] top-[339px] bg-[#8888D3] rounded-full rotate-[118.19deg]"></div>
 
@@ -36,30 +36,27 @@ function Cadastro() {
 
         <div className="absolute w-[140px] h-[140px] left-[149.85px] top-[534.7px] bg-[rgba(136,136,211,0.83)] rounded-full rotate-[118.19deg]"></div>
       </div>
-      {/* Formulário - sempre na frente de tudo */}
-      <div className="relative z-60 ..."></div>
 
       <div
         className="relative z-60 flex flex-col items-center gap-4 w-[300px]"
         style={{ transform: "scale(1.3)" }}
       >
         <img
-          className="w-16 h-auto max-w-[80px]"
+          className="w-16 h-800 max-w-[100px]"
           alt="Logo EPOL"
           src="/img/LogoEPOLPreta.png"
         />
+        <h1 className="text-[#FFA400]  ">CADASTRE-SE!!</h1>
+        <div className="flex flex-col  gap-8">
+          <Input placeholder="Email" />
 
-        <p className="text-[#FFA400] font-bold text-xl tracking-widest">
-          CADASTRE-SE!!
-        </p>
-
-        <Input placeholder="Email" />
-        <Input placeholder="Nome Completo" />
-        <Input placeholder="Nome do Usuário" />
-        <Input placeholder="Senha" />
+          <Input placeholder="Nome Completo" />
+          <Input placeholder="Nome do Usuário" />
+          <Input placeholder="Senha" />
+        </div>
 
         <button
-          className="w-[200px] rounded-full bg-[#FFA400] font-bold py-8 text-[18px] outline-none border-none focus:outline-none focus:ring-0"
+          className="w-[230px] h-[35px] rounded-full bg-[#FFA400]  text-[18px] outline-none border-none focus:outline-none cursor-pointer"
           style={{ color: "white" }}
         >
           CADASTRAR
@@ -67,7 +64,9 @@ function Cadastro() {
 
         <p className="text-white text-sm" style={{ color: "white" }}>
           Já tem uma conta?{" "}
-          <span className="text-[#A9A9F6] cursor-pointer">Entrar</span>
+          <span className="text-[#A9A9F6] font-thin cursor-pointer">
+            Entrar
+          </span>
         </p>
       </div>
     </section>
