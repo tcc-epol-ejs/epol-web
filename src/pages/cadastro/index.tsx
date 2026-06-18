@@ -1,5 +1,5 @@
 import Input from "../../components/Input";
-
+import Bolas from "../../components/bolas";
 function Cadastro() {
   return (
     <section className="w-full h-dvh bg-[#2a2a72] flex items-center justify-center overflow-hidden relative">
@@ -16,6 +16,11 @@ function Cadastro() {
           clipPath: "polygon(0 0, 100% 50%, 0 100%)",
         }}
       ></div>
+      <Bolas />
+      <Bolas className="left-[-20px] top-[270px]" />
+      <Bolas className="left-[-20px] top-[1000px]" />
+      <Bolas className="right-[-100px] top-[800px]" />
+      <div className="absolute w-[140px] h-[140px] left-[149.85px] top-[534.7px] bg-[rgba(136,136,211,0.83)] rounded-full rotate-[118.19deg]"></div>
 
       <div
         style={{
@@ -29,13 +34,7 @@ function Cadastro() {
         }}
       ></div>
       <div className="absolute w-[545px] h-[496px] left-[440px]  top-[150px] bg-[#2a2a72] rounded-full"></div>
-      <div className="absolute w-[456.42px] h-[433px] right-[-227.17px] top-[200px] rotate-[118.19deg]">
-        <div className="absolute w-[197px] h-[197px] left-[-104.62px] top-[339px] bg-[#8888D3] rounded-full rotate-[118.19deg]"></div>
-
-        <div className="absolute w-[346.2px] h-[315.95px] left-[-162px] top-[470px] bg-[rgba(136,136,211,0.81)] rounded-full rotate-[117.81deg]"></div>
-
-        <div className="absolute w-[140px] h-[140px] left-[149.85px] top-[534.7px] bg-[rgba(136,136,211,0.83)] rounded-full rotate-[118.19deg]"></div>
-      </div>
+      <div className="absolute w-[456.42px] h-[433px] right-[-227.17px] top-[200px] rotate-[118.19deg]"></div>
 
       <div
         className="relative z-60 flex flex-col items-center gap-4 w-[300px]"
