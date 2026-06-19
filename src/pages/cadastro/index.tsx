@@ -1,5 +1,6 @@
 import Input from "../../components/Input";
 import Bolas from "../../components/bolas";
+
 function Cadastro() {
   return (
     <section className="w-full h-dvh bg-[#2a2a72] flex items-center justify-center overflow-hidden relative">
@@ -36,26 +37,28 @@ function Cadastro() {
       <div className="absolute w-[545px] h-[496px] left-[440px]  top-[150px] bg-[#2a2a72] rounded-full"></div>
       <div className="absolute w-[456.42px] h-[433px] right-[-227.17px] top-[200px] rotate-[118.19deg]"></div>
 
+      {/* Ajustado o gap geral para 6 */}
       <div
-        className="relative z-60 flex flex-col items-center gap-4 w-[300px]"
+        className="relative z-50 flex flex-col items-center gap-6 w-[300px]"
         style={{ transform: "scale(1.3)" }}
       >
         <img
-          className="w-16 h-800 max-w-[100px]"
+          className="w-16 h-auto max-w-[100px]"
           alt="Logo EPOL"
-          src="/img/LogoEPOLPreta.png"
+          src="/img/logoepol.png"
         />
-        <h1 className="text-[#FFA400]  ">CADASTRE-SE!!</h1>
-        <div className="flex flex-col  gap-8">
-          <Input placeholder="Email" />
+        <h1 className="text-[#FFA400] font-bold">CADASTRE-SE!!</h1>
 
-          <Input placeholder="Nome Completo" />
+        {/* Mantido o bom espaçamento entre os inputs */}
+        <div className="flex flex-col gap-6 w-full">
+          <Input placeholder="Email" />
           <Input placeholder="Nome do Usuário" />
           <Input placeholder="Senha" />
         </div>
 
+        {/* mt-8 adiciona o espaço extra que faltava entre a senha e o botão */}
         <button
-          className="w-[230px] h-[35px] rounded-full bg-[#FFA400]  text-[18px] outline-none border-none focus:outline-none cursor-pointer"
+          className="w-[230px] h-[35px] rounded-full bg-[#FFA400] text-[18px] outline-none border-none focus:outline-none cursor-pointer mt-8"
           style={{ color: "white" }}
         >
           CADASTRAR
