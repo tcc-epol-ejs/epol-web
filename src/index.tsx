@@ -1,9 +1,9 @@
-import Home from './pages/home/index';
+import RecuperarSenha from './pages/recuperar_senha';
 
 function App() {
   return (
     <>
-      <Home />
+      <RecuperarSenha />
     </>
   );
 }

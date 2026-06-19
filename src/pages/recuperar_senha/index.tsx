@@ -1,8 +1,8 @@
 import Textbox from '../../components/textboxes/textboxRecuperar';
 import Botao from '../../components/botoes/botaoRecuperar';
-import efeitoTras from '../../assets/efeitotras.png';
-import losango from '../../assets/losango.png';
-import efeitoFrente from '../../assets/efeitofrente.png';
+import efeitoTras from '../../assets/Imagens/efeitotras.png';
+import losango from '../../assets/Imagens/losango.png';
+import efeitoFrente from '../../assets/Imagens/efeitofrente.png';
 import Voltar from '../../components/botoes/botaoRecuperar/voltar';
 
 function RecuperarSenha() {
