@@ -37,7 +37,6 @@ function Cadastro() {
       <div className="absolute w-[545px] h-[496px] left-[440px]  top-[150px] bg-[#2a2a72] rounded-full"></div>
       <div className="absolute w-[456.42px] h-[433px] right-[-227.17px] top-[200px] rotate-[118.19deg]"></div>
 
-      {/* Ajustado o gap geral para 6 */}
       <div
         className="relative z-50 flex flex-col items-center gap-6 w-[300px]"
         style={{ transform: "scale(1.3)" }}
@@ -49,14 +48,12 @@ function Cadastro() {
         />
         <h1 className="text-[#FFA400] font-bold">CADASTRE-SE!!</h1>
 
-        {/* Mantido o bom espaçamento entre os inputs */}
         <div className="flex flex-col gap-6 w-full">
           <Input placeholder="Email" />
           <Input placeholder="Nome do Usuário" />
           <Input placeholder="Senha" />
         </div>
 
-        {/* mt-8 adiciona o espaço extra que faltava entre a senha e o botão */}
         <button
           className="w-[230px] h-[35px] rounded-full bg-[#FFA400] text-[18px] outline-none border-none focus:outline-none cursor-pointer mt-8"
           style={{ color: "white" }}
