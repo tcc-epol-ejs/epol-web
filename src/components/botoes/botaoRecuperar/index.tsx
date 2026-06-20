@@ -17,7 +17,7 @@ export default function BotaoRecuperar({
     <button
       type="button"
       onClick={onClick}
-      className={`rounded-full font-bold py-[14px] px-[50px] text-[13px] uppercase whitespace-nowrap hover:brightness-[.85] ${className}`.trim()}
+      className={`rounded-full font-bold w-[320px] h-[50px] text-[13px] uppercase whitespace-nowrap hover:brightness-[.85] ${className}`.trim()}
       style={{ backgroundColor: bgColor, color: textColor }}
     >
       {children}
