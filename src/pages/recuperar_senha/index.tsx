@@ -70,7 +70,7 @@ function RecuperarSenha() {
               <p className="text-lg font-bold">Recuperação iniciada</p>
               <p className="mt-4 text-base leading-7 text-[#4d5176]">
                 Um link de recuperação foi enviado para o email{' '}
-                {email || 'seu e-mail'}
+                {<strong>{email}</strong>}
               </p>
               <div className="mt-6 flex justify-center">
                 <Confirmar onClick={() => setShowModal(false)}>OK</Confirmar>
