@@ -1,9 +1,9 @@
-import Home from './pages/home/index';
+import Cadastro from './pages/cadastro/index';
 
 function App() {
   return (
     <>
-      <Home />
+      <Cadastro />
     </>
   );
 }
