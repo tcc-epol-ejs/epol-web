@@ -73,7 +73,14 @@ function RecuperarSenha() {
                 {<strong>{email}</strong>}
               </p>
               <div className="mt-6 flex justify-center">
-                <Confirmar onClick={() => setShowModal(false)}>OK</Confirmar>
+                <Confirmar
+                  onClick={() => {
+                    setShowModal(false);
+                    setEmail('');
+                  }}
+                >
+                  OK
+                </Confirmar>
               </div>
             </div>
           </div>
