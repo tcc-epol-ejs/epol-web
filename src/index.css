@@ -5,6 +5,9 @@
 @tailwind utilities;
 
 body {
+  margin: 0 0 0px 0;
+  padding: 0;
+  box-sizing: border-box;
   font-family: 'Montserrat', sans-serif;
   background-color: #eaf6ff;
 }
@@ -28,4 +31,19 @@ body {
   100% {
     transform: translateY(-50%);
   }
+}
+
+.triangle-left {
+  clip-path: polygon(0 0, 100% 50%, 0 100%);
+}
+
+.triangle-right {
+  clip-path: polygon(100% 0, 0 50%, 100% 100%);
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  width: 100%;
 }
