@@ -1,4 +1,5 @@
 import { ChangeEvent, useState } from 'react';
+import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import Textbox from '../../components/textboxes/textboxRecuperar';
 import Botao from '../../components/botoes/botaoRecuperar';
 import efeitoTras from '../../assets/Imagens/efeitotras.png';
@@ -8,6 +9,8 @@ import efeitoFrente from '../../assets/Imagens/efeitofrente.png';
 function RecuperarSenha() {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [showError, setShowError] = useState(false);
 
   function handlePasswordChange(event: ChangeEvent<HTMLInputElement>) {
@@ -45,20 +48,47 @@ function RecuperarSenha() {
           <h1 className="m-0 mb-[3px] text-[3rem] text-[#4141a8] font-bold">
             DIGITE SUA SENHA
           </h1>
-          <Textbox
-            type="password"
-            value={password}
-            onChange={handlePasswordChange}
-          >
-            Nova senha
-          </Textbox>
-          <Textbox
-            type="password"
-            value={confirmPassword}
-            onChange={handleConfirmPasswordChange}
-          >
-            Confirme a senha
-          </Textbox>
+
+          <div className="relative w-full max-w-[320px]">
+            <Textbox
+              type={showPassword ? 'text' : 'password'}
+              value={password}
+              onChange={handlePasswordChange}
+              className="pr-12"
+            >
+              Nova senha
+            </Textbox>
+            <button
+              type="button"
+              onClick={() => setShowPassword((prev) => !prev)}
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-[#2a2a72]"
+            >
+              {showPassword ? <FaEyeSlash size={18} /> : <FaEye size={18} />}
+            </button>
+          </div>
+
+          <div className="relative w-full max-w-[320px]">
+            <Textbox
+              type={showConfirmPassword ? 'text' : 'password'}
+              value={confirmPassword}
+              onChange={handleConfirmPasswordChange}
+              className="pr-12"
+            >
+              Confirme a senha
+            </Textbox>
+            <button
+              type="button"
+              onClick={() => setShowConfirmPassword((prev) => !prev)}
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-[#2a2a72]"
+            >
+              {showConfirmPassword ? (
+                <FaEyeSlash size={18} />
+              ) : (
+                <FaEye size={18} />
+              )}
+            </button>
+          </div>
+
           {showError && (
             <p className="text-red-500 text-sm font-semibold text-center">
               As senhas devem ser iguais e não podem ficar vazias.
