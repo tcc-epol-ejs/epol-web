@@ -2,4 +2,52 @@
 
 * {
   font-family: "Montserrat", sans-serif;
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  margin: 0 0 0px 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Montserrat', sans-serif;
+  background-color: #eaf6ff;
+}
+
+.forced-small-caps {
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.carousel-track {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  animation: scroll-up 25s linear infinite;
+}
+
+@keyframes scroll-up {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(-50%);
+  }
+}
+
+.triangle-left {
+  clip-path: polygon(0 0, 100% 50%, 0 100%);
+}
+
+.triangle-right {
+  clip-path: polygon(100% 0, 0 50%, 100% 100%);
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  width: 100%;
 }
