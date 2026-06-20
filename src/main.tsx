@@ -5,10 +5,6 @@ import './index.css';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Cadastro />} />
-      </Routes>
-    </BrowserRouter>
+    <App />
   </React.StrictMode>,
 );
