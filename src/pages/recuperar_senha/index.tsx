@@ -1,6 +1,7 @@
 import { ChangeEvent, useState } from 'react';
 import Textbox from '../../components/textboxes/textboxRecuperar';
 import Botao from '../../components/botoes/botaoRecuperar';
+import Confirmar from '../../components/botoes/botaoRecuperar/confirmar';
 import efeitoTras from '../../assets/Imagens/efeitotras.png';
 import losango from '../../assets/Imagens/losango.png';
 import efeitoFrente from '../../assets/Imagens/efeitofrente.png';
@@ -9,12 +10,19 @@ import Voltar from '../../components/botoes/botaoRecuperar/voltar';
 function RecuperarSenha() {
   const [email, setEmail] = useState('');
   const [showModal, setShowModal] = useState(false);
+  const [showError, setShowError] = useState(false);
 
   function handleEmailChange(event: ChangeEvent<HTMLInputElement>) {
     setEmail(event.target.value);
+    setShowError(false);
   }
 
   function handleRecover() {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email.trim() || !emailRegex.test(email)) {
+      setShowError(true);
+      return;
+    }
     setShowModal(true);
   }
 
@@ -39,6 +47,11 @@ function RecuperarSenha() {
           <Textbox value={email} onChange={handleEmailChange}>
             Digite seu E-mail
           </Textbox>
+          {showError && (
+            <p className="text-red-500 text-sm font-semibold">
+              Por favor, insira um email válido
+            </p>
+          )}
           <Botao onClick={handleRecover}>ENVIAR CÓDIGO</Botao>
           <Voltar>Voltar</Voltar>
         </div>
@@ -56,17 +69,12 @@ function RecuperarSenha() {
             <div className="mt-8 text-center">
               <p className="text-lg font-bold">Recuperação iniciada</p>
               <p className="mt-4 text-base leading-7 text-[#4d5176]">
-                Um link de recuperação foi enviado para o email
-              </p>
-              <p className="mt-3 break-words font-semibold text-[#2a2a72]">
+                Um link de recuperação foi enviado para o email{' '}
                 {email || 'seu e-mail'}
               </p>
-              <Voltar
-                onClick={() => setShowModal(false)}
-                className="absolute right-4 top-4 px-4 py-2 text-[12px] uppercase"
-              >
-                Voltar
-              </Voltar>
+              <div className="mt-6 flex justify-center">
+                <Confirmar onClick={() => setShowModal(false)}>OK</Confirmar>
+              </div>
             </div>
           </div>
         </div>
