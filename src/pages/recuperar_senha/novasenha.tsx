@@ -36,7 +36,7 @@ function RecuperarSenha({ onSuccess }: RecuperarSenhaProps) {
     }
 
     if (password !== confirmPassword) {
-      setErrorMessage('As senhas digitadas devem ser iguais.');
+      setErrorMessage('As senhas não são iguais.');
       return;
     }
 
