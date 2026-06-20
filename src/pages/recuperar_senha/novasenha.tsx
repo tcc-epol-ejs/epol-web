@@ -17,23 +17,29 @@ function RecuperarSenha({ onSuccess }: RecuperarSenhaProps) {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [showModal, setShowModal] = useState(false);
-  const [showError, setShowError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
 
   function handlePasswordChange(event: ChangeEvent<HTMLInputElement>) {
     setPassword(event.target.value);
-    setShowError(false);
+    setErrorMessage('');
   }
 
   function handleConfirmPasswordChange(event: ChangeEvent<HTMLInputElement>) {
     setConfirmPassword(event.target.value);
-    setShowError(false);
+    setErrorMessage('');
   }
 
   function handleSave() {
-    if (!password || !confirmPassword || password !== confirmPassword) {
-      setShowError(true);
+    if (!password || !confirmPassword) {
+      setErrorMessage('As senhas não podem ficar vazias.');
       return;
     }
+
+    if (password !== confirmPassword) {
+      setErrorMessage('As senhas digitadas devem ser iguais.');
+      return;
+    }
+
     setShowModal(true);
   }
 
@@ -96,9 +102,9 @@ function RecuperarSenha({ onSuccess }: RecuperarSenhaProps) {
             </button>
           </div>
 
-          {showError && (
+          {errorMessage && (
             <p className="text-red-500 text-sm font-semibold text-center">
-              As senhas devem ser iguais e não podem ficar vazias.
+              {errorMessage}
             </p>
           )}
           <Botao onClick={handleSave}>ALTERAR SENHA</Botao>
