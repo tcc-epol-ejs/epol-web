@@ -1,7 +1,7 @@
-import type { ChangeEvent } from 'react';
+import type { ChangeEvent, HTMLInputTypeAttribute } from 'react';
 
 type TextboxProps = {
-  type?: 'email';
+  type?: HTMLInputTypeAttribute;
   children?: string;
   placeholder?: string;
   value?: string;
@@ -12,7 +12,7 @@ type TextboxProps = {
 };
 
 export default function Textbox({
-  type = 'email',
+  type = 'text',
   children,
   placeholder = '',
   value,

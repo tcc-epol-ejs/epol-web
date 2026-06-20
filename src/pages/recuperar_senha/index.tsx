@@ -44,7 +44,7 @@ function RecuperarSenha() {
           <h1 className="m-0 mb-[3px] text-[3rem] text-[#4141a8] font-bold">
             RECUPERAR SENHA
           </h1>
-          <Textbox value={email} onChange={handleEmailChange}>
+          <Textbox type="email" value={email} onChange={handleEmailChange}>
             Digite seu E-mail
           </Textbox>
           {showError && (
