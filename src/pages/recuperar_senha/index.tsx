@@ -7,7 +7,11 @@ import losango from '../../assets/Imagens/losango.png';
 import efeitoFrente from '../../assets/Imagens/efeitofrente.png';
 import Voltar from '../../components/botoes/botaoRecuperar/voltar';
 
-function RecuperarSenha() {
+type RecuperarSenhaProps = {
+  onSuccess?: () => void;
+};
+
+function RecuperarSenha({ onSuccess }: RecuperarSenhaProps) {
   const [email, setEmail] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [showError, setShowError] = useState(false);
@@ -77,6 +81,9 @@ function RecuperarSenha() {
                   onClick={() => {
                     setShowModal(false);
                     setEmail('');
+                    if (onSuccess) {
+                      onSuccess();
+                    }
                   }}
                 >
                   OK
