@@ -147,7 +147,7 @@ export default function Login() {
             </Botao>
 
             <p
-              className="text-[#2d2d6b] text-center cursor-pointer hover:underline"
+              className="text-[#2d2d6b] text-center cursor-pointer font-semibold hover:underline"
               style={{ fontSize: 'clamp(11px, 2vw, 14px)' }}
               onClick={() => navigate('/recuperar-senha')}
             >
@@ -161,7 +161,7 @@ export default function Login() {
               Não tem uma conta?{' '}
               <span
                 onClick={() => navigate('/cadastro')}
-                className="text-[#2d2d8b] font-semibold cursor-pointer hover:underline"
+                className="text-[#2d2d6b] font-semibold cursor-pointer hover:underline"
               >
                 Cadastre-se
               </span>
