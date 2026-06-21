@@ -1,3 +1,4 @@
+import { ChangeEvent, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Textbox from '../../components/textboxes/textbox';
 import Botao from '../../components/botoes/botao';
@@ -19,6 +20,47 @@ function Cadastro() {
   const circleSize = 'min(580px, 75vw, 75dvh)';
   const gap = '20px';
   const navigate = useNavigate();
+
+  const [email, setEmail] = useState('');
+  const [usuario, setUsuario] = useState('');
+  const [senha, setSenha] = useState('');
+  const [showError, setShowError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
+
+  function handleEmailChange(event: ChangeEvent<HTMLInputElement>) {
+    setEmail(event.target.value);
+    setShowError(false);
+  }
+
+  function handleUsuarioChange(event: ChangeEvent<HTMLInputElement>) {
+    setUsuario(event.target.value);
+    setShowError(false);
+  }
+
+  function handleSenhaChange(event: ChangeEvent<HTMLInputElement>) {
+    setSenha(event.target.value);
+    setShowError(false);
+  }
+
+  function handleCadastro() {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email.trim() || !emailRegex.test(email)) {
+      setErrorMessage('Por favor, insira um e-mail válido');
+      setShowError(true);
+      return;
+    }
+    if (!usuario.trim()) {
+      setErrorMessage('Informe um nome de usuário');
+      setShowError(true);
+      return;
+    }
+    if (senha.length < 6) {
+      setErrorMessage('A senha deve ter pelo menos 6 caracteres');
+      setShowError(true);
+      return;
+    }
+    // TODO: chamar a API de cadastro com { email, usuario, senha }
+  }
 
   return (
     <section className="w-full min-h-[100dvh] bg-[#2a2a72] flex items-center justify-center overflow-hidden relative">
@@ -74,12 +116,32 @@ function Cadastro() {
           </h1>
 
           <div className="flex flex-col gap-4 w-full">
-            <Textbox placeholder="E-mail" type="email" />
-            <Textbox placeholder="Nome do Usuário" />
-            <Textbox showToggle type="password" placeholder="Senha" />
+            <Textbox
+              placeholder="E-mail"
+              type="email"
+              value={email}
+              onChange={handleEmailChange}
+            />
+            <Textbox
+              placeholder="Nome do Usuário"
+              value={usuario}
+              onChange={handleUsuarioChange}
+            />
+            <Textbox
+              showToggle
+              type="password"
+              placeholder="Senha"
+              value={senha}
+              onChange={handleSenhaChange}
+            />
+            {showError && (
+              <p className="text-red-400 text-[10px] font-semibold text-center">
+                {errorMessage}
+              </p>
+            )}
           </div>
 
-          <Botao bgColor="#ffa400" textColor="#ffffff">
+          <Botao bgColor="#ffa400" textColor="#ffffff" onClick={handleCadastro}>
             cadastrar
           </Botao>
 

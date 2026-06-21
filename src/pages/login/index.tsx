@@ -1,3 +1,4 @@
+import { ChangeEvent, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Textbox from '../../components/textboxes/textbox';
 import Botao from '../../components/botoes/botao';
@@ -37,6 +38,35 @@ export default function Login() {
   const circleSize = 'min(580px, 75vw, 75dvh)';
   const gap = '20px';
   const navigate = useNavigate();
+
+  const [emailOuUsuario, setEmailOuUsuario] = useState('');
+  const [senha, setSenha] = useState('');
+  const [showError, setShowError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
+
+  function handleEmailOuUsuarioChange(event: ChangeEvent<HTMLInputElement>) {
+    setEmailOuUsuario(event.target.value);
+    setShowError(false);
+  }
+
+  function handleSenhaChange(event: ChangeEvent<HTMLInputElement>) {
+    setSenha(event.target.value);
+    setShowError(false);
+  }
+
+  function handleLogin() {
+    if (!emailOuUsuario.trim()) {
+      setErrorMessage('Informe seu usuário ou e-mail');
+      setShowError(true);
+      return;
+    }
+    if (!senha.trim()) {
+      setErrorMessage('Informe sua senha');
+      setShowError(true);
+      return;
+    }
+    // TODO: chamar a API de login com { emailOuUsuario, senha }
+  }
 
   return (
     <div>
@@ -93,11 +123,26 @@ export default function Login() {
             </h1>
 
             <div className="flex flex-col gap-4 w-full">
-              <Textbox placeholder="Nome de usuário ou Email" />
-              <Textbox showToggle type="password" placeholder="Senha" />
+              <Textbox
+                placeholder="Nome de usuário ou Email"
+                value={emailOuUsuario}
+                onChange={handleEmailOuUsuarioChange}
+              />
+              <Textbox
+                showToggle
+                type="password"
+                placeholder="Senha"
+                value={senha}
+                onChange={handleSenhaChange}
+              />
+              {showError && (
+                <p className="text-red-500 text-[10px] font-semibold text-center">
+                  {errorMessage}
+                </p>
+              )}
             </div>
 
-            <Botao bgColor="#2d2d6b" textColor="#fff">
+            <Botao bgColor="#2d2d6b" textColor="#fff" onClick={handleLogin}>
               entrar
             </Botao>
 
@@ -124,53 +169,6 @@ export default function Login() {
           </div>
         </div>
       </section>
-
-      {/* <footer className="w-full bg-[#2d2d6b] text-white py-96 px-24 flex gap-76">
-        <div className="flex flex-col gap-3">
-          <p className="font-bold text-2xl">EPOL</p>
-          <p className="text-gray-300 text-2xl">
-            Política que faz sentido pra você.
-            <br />
-            Informação clara para quem vai mudar o Brasil.
-            <br />
-            <br />
-            <br />
-            <br />
-            <div className="flex items-center gap-2">
-              <img
-                className="w-8 h-auto mb-8"
-                alt="Logo Insta"
-                src="/LogoInstaBranca.png"
-              />
-              <span>
-                epol.tcc
-                <p>
-                  <br />
-                </p>
-              </span>
-            </div>
-            <div className="flex items-center gap-2">
-              <img
-                className="w-8 h-auto"
-                alt="Logo Email"
-                src="/LogoEmailBranca.png"
-              />
-              <span>epol@gmail.com</span>
-            </div>
-          </p>
-        </div>
-
-        <div className="flex flex-col gap-3 mr-150">
-          <p className="text-2xl w-40 mb-3">EXPLORAR</p>
-          <p className="text-2xl mt-3 text-gray-300">Página Inicial</p>
-          <p className="text-2xl mt-3 text-gray-300">SearchPol</p>
-          <p className="text-2xl mt-3 text-gray-300">Visualizador</p>
-          <p className="text-2xl mt-3 text-gray-300">Urna</p>
-          <p className="text-2xl mt-3 whitespace-nowrap text-gray-300">
-            Título de Eleitor
-          </p>
-        </div>
-      </footer> */}
     </div>
   );
 }
