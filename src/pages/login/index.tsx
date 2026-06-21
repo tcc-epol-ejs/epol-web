@@ -1,5 +1,7 @@
 import { ChangeEvent, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { login } from '../../services/api';
+import { useAuth } from '../../contexts/AuthContext';
 import Textbox from '../../components/textboxes/textbox';
 import Botao from '../../components/botoes/botao';
 
@@ -38,11 +40,13 @@ export default function Login() {
   const circleSize = 'min(580px, 75vw, 75dvh)';
   const gap = '20px';
   const navigate = useNavigate();
+  const { salvarSessao } = useAuth();
 
   const [emailOuUsuario, setEmailOuUsuario] = useState('');
   const [senha, setSenha] = useState('');
   const [showError, setShowError] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const [loginSucesso, setLoginSucesso] = useState(false);
 
   function handleEmailOuUsuarioChange(event: ChangeEvent<HTMLInputElement>) {
     setEmailOuUsuario(event.target.value);
@@ -54,9 +58,9 @@ export default function Login() {
     setShowError(false);
   }
 
-  function handleLogin() {
+  async function handleLogin() {
     if (!emailOuUsuario.trim()) {
-      setErrorMessage('Informe seu usuário ou e-mail');
+      setErrorMessage('Informe seu e-mail');
       setShowError(true);
       return;
     }
@@ -65,7 +69,14 @@ export default function Login() {
       setShowError(true);
       return;
     }
-    // TODO: chamar a API de login com { emailOuUsuario, senha }
+    try {
+      const { usuario, token } = await login(emailOuUsuario, senha);
+      salvarSessao(usuario, token);
+      setLoginSucesso(true);
+    } catch (err: any) {
+      setErrorMessage(err.message || 'E-mail ou senha inválidos');
+      setShowError(true);
+    }
   }
 
   return (
@@ -124,7 +135,7 @@ export default function Login() {
 
             <div className="flex flex-col gap-4 w-full">
               <Textbox
-                placeholder="Nome de usuário ou Email"
+                placeholder="E-mail"
                 value={emailOuUsuario}
                 onChange={handleEmailOuUsuarioChange}
               />
@@ -146,6 +157,11 @@ export default function Login() {
               entrar
             </Botao>
 
+            {loginSucesso && (
+              <p className="text-green-500 text-[12px] font-semibold text-center">
+                Logado com sucesso!
+              </p>
+            )}
             <p
               className="text-[#2d2d6b] text-center cursor-pointer font-semibold hover:underline"
               style={{ fontSize: 'clamp(11px, 2vw, 14px)' }}
