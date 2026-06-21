@@ -125,7 +125,7 @@ export default function Login() {
         </div>
       </section>
 
-      <footer className="w-full bg-[#2d2d6b] text-white py-96 px-24 flex gap-76">
+      {/* <footer className="w-full bg-[#2d2d6b] text-white py-96 px-24 flex gap-76">
         <div className="flex flex-col gap-3">
           <p className="font-bold text-2xl">EPOL</p>
           <p className="text-gray-300 text-2xl">
@@ -170,7 +170,7 @@ export default function Login() {
             Título de Eleitor
           </p>
         </div>
-      </footer>
+      </footer> */}
     </div>
   );
 }
