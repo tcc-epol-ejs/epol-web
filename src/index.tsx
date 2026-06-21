@@ -1,20 +1,19 @@
-import { useState } from 'react';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import Home from './pages/home';
+import Login from './pages/login';
+import Cadastro from './pages/cadastro';
 import RecuperarSenha from './pages/recuperar_senha';
-import NovaSenha from './pages/recuperar_senha/novasenha';
-import Cadastro from './pages/cadastro/index';
 
 function App() {
-  const [page, setPage] = useState<'recuperar' | 'novasenha'>('recuperar');
-
   return (
-    <>
-      {page === 'recuperar' ? (
-        <RecuperarSenha onSuccess={() => setPage('novasenha')} />
-      ) : (
-        <NovaSenha />
-      )}
-      <Cadastro />
-    </>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/cadastro" element={<Cadastro />} />
+        <Route path="/recuperar-senha" element={<RecuperarSenha />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 
