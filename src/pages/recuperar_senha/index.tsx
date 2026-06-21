@@ -4,6 +4,7 @@ import Textbox from '../../components/textboxes/textbox';
 import Botao from '../../components/botoes/botao';
 import Confirmar from '../../components/botoes/botaoRecuperar/confirmar';
 import Voltar from '../../components/botoes/botaoRecuperar/voltar';
+import { recuperarSenha, redefinirSenha } from '../../services/api';
 
 type RecuperarSenhaProps = {
   onSuccess?: () => void;
@@ -61,18 +62,23 @@ function RecuperarSenha({ onSuccess }: RecuperarSenhaProps) {
     setShowError(false);
   }
 
-  function handleRecover() {
+  async function handleRecover() {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!email.trim() || !emailRegex.test(email)) {
       setErrorMessage('Por favor, insira um email válido');
       setShowError(true);
       return;
     }
-    // TODO: chamar a API pra disparar o e-mail com o link (?token=...)
-    setShowModal(true);
+    try {
+      await recuperarSenha(email);
+      setShowModal(true);
+    } catch (err: any) {
+      setErrorMessage(err.message || 'Erro ao enviar e-mail de recuperação');
+      setShowError(true);
+    }
   }
 
-  function handleResetPassword() {
+  async function handleResetPassword() {
     if (novaSenha.length < 6) {
       setErrorMessage('A senha deve ter pelo menos 6 caracteres');
       setShowError(true);
@@ -83,8 +89,13 @@ function RecuperarSenha({ onSuccess }: RecuperarSenhaProps) {
       setShowError(true);
       return;
     }
-    // TODO: chamar a API passando { token, novaSenha } pra efetivar a troca
-    setShowModal(true);
+    try {
+      await redefinirSenha(token!, novaSenha);
+      setShowModal(true);
+    } catch (err: any) {
+      setErrorMessage(err.message || 'Erro ao redefinir senha');
+      setShowError(true);
+    }
   }
 
   function handleModalConfirm() {

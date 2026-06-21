@@ -1,5 +1,7 @@
 import { ChangeEvent, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { cadastrar } from '../../services/api';
+import { useAuth } from '../../contexts/AuthContext';
 import Textbox from '../../components/textboxes/textbox';
 import Botao from '../../components/botoes/botao';
 
@@ -20,6 +22,7 @@ function Cadastro() {
   const circleSize = 'min(580px, 75vw, 75dvh)';
   const gap = '20px';
   const navigate = useNavigate();
+  const { salvarSessao } = useAuth();
 
   const [email, setEmail] = useState('');
   const [usuario, setUsuario] = useState('');
@@ -42,7 +45,7 @@ function Cadastro() {
     setShowError(false);
   }
 
-  function handleCadastro() {
+  async function handleCadastro() {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!email.trim() || !emailRegex.test(email)) {
       setErrorMessage('Por favor, insira um e-mail válido');
@@ -59,7 +62,17 @@ function Cadastro() {
       setShowError(true);
       return;
     }
-    // TODO: chamar a API de cadastro com { email, usuario, senha }
+    try {
+      await cadastrar({
+        nome: usuario,
+        email,
+        senha,
+      });
+      navigate('/login');
+    } catch (err: any) {
+      setErrorMessage(err.message || 'Erro ao cadastrar');
+      setShowError(true);
+    }
   }
 
   return (
