@@ -9,6 +9,7 @@ import MatchPolitico from '../../assets/Imagens/matchPolitico.png';
 import UrnaEletronica from '../../assets/Imagens/urnaEletronica.png';
 import WidgetsFlutuantes from '../../components/widgetsFlutuantes';
 import Header from '../../components/header';
+import { useNavigate } from 'react-router-dom';
 
 function Home() {
   const trackRef = useRef<HTMLDivElement>(null);
@@ -16,6 +17,7 @@ function Home() {
   const rafRef = useRef<number>();
   const SPEED = 0.8;
   const GAP = 40;
+  const navigate = useNavigate();
 
   useEffect(() => {
     const track = trackRef.current;
@@ -64,7 +66,9 @@ function Home() {
             </div>
 
             <div className="flex gap-3 w-full items-center ">
-              <BotaoCadastro>Cadastre-se</BotaoCadastro>
+              <BotaoCadastro onClick={() => navigate('/cadastro')}>
+                Cadastre-se
+              </BotaoCadastro>
 
               <p className="uppercase font-bold text-[#FFA400] text-[13px] tracking-wider">
                 e desenvolva um pensamento político crítico!
@@ -89,7 +93,6 @@ function Home() {
         {/* SEGUNDA PARTE SEÇÃO */}
         <div className="w-full h-full flex gap-[100px] justify-between overflow-hidden">
           <div className="flex items-center gap-3 h-full py-[100px] pl-[65px]">
-            {/* Card grande — esquerda */}
             <div className="flex-1 h-[360px] w-[245px] rounded-[20px] bg-[#FFA400] flex flex-col items-center justify-center gap-4 p-6">
               <p className="text-white font-black uppercase tracking-wider text-center text-sm">
                 Visualizador Geográfico
@@ -137,7 +140,9 @@ function Home() {
             </div>
 
             <div className="flex gap-3 w-full items-center ">
-              <BotaoCadastro>Cadastre-se</BotaoCadastro>
+              <BotaoCadastro onClick={() => navigate('/cadastro')}>
+                Cadastre-se
+              </BotaoCadastro>
 
               <p className="uppercase font-bold text-[#FFA400] text-[13px] tracking-wider">
                 e obtenha acesso à funcionalidades exclusivas!
@@ -159,7 +164,11 @@ function Home() {
             </div>
 
             <div className="flex gap-3 w-full items-center ">
-              <BotaoCadastro bgColor="#2A2A72" textColor="#eaf6ff">
+              <BotaoCadastro
+                onClick={() => navigate('/cadastro')}
+                bgColor="#2A2A72"
+                textColor="#eaf6ff"
+              >
                 Cadastre-se
               </BotaoCadastro>
 
