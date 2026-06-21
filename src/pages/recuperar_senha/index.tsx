@@ -6,6 +6,7 @@ import efeitoTras from '../../assets/Imagens/efeitotras.png';
 import losango from '../../assets/Imagens/losango.png';
 import efeitoFrente from '../../assets/Imagens/efeitofrente.png';
 import Voltar from '../../components/botoes/botaoRecuperar/voltar';
+import { useNavigate } from 'react-router-dom';
 
 type RecuperarSenhaProps = {
   onSuccess?: () => void;
@@ -15,6 +16,7 @@ function RecuperarSenha({ onSuccess }: RecuperarSenhaProps) {
   const [email, setEmail] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [showError, setShowError] = useState(false);
+  const navigate = useNavigate();
 
   function handleEmailChange(event: ChangeEvent<HTMLInputElement>) {
     setEmail(event.target.value);
@@ -57,7 +59,7 @@ function RecuperarSenha({ onSuccess }: RecuperarSenhaProps) {
             </p>
           )}
           <Botao onClick={handleRecover}>ENVIAR CÓDIGO</Botao>
-          <Voltar>Voltar</Voltar>
+          <Voltar onClick={() => navigate('/login')}>Voltar</Voltar>
         </div>
 
         <img

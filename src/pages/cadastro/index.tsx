@@ -1,4 +1,6 @@
+import { useNavigate } from 'react-router-dom';
 import Textbox from '../../components/textboxes/textbox';
+import Botao from '../../components/botoes/botao';
 
 const bolasConfig = [
   { size: 280, top: '-40px', left: '-30px', opacity: 1 },
@@ -16,6 +18,7 @@ const bolasConfig = [
 function Cadastro() {
   const circleSize = 'min(580px, 75vw, 75dvh)';
   const gap = '20px';
+  const navigate = useNavigate();
 
   return (
     <section className="w-full min-h-[100dvh] bg-[#2a2a72] flex items-center justify-center overflow-hidden relative">
@@ -76,21 +79,19 @@ function Cadastro() {
             <Textbox showToggle type="password" placeholder="Senha" />
           </div>
 
-          <button
-            className="w-full rounded-full bg-[#FFA400] text-white py-2 font-semibold outline-none border-none cursor-pointer transition-all duration-300 hover:brightness-[.85]"
-            style={{
-              fontSize: 'clamp(13px, 2.5vw, 17px)',
-            }}
-          >
-            CADASTRAR
-          </button>
+          <Botao bgColor="#ffa400" textColor="#ffffff">
+            cadastrar
+          </Botao>
 
           <p
             className="text-white text-center"
             style={{ fontSize: 'clamp(11px, 2vw, 14px)' }}
           >
             Já tem uma conta?{' '}
-            <span className="text-[#CBCBEC] font-semibold cursor-pointer hover:underline">
+            <span
+              onClick={() => navigate('/login')}
+              className="text-[#CBCBEC] font-semibold cursor-pointer hover:underline"
+            >
               Entrar
             </span>
           </p>
