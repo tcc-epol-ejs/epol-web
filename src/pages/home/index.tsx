@@ -131,7 +131,7 @@ function Home() {
           <div className="flex-1 flex flex-col gap-[50px] pr-[65px] items-center justify-center">
             <div className="w-full flex flex-col gap-[15px]">
               <h1 className="font-black uppercase forced-small-caps leading-10 tracking-wider text-[36px] text-[#333]">
-                política de um jeito fácil e divertido!
+                política de um jeito fácil e educativo!
               </h1>
               <h2 className=" tracking-wider text-[14px] text-[#333]">
                 No EPOL, você encontra funcionalidades diversas que facilitam a
