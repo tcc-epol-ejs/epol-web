@@ -1,21 +1,14 @@
-import Input from '../../components/Input';
+import Textbox from '../../components/textboxes/textbox';
 
 const bolasConfig = [
-  // Canto superior esquerdo
   { size: 280, top: '-40px', left: '-30px', opacity: 1 },
   { size: 160, top: '20px', left: '220px', opacity: 0.6 },
   { size: 100, top: '160px', left: '30px', opacity: 0.75 },
-
-  // Canto superior direito
   { size: 240, top: '-50px', right: '-30px', opacity: 0.85 },
   { size: 150, top: '60px', right: '220px', opacity: 0.5 },
   { size: 80, top: '10px', right: '180px', opacity: 0.7 },
-
-  // Canto inferior esquerdo
   { size: 260, bottom: '-50px', left: '-40px', opacity: 0.9 },
   { size: 120, bottom: '-20px', left: '190px', opacity: 0.7 },
-
-  // Canto inferior direito
   { size: 300, bottom: '-60px', right: '-40px', opacity: 1 },
   { size: 160, bottom: '120px', right: '200px', opacity: 0.6 },
 ];
@@ -66,33 +59,27 @@ function Cadastro() {
         className="relative z-20 bg-[#2a2a72] rounded-full flex items-center justify-center flex-shrink-0"
         style={{ width: circleSize, height: circleSize }}
       >
-        <div className="flex flex-col items-center gap-[clamp(12px,2.5vh,24px)] w-[70%]">
+        <div className="flex flex-col items-center gap-4 w-[70%] pt-5 relative">
           <img
-            className="h-auto"
-            style={{ width: 'clamp(55px, 14%, 90px)' }}
+            className="h-auto w-[100px] absolute -top-[50px]"
             alt="Logo EPOL"
             src="/img/logoepol.png"
           />
 
-          <h1
-            className="text-[#FFA400] font-bold text-center leading-tight"
-            style={{ fontSize: 'clamp(20px, 4vw, 34px)' }}
-          >
-            CADASTRE-SE!!
+          <h1 className="text-[#FFA400] font-bold text-center text-[22px] leading-tight">
+            Crie sua conta!
           </h1>
 
-          <div className="flex flex-col gap-[clamp(8px,1.5vh,16px)] w-full">
-            <Input placeholder="Email" />
-            <Input placeholder="Nome do Usuário" />
-            <Input placeholder="Senha" />
+          <div className="flex flex-col gap-4 w-full">
+            <Textbox placeholder="E-mail" type="email" />
+            <Textbox placeholder="Nome do Usuário" />
+            <Textbox showToggle type="password" placeholder="Senha" />
           </div>
 
           <button
-            className="w-full rounded-full bg-[#FFA400] text-white font-semibold outline-none border-none cursor-pointer"
+            className="w-full rounded-full bg-[#FFA400] text-white py-2 font-semibold outline-none border-none cursor-pointer transition-all duration-300 hover:brightness-[.85]"
             style={{
-              height: 'clamp(34px, 5vh, 44px)',
               fontSize: 'clamp(13px, 2.5vw, 17px)',
-              maxWidth: '240px',
             }}
           >
             CADASTRAR
@@ -103,7 +90,7 @@ function Cadastro() {
             style={{ fontSize: 'clamp(11px, 2vw, 14px)' }}
           >
             Já tem uma conta?{' '}
-            <span className="text-[#A9A9F6] font-thin cursor-pointer">
+            <span className="text-[#CBCBEC] font-semibold cursor-pointer hover:underline">
               Entrar
             </span>
           </p>
