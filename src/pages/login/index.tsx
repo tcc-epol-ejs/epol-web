@@ -155,7 +155,7 @@ export default function Login() {
             </p>
 
             <p
-              className="text-[#7b6bb5] text-center"
+              className="text-[#2d2d6b] text-center"
               style={{ fontSize: 'clamp(11px, 2vw, 14px)' }}
             >
               Não tem uma conta?{' '}
