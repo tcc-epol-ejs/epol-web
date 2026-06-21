@@ -1,71 +1,113 @@
 import Input from '../../components/Input';
-import Bolas from '../../components/bolas';
+
+const bolasConfig = [
+  // Canto superior esquerdo
+  { size: 280, top: '-40px', left: '-30px', opacity: 1 },
+  { size: 160, top: '20px', left: '220px', opacity: 0.6 },
+  { size: 100, top: '160px', left: '30px', opacity: 0.75 },
+
+  // Canto superior direito
+  { size: 240, top: '-50px', right: '-30px', opacity: 0.85 },
+  { size: 150, top: '60px', right: '220px', opacity: 0.5 },
+  { size: 80, top: '10px', right: '180px', opacity: 0.7 },
+
+  // Canto inferior esquerdo
+  { size: 260, bottom: '-50px', left: '-40px', opacity: 0.9 },
+  { size: 120, bottom: '-20px', left: '190px', opacity: 0.7 },
+
+  // Canto inferior direito
+  { size: 300, bottom: '-60px', right: '-40px', opacity: 1 },
+  { size: 160, bottom: '120px', right: '200px', opacity: 0.6 },
+];
 
 function Cadastro() {
+  const circleSize = 'min(580px, 75vw, 75dvh)';
+  const gap = '20px';
+
   return (
     <section className="w-full min-h-[100dvh] bg-[#2a2a72] flex items-center justify-center overflow-hidden relative">
-      <div className="absolute w-[545px] h-[496px] left-[445px] top-[108px] bg-[#2a2a72] rounded-full"></div>
-      <div
-        style={{
-          position: 'absolute',
-          left: 730,
-          top: 0,
-          width: '50%',
-          height: '100%',
-          backgroundColor: '#FFA400',
-          clipPath: 'polygon(0 0, 100% 50%, 0 100%)',
-        }}
-      ></div>
-      <Bolas />
-      <Bolas className="left-[-20px] top-[270px]" />
-      <Bolas className="left-[-20px] top-[1000px]" />
-      <Bolas className="right-[-100px] top-[800px]" />
-      <div className="absolute w-[140px] h-[140px] left-[149.85px] top-[534.7px] bg-[rgba(136,136,211,0.83)] rounded-full rotate-[118.19deg]"></div>
-
-      <div
-        style={{
-          position: 'absolute',
-          right: 730,
-          top: 0,
-          width: '50%',
-          height: '100%',
-          backgroundColor: '#FFA400',
-          clipPath: 'polygon(100% 0, 0 50%, 100% 100%)',
-        }}
-      ></div>
-      <div className="absolute w-[600px] h-[600px] left-[415px]  top-[85px] bg-[#2a2a72] rounded-full"></div>
-      <div className="absolute w-[456.42px] h-[433px] right-[-227.17px] top-[200px] rotate-[118.19deg]"></div>
-
-      <div
-        className="relative z-50 flex flex-col items-center gap-6 w-[300px]"
-        style={{ transform: 'scale(1.3)' }}
-      >
-        <img
-          className="w-30 h-auto max-w-[100px]"
-          alt="Logo EPOL"
-          src="/img/logoepol.png"
+      {bolasConfig.map((b, i) => (
+        <div
+          key={i}
+          className="absolute rounded-full"
+          style={{
+            width: b.size,
+            height: b.size,
+            top: 'top' in b ? b.top : undefined,
+            bottom: 'bottom' in b ? b.bottom : undefined,
+            left: 'left' in b ? b.left : undefined,
+            right: 'right' in b ? b.right : undefined,
+            backgroundColor: '#8888D3',
+            opacity: b.opacity,
+            zIndex: 0,
+          }}
         />
-        <h1 className="text-[#FFA400] text-[35px] font-bold">CADASTRE-SE!!</h1>
+      ))}
 
-        <div className="flex flex-col gap-4 w-full">
-          <Input placeholder="Email" />
-          <Input placeholder="Nome do Usuário" />
-          <Input placeholder="Senha" />
+      <div
+        className="absolute inset-y-0 left-0 z-10"
+        style={{
+          width: '50vw',
+          backgroundColor: '#FFA400',
+          clipPath: `polygon(0% 50%, 100% 0%, calc(100% - ${gap}) 50%, 100% 100%)`,
+        }}
+      />
+
+      <div
+        className="absolute inset-y-0 right-0 z-10"
+        style={{
+          width: '50vw',
+          backgroundColor: '#FFA400',
+          clipPath: `polygon(${gap} 0%, 100% 50%, ${gap} 100%, 0% 50%)`,
+        }}
+      />
+
+      <div
+        className="relative z-20 bg-[#2a2a72] rounded-full flex items-center justify-center flex-shrink-0"
+        style={{ width: circleSize, height: circleSize }}
+      >
+        <div className="flex flex-col items-center gap-[clamp(12px,2.5vh,24px)] w-[70%]">
+          <img
+            className="h-auto"
+            style={{ width: 'clamp(55px, 14%, 90px)' }}
+            alt="Logo EPOL"
+            src="/img/logoepol.png"
+          />
+
+          <h1
+            className="text-[#FFA400] font-bold text-center leading-tight"
+            style={{ fontSize: 'clamp(20px, 4vw, 34px)' }}
+          >
+            CADASTRE-SE!!
+          </h1>
+
+          <div className="flex flex-col gap-[clamp(8px,1.5vh,16px)] w-full">
+            <Input placeholder="Email" />
+            <Input placeholder="Nome do Usuário" />
+            <Input placeholder="Senha" />
+          </div>
+
+          <button
+            className="w-full rounded-full bg-[#FFA400] text-white font-semibold outline-none border-none cursor-pointer"
+            style={{
+              height: 'clamp(34px, 5vh, 44px)',
+              fontSize: 'clamp(13px, 2.5vw, 17px)',
+              maxWidth: '240px',
+            }}
+          >
+            CADASTRAR
+          </button>
+
+          <p
+            className="text-white text-center"
+            style={{ fontSize: 'clamp(11px, 2vw, 14px)' }}
+          >
+            Já tem uma conta?{' '}
+            <span className="text-[#A9A9F6] font-thin cursor-pointer">
+              Entrar
+            </span>
+          </p>
         </div>
-
-        <button
-          className="w-[250px] h-[40px] rounded-full bg-[#FFA400] text-[18px] outline-none border-none focus:outline-none cursor-pointer"
-          style={{ color: 'white' }}
-        >
-          CADASTRAR
-        </button>
-
-        <p className="text-white text-sm" style={{ color: 'white' }}>
-          Já tem uma conta?{' '}
-          <span className="text-[#A9A9F6] font-thin cursor-pointer">
-            Entrar
-          </span>
-        </p>
       </div>
     </section>
   );
