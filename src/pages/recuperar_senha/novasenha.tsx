@@ -1,6 +1,14 @@
+/*
+===================================================================
+===================================================================
+      !!!!!!!!!!CÓDIGO NÃO USADO POR ENQUANTO!!!!!!!!!!
+        (recuperar senha já está funcionando sem ele)
+===================================================================
+===================================================================
+*/
 import { ChangeEvent, useState } from 'react';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
-import Textbox from '../../components/textboxes/textboxRecuperar';
+import Textbox from '../../components/inputs';
 import Botao from '../../components/botoes/botaoRecuperar';
 import efeitoTras from '../../assets/Imagens/efeitotras.png';
 import losango from '../../assets/Imagens/losango.png';

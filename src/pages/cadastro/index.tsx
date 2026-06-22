@@ -2,8 +2,9 @@ import { ChangeEvent, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { cadastrar } from '../../services/api';
 import { useAuth } from '../../contexts/AuthContext';
-import Textbox from '../../components/textboxes/textbox';
+import Textbox from '../../components/inputs';
 import Botao from '../../components/botoes/botao';
+import LogoEpol from '../../assets/Imagens/Logos/logoepol.png';
 
 const bolasConfig = [
   { size: 280, top: '-40px', left: '-30px', opacity: 1 },
@@ -121,7 +122,7 @@ function Cadastro() {
           <img
             className="h-auto w-[100px] absolute -top-[50px]"
             alt="Logo EPOL"
-            src="/img/logoepol.png"
+            src={LogoEpol}
           />
 
           <h1 className="text-[#FFA400] font-bold text-center text-[22px] leading-tight">

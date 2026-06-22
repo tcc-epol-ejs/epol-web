@@ -1,10 +1,11 @@
 import { ChangeEvent, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import Textbox from '../../components/textboxes/textbox';
+import Textbox from '../../components/inputs';
 import Botao from '../../components/botoes/botao';
 import Confirmar from '../../components/botoes/botaoRecuperar/confirmar';
 import Voltar from '../../components/botoes/botaoRecuperar/voltar';
 import { recuperarSenha, redefinirSenha } from '../../services/api';
+import LogoEpol from '../../assets/Imagens/Logos/LogoEPOLPreta.png';
 
 type RecuperarSenhaProps = {
   onSuccess?: () => void;
@@ -157,7 +158,7 @@ function RecuperarSenha({ onSuccess }: RecuperarSenhaProps) {
             <img
               className="h-auto w-[100px] absolute -top-[60px]"
               alt="Logo EPOL"
-              src="/LogoEPOLPreta.png"
+              src={LogoEpol}
             />
 
             <h1 className="text-[#2d2d6b] font-bold text-center text-[22px] leading-tight">
