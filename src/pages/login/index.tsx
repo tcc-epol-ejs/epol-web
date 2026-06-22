@@ -2,8 +2,9 @@ import { ChangeEvent, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { login } from '../../services/api';
 import { useAuth } from '../../contexts/AuthContext';
-import Textbox from '../../components/textboxes/textbox';
+import Textbox from '../../components/inputs';
 import Botao from '../../components/botoes/botao';
+import LogoEpol from '../../assets/Imagens/Logos/LogoEPOLPreta.png';
 
 const bolasConfig = [
   { size: 280, top: '-40px', left: '-30px', opacity: 1 },
@@ -126,7 +127,7 @@ export default function Login() {
             <img
               className="h-auto w-[100px] absolute -top-[60px]"
               alt="Logo EPOL"
-              src="/LogoEPOLPreta.png"
+              src={LogoEpol}
             />
 
             <h1 className="text-[#2d2d6b] font-bold text-center text-[22px] leading-tight">
