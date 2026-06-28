@@ -9,6 +9,7 @@ import MatchPolitico from '../../assets/Imagens/matchPolitico.png';
 import UrnaEletronica from '../../assets/Imagens/urnaEletronica.png';
 import WidgetsFlutuantes from '../../components/widgetsFlutuantes';
 import Header from '../../components/header';
+import Footer from '../../components/footer/footer';
 import { useNavigate } from 'react-router-dom';
 
 function Home() {
@@ -190,6 +191,7 @@ function Home() {
           </div>
         </div>
       </section>
+      <Footer />
     </>
   );
 }
