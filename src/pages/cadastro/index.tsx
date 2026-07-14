@@ -25,19 +25,39 @@ function Cadastro() {
   const navigate = useNavigate();
   const { salvarSessao } = useAuth();
 
+  // Controle de qual passo está ativo (1 ou 2)
+  const [step, setStep] = useState<1 | 2>(1);
+
+  // Passo 1
+  const [nome, setNome] = useState('');
+  const [apelido, setApelido] = useState('');
   const [email, setEmail] = useState('');
-  const [usuario, setUsuario] = useState('');
+
+  // Passo 2
+  const [partido, setPartido] = useState('');
   const [senha, setSenha] = useState('');
+  const [estado, setEstado] = useState('');
+
   const [showError, setShowError] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+
+  function handleNomeChange(event: ChangeEvent<HTMLInputElement>) {
+    setNome(event.target.value);
+    setShowError(false);
+  }
+
+  function handleApelidoChange(event: ChangeEvent<HTMLInputElement>) {
+    setApelido(event.target.value);
+    setShowError(false);
+  }
 
   function handleEmailChange(event: ChangeEvent<HTMLInputElement>) {
     setEmail(event.target.value);
     setShowError(false);
   }
 
-  function handleUsuarioChange(event: ChangeEvent<HTMLInputElement>) {
-    setUsuario(event.target.value);
+  function handlePartidoChange(event: ChangeEvent<HTMLInputElement>) {
+    setPartido(event.target.value);
     setShowError(false);
   }
 
@@ -46,15 +66,42 @@ function Cadastro() {
     setShowError(false);
   }
 
-  async function handleCadastro() {
+  function handleEstadoChange(event: ChangeEvent<HTMLInputElement>) {
+    setEstado(event.target.value);
+    setShowError(false);
+  }
+
+  function handleAvancar() {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!nome.trim()) {
+      setErrorMessage('Informe seu nome');
+      setShowError(true);
+      return;
+    }
+    if (!apelido.trim()) {
+      setErrorMessage('Informe um apelido');
+      setShowError(true);
+      return;
+    }
     if (!email.trim() || !emailRegex.test(email)) {
       setErrorMessage('Por favor, insira um e-mail válido');
       setShowError(true);
       return;
     }
-    if (!usuario.trim()) {
-      setErrorMessage('Informe um nome de usuário');
+
+    setShowError(false);
+    setStep(2);
+  }
+
+  function handleVoltar() {
+    setShowError(false);
+    setStep(1);
+  }
+
+  async function handleCadastro() {
+    if (!partido.trim()) {
+      setErrorMessage('Informe o partido');
       setShowError(true);
       return;
     }
@@ -63,11 +110,20 @@ function Cadastro() {
       setShowError(true);
       return;
     }
+    if (!estado.trim()) {
+      setErrorMessage('Informe o estado');
+      setShowError(true);
+      return;
+    }
+
     try {
       await cadastrar({
-        nome: usuario,
+        nome,
+        apelido,
         email,
+        partido,
         senha,
+        estado,
       });
       navigate('/login');
     } catch (err: any) {
@@ -129,25 +185,58 @@ function Cadastro() {
             Crie sua conta!
           </h1>
 
+          {/* Indicador simples de progresso */}
+          <p
+            className="text-[#CBCBEC] text-center font-semibold"
+            style={{ fontSize: '11px' }}
+          >
+            Passo {step} de 2
+          </p>
+
           <div className="flex flex-col gap-4 w-full">
-            <Textbox
-              placeholder="E-mail"
-              type="email"
-              value={email}
-              onChange={handleEmailChange}
-            />
-            <Textbox
-              placeholder="Nome do Usuário"
-              value={usuario}
-              onChange={handleUsuarioChange}
-            />
-            <Textbox
-              showToggle
-              type="password"
-              placeholder="Senha"
-              value={senha}
-              onChange={handleSenhaChange}
-            />
+            {step === 1 && (
+              <>
+                <Textbox
+                  placeholder="Nome"
+                  value={nome}
+                  onChange={handleNomeChange}
+                />
+                <Textbox
+                  placeholder="Apelido"
+                  value={apelido}
+                  onChange={handleApelidoChange}
+                />
+                <Textbox
+                  placeholder="Email"
+                  type="email"
+                  value={email}
+                  onChange={handleEmailChange}
+                />
+              </>
+            )}
+
+            {step === 2 && (
+              <>
+                <Textbox
+                  placeholder="Partido"
+                  value={partido}
+                  onChange={handlePartidoChange}
+                />
+                <Textbox
+                  showToggle
+                  type="password"
+                  placeholder="Senha"
+                  value={senha}
+                  onChange={handleSenhaChange}
+                />
+                <Textbox
+                  placeholder="Estado"
+                  value={estado}
+                  onChange={handleEstadoChange}
+                />
+              </>
+            )}
+
             {showError && (
               <p className="text-red-400 text-[10px] font-semibold text-center">
                 {errorMessage}
@@ -155,9 +244,34 @@ function Cadastro() {
             )}
           </div>
 
-          <Botao bgColor="#ffa400" textColor="#ffffff" onClick={handleCadastro}>
-            cadastrar
-          </Botao>
+          {step === 1 && (
+            <Botao
+              bgColor="#ffa400"
+              textColor="#ffffff"
+              onClick={handleAvancar}
+            >
+              avançar
+            </Botao>
+          )}
+
+          {step === 2 && (
+            <div className="flex gap-3 w-full justify-center">
+              <Botao
+                bgColor="#8888D3"
+                textColor="#ffffff"
+                onClick={handleVoltar}
+              >
+                voltar
+              </Botao>
+              <Botao
+                bgColor="#ffa400"
+                textColor="#ffffff"
+                onClick={handleCadastro}
+              >
+                cadastrar
+              </Botao>
+            </div>
+          )}
 
           <p
             className="text-white text-center"
