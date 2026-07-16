@@ -10,7 +10,7 @@ export default function Admin() {
     'partido',
   );
 
-  const [formData, setFormData] = useState({
+  const initialFormState = {
     nome: '',
     sigla: '',
     numero: '',
@@ -23,12 +23,20 @@ export default function Admin() {
     estado: '',
     idade: '',
     descricao: '',
-  });
+  };
 
+  const [formData, setFormData] = useState(initialFormState);
   const [statusMessage, setStatusMessage] = useState('');
 
   const updateField = (field: string, value: string) => {
     setFormData((current) => ({ ...current, [field]: value }));
+    setStatusMessage('');
+  };
+
+  // Função criada para mudar a aba e limpar os formulários automaticamente
+  const handleSectionChange = (section: 'partido' | 'politico') => {
+    setActiveSection(section);
+    setFormData(initialFormState);
     setStatusMessage('');
   };
 
@@ -149,14 +157,16 @@ export default function Admin() {
                   <div className="flex gap-2 rounded-full bg-[#eef2ff] p-1">
                     <button
                       type="button"
-                      onClick={() => setActiveSection('partido')}
+                      // Usando a nova função em vez de setActiveSection direto
+                      onClick={() => handleSectionChange('partido')}
                       className={`rounded-full px-4 py-2 text-sm font-semibold transition ${activeSection === 'partido' ? 'bg-[#3f5ca7] text-white' : 'text-[#3f5ca7] hover:bg-[#d7e0ff]'}`}
                     >
                       Partido
                     </button>
                     <button
                       type="button"
-                      onClick={() => setActiveSection('politico')}
+                      // Usando a nova função em vez de setActiveSection direto
+                      onClick={() => handleSectionChange('politico')}
                       className={`rounded-full px-4 py-2 text-sm font-semibold transition ${activeSection === 'politico' ? 'bg-[#3f5ca7] text-white' : 'text-[#3f5ca7] hover:bg-[#d7e0ff]'}`}
                     >
                       Candidato
@@ -286,20 +296,7 @@ export default function Admin() {
                     <button
                       type="button"
                       onClick={() => {
-                        setFormData({
-                          nome: '',
-                          sigla: '',
-                          numero: '',
-                          presidente: '',
-                          fundacao: '',
-                          ideologia: '',
-                          partido: '',
-                          cargo: '',
-                          genero: '',
-                          estado: '',
-                          idade: '',
-                          descricao: '',
-                        });
+                        setFormData(initialFormState); // Reutilizando o estado inicial para limpar
                         setStatusMessage('Campos limpos.');
                       }}
                       className="rounded-full border border-[#3f5ca7] bg-white px-5 py-3 text-sm font-semibold text-[#3f5ca7] transition hover:bg-[#eef2ff]"
