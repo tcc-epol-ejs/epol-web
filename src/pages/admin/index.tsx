@@ -39,10 +39,10 @@ export default function Admin() {
       setStatusMessage('Partido pronto para envio.');
     } else {
       if (!formData.nome.trim() || !formData.partido.trim()) {
-        setStatusMessage('Preencha nome e partido do político.');
+        setStatusMessage('Preencha nome e partido do candidato.');
         return;
       }
-      setStatusMessage('Político pronto para envio.');
+      setStatusMessage('Candidato pronto para envio.');
     }
   };
 
@@ -66,7 +66,7 @@ export default function Admin() {
             <button
               type="button"
               onClick={() => navigate('/')}
-              className="rounded-full border border-[#3f5ca7] bg-white px-4 py-2 text-sm font-semibold text-[#3f5ca7] hover:bg-[#eef2ff]"
+              className="rounded-full border border-[#3f5ca7] bg-white px-4 py-4 text-sm font-semibold text-[#3f5ca7] hover:bg-[#eef2ff]"
             >
               Voltar ao site
             </button>
@@ -82,10 +82,10 @@ export default function Admin() {
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                   <div>
                     <p className="text-sm uppercase tracking-[0.28em] text-[#3f5ca7]">
-                      Escolha a criação
+                      O que quer adicionar?
                     </p>
                     <h2 className="mt-2 text-2xl font-bold">
-                      Adicionar novo registro
+                      Adicionar novo item
                     </h2>
                   </div>
                   <div className="flex gap-2 rounded-full bg-[#eef2ff] p-1">
@@ -101,7 +101,7 @@ export default function Admin() {
                       onClick={() => setActiveSection('politico')}
                       className={`rounded-full px-4 py-2 text-sm font-semibold transition ${activeSection === 'politico' ? 'bg-[#3f5ca7] text-white' : 'text-[#3f5ca7] hover:bg-[#d7e0ff]'}`}
                     >
-                      Político
+                      Candidato
                     </button>
                   </div>
                 </div>
@@ -109,7 +109,7 @@ export default function Admin() {
                 <div className="rounded-[28px] bg-[#f5f8ff] p-6">
                   <p className="text-sm font-semibold text-[#3f5ca7]">
                     Dados para{' '}
-                    {activeSection === 'partido' ? 'partido' : 'político'}
+                    {activeSection === 'partido' ? 'partido' : 'candidato'}
                   </p>
                   <div className="mt-6 grid gap-4 sm:grid-cols-2">
                     {activeSection === 'partido' ? (
@@ -223,7 +223,7 @@ export default function Admin() {
                     <Botao onClick={handleAdd}>
                       {activeSection === 'partido'
                         ? 'Adicionar partido'
-                        : 'Adicionar político'}
+                        : 'Adicionar candidato'}
                     </Botao>
                     <button
                       type="button"
