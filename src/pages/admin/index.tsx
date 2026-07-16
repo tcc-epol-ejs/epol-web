@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Botao from '../../components/botoes/botao';
+import Textbox from '../../components/inputs';
 import LogoEPOL from '../../assets/SVGs/LogoEPOL.svg';
 
 export default function Admin() {
@@ -7,6 +9,42 @@ export default function Admin() {
   const [activeSection, setActiveSection] = useState<'partido' | 'politico'>(
     'partido',
   );
+  const [formData, setFormData] = useState({
+    nome: '',
+    sigla: '',
+    numero: '',
+    presidente: '',
+    fundacao: '',
+    ideologia: '',
+    partido: '',
+    cargo: '',
+    genero: '',
+    estado: '',
+    idade: '',
+    descricao: '',
+  });
+  const [statusMessage, setStatusMessage] = useState('');
+
+  const updateField = (field: string, value: string) => {
+    setFormData((current) => ({ ...current, [field]: value }));
+    setStatusMessage('');
+  };
+
+  const handleAdd = () => {
+    if (activeSection === 'partido') {
+      if (!formData.nome.trim() || !formData.sigla.trim()) {
+        setStatusMessage('Preencha nome e sigla do partido.');
+        return;
+      }
+      setStatusMessage('Partido pronto para envio.');
+    } else {
+      if (!formData.nome.trim() || !formData.partido.trim()) {
+        setStatusMessage('Preencha nome e partido do político.');
+        return;
+      }
+      setStatusMessage('Político pronto para envio.');
+    }
+  };
 
   return (
     <section className="min-h-[100dvh] bg-[#f8fbff] text-[#1f2332]">
@@ -44,10 +82,10 @@ export default function Admin() {
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                   <div>
                     <p className="text-sm uppercase tracking-[0.28em] text-[#3f5ca7]">
-                      O que quer adicionar?
+                      Escolha a criação
                     </p>
                     <h2 className="mt-2 text-2xl font-bold">
-                      Adicionar novo item
+                      Adicionar novo registro
                     </h2>
                   </div>
                   <div className="flex gap-2 rounded-full bg-[#eef2ff] p-1">
@@ -73,9 +111,149 @@ export default function Admin() {
                     Dados para{' '}
                     {activeSection === 'partido' ? 'partido' : 'político'}
                   </p>
-                  <p className="mt-4 text-[#4c557a]">
-                    Formulário em construção...
-                  </p>
+                  <div className="mt-6 grid gap-4 sm:grid-cols-2">
+                    {activeSection === 'partido' ? (
+                      <>
+                        <Textbox
+                          placeholder="Nome"
+                          value={formData.nome}
+                          onChange={(event) =>
+                            updateField('nome', event.target.value)
+                          }
+                        />
+                        <Textbox
+                          placeholder="Sigla"
+                          value={formData.sigla}
+                          onChange={(event) =>
+                            updateField('sigla', event.target.value)
+                          }
+                        />
+                        <Textbox
+                          placeholder="Número"
+                          value={formData.numero}
+                          onChange={(event) =>
+                            updateField('numero', event.target.value)
+                          }
+                        />
+                        <Textbox
+                          placeholder="Presidente"
+                          value={formData.presidente}
+                          onChange={(event) =>
+                            updateField('presidente', event.target.value)
+                          }
+                        />
+                        <Textbox
+                          placeholder="Fundação"
+                          value={formData.fundacao}
+                          onChange={(event) =>
+                            updateField('fundacao', event.target.value)
+                          }
+                        />
+                        <Textbox
+                          placeholder="Ideologia"
+                          value={formData.ideologia}
+                          onChange={(event) =>
+                            updateField('ideologia', event.target.value)
+                          }
+                        />
+                      </>
+                    ) : (
+                      <>
+                        <Textbox
+                          placeholder="Nome"
+                          value={formData.nome}
+                          onChange={(event) =>
+                            updateField('nome', event.target.value)
+                          }
+                        />
+                        <Textbox
+                          placeholder="Partido"
+                          value={formData.partido}
+                          onChange={(event) =>
+                            updateField('partido', event.target.value)
+                          }
+                        />
+                        <Textbox
+                          placeholder="Cargo"
+                          value={formData.cargo}
+                          onChange={(event) =>
+                            updateField('cargo', event.target.value)
+                          }
+                        />
+                        <Textbox
+                          placeholder="Gênero"
+                          value={formData.genero}
+                          onChange={(event) =>
+                            updateField('genero', event.target.value)
+                          }
+                        />
+                        <Textbox
+                          placeholder="Estado"
+                          value={formData.estado}
+                          onChange={(event) =>
+                            updateField('estado', event.target.value)
+                          }
+                        />
+                        <Textbox
+                          placeholder="Idade"
+                          value={formData.idade}
+                          onChange={(event) =>
+                            updateField('idade', event.target.value)
+                          }
+                        />
+                        <Textbox
+                          placeholder="Número"
+                          value={formData.numero}
+                          onChange={(event) =>
+                            updateField('numero', event.target.value)
+                          }
+                        />
+                        <Textbox
+                          placeholder="Descrição"
+                          value={formData.descricao}
+                          onChange={(event) =>
+                            updateField('descricao', event.target.value)
+                          }
+                          className="sm:col-span-2"
+                        />
+                      </>
+                    )}
+                  </div>
+                  <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <Botao onClick={handleAdd}>
+                      {activeSection === 'partido'
+                        ? 'Adicionar partido'
+                        : 'Adicionar político'}
+                    </Botao>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setFormData({
+                          nome: '',
+                          sigla: '',
+                          numero: '',
+                          presidente: '',
+                          fundacao: '',
+                          ideologia: '',
+                          partido: '',
+                          cargo: '',
+                          genero: '',
+                          estado: '',
+                          idade: '',
+                          descricao: '',
+                        });
+                        setStatusMessage('Campos limpos.');
+                      }}
+                      className="rounded-full border border-[#3f5ca7] bg-white px-5 py-3 text-sm font-semibold text-[#3f5ca7] transition hover:bg-[#eef2ff]"
+                    >
+                      Limpar campos
+                    </button>
+                  </div>
+                  {statusMessage && (
+                    <div className="mt-4 rounded-[20px] bg-[#e8f0ff] px-4 py-3 text-sm text-[#34418a]">
+                      {statusMessage}
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
