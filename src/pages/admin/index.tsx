@@ -9,6 +9,7 @@ export default function Admin() {
   const [activeSection, setActiveSection] = useState<'partido' | 'politico'>(
     'partido',
   );
+
   const [formData, setFormData] = useState({
     nome: '',
     sigla: '',
@@ -23,6 +24,7 @@ export default function Admin() {
     idade: '',
     descricao: '',
   });
+
   const [statusMessage, setStatusMessage] = useState('');
 
   const updateField = (field: string, value: string) => {
@@ -36,12 +38,68 @@ export default function Admin() {
         setStatusMessage('Preencha nome e sigla do partido.');
         return;
       }
+
+      /* 
+      LÓGICA DE INSERT DOS PARTIDOS
+      const query = `
+        INSERT INTO dados_politicos.partidos (
+          nome_completo, 
+          sigla, 
+          numero_legenda, 
+          presidente_nacional, 
+          data_fundacao, 
+          ideologia
+        ) VALUES (
+          $1, $2, $3, $4, $5, $6
+        ) RETURNING id;
+      `;
+      
+      const values = [
+        formData.nome, 
+        formData.sigla, 
+        parseInt(formData.numero), 
+        formData.presidente, 
+        formData.fundacao, // formato YYYY-MM-DD
+        [formData.ideologia]
+      ];
+      */
+
       setStatusMessage('Partido pronto para envio.');
     } else {
       if (!formData.nome.trim() || !formData.partido.trim()) {
         setStatusMessage('Preencha nome e partido do candidato.');
         return;
       }
+
+      /* 
+      LÓGICA DE INSERT - CANDIDATOS
+      const query = `
+        INSERT INTO dados_politicos.candidatos (
+          nome_completo, 
+          nome_politico, 
+          numero_urna, 
+          candidatura, 
+          cargo_atual, 
+          uf_candidatura, 
+          partido_id,
+          feitos_resumo
+        ) VALUES (
+          $1, $2, $3, $4, $5, $6, $7, $8
+        ) RETURNING id;
+      `;
+      
+      const values = [
+        formData.nome,
+        formData.nome,
+        parseInt(formData.numero), 
+        formData.cargo,
+        formData.cargo, 
+        formData.estado,
+        "uuid-do-partido-aqui",
+        [formData.descricao]
+      ];
+      */
+
       setStatusMessage('Candidato pronto para envio.');
     }
   };
@@ -265,10 +323,8 @@ export default function Admin() {
                 </p>
                 <div className="mt-4 space-y-4 text-sm leading-6 text-[#4c557a]">
                   <div>
-                    <p className="font-semibold text-[#1f2332]">
-                      Título da observação
-                    </p>
-                    <p>Colocar observações importantes depois!</p>
+                    <p className="font-semibold text-[#1f2332]">Titulo</p>
+                    <p>Adicionar observações no futuro!</p>
                   </div>
                 </div>
               </div>
