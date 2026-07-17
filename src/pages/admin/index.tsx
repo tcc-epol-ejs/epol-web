@@ -307,7 +307,7 @@ export default function Admin() {
                           setFormData(initialFormState);
                           setStatus({ text: 'Campos limpos.', isError: false });
                         }}
-                        className="rounded-full border border-[#3f5ca7] bg-white px-5 py-3 text-sm font-semibold text-[#3f5ca7] transition hover:bg-[#eef2ff]"
+                        className="rounded-full border border-[#3f5ca7] bg-white px-5 py-4 text-sm font-semibold text-[#3f5ca7] transition hover:bg-[#eef2ff] text-nowrap"
                       >
                         Limpar campos
                       </button>
