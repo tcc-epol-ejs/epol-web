@@ -72,6 +72,7 @@ export default function Admin() {
     estado: '',
     idade: '',
     descricao: '',
+    foto: '',
   };
 
   const [formData, setFormData] = useState(initialFormState);
@@ -107,7 +108,6 @@ export default function Admin() {
         'numero',
         'presidente',
         'fundacao',
-        'ideologia',
       ];
       const algumVazio = camposObrigatorios.some(
         (campo) => !formData[campo as keyof typeof formData].trim(),
@@ -140,7 +140,6 @@ export default function Admin() {
         'estado',
         'idade',
         'numero',
-        'descricao',
       ];
       const algumVazio = camposObrigatorios.some(
         (campo) => !formData[campo as keyof typeof formData].trim(),
@@ -297,6 +296,13 @@ export default function Admin() {
                               updateField('ideologia', e.target.value)
                             }
                           />
+                          <Textbox
+                            placeholder="Foto (URL)"
+                            value={formData.foto}
+                            onChange={(e) =>
+                              updateField('foto', e.target.value)
+                            }
+                          />
                         </>
                       ) : (
                         <>
@@ -360,6 +366,13 @@ export default function Admin() {
                             }
                             className="sm:col-span-2"
                           />
+                          <Textbox
+                            placeholder="Foto (URL)"
+                            value={formData.foto}
+                            onChange={(e) =>
+                              updateField('foto', e.target.value)
+                            }
+                          />
                         </>
                       )}
                     </div>
@@ -405,8 +418,12 @@ export default function Admin() {
                   </p>
                   <div className="mt-4 space-y-4 text-sm leading-6 text-[#4c557a]">
                     <div>
-                      <p className="font-semibold text-[#1f2332]">Titulo</p>
-                      <p>Adicionar observações no futuro!</p>
+                      <p className="font-semibold text-[#1f2332]">CAMPO FOTO</p>
+                      <p>
+                        Sempre que quiser adicionar uma foto para o partido ou
+                        candidato, utilize um URL válido ao invés de um arquivo
+                        local.
+                      </p>
                     </div>
                   </div>
                 </div>
