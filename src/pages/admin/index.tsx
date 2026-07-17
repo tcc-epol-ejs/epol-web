@@ -209,7 +209,9 @@ export default function Admin() {
                         O que quer adicionar?
                       </p>
                       <h2 className="mt-2 text-2xl font-bold">
-                        Adicionar novo item
+                        {activeSection === 'partido'
+                          ? 'Novo partido'
+                          : 'Novo candidato'}
                       </h2>
                     </div>
                     <div className="flex gap-2 rounded-full bg-[#eef2ff] p-1">
@@ -231,11 +233,7 @@ export default function Admin() {
                   </div>
 
                   <div className="rounded-[28px] bg-[#f5f8ff] p-6">
-                    <p className="text-sm font-semibold text-[#3f5ca7]">
-                      Dados para{' '}
-                      {activeSection === 'partido' ? 'partido' : 'candidato'}
-                    </p>
-                    <div className="mt-6 grid gap-4 sm:grid-cols-2">
+                    <div className="mt-2 grid gap-4 sm:grid-cols-2">
                       {activeSection === 'partido' ? (
                         <>
                           <Textbox
