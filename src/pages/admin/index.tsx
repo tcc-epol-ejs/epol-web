@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import type { ChangeEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Botao from '../../components/botoes/botao';
 import Textbox from '../../components/inputs';
@@ -81,6 +82,17 @@ export default function Admin() {
     setStatus({ text: '', isError: false });
   };
 
+  const handleNumeroChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+
+    // permite só dígitos, com no máximo 2 caracteres
+    if (value !== '' && (!/^\d+$/.test(value) || value.length > 2)) {
+      return;
+    }
+
+    updateField('numero', value);
+  };
+
   const handleSectionChange = (section: 'partido' | 'politico') => {
     setActiveSection(section);
     setFormData(initialFormState);
@@ -109,6 +121,15 @@ export default function Admin() {
         return;
       }
 
+      const numero = Number(formData.numero);
+      if (numero < 10 || numero > 90) {
+        setStatus({
+          text: 'O número deve estar entre 10 e 90.',
+          isError: true,
+        });
+        return;
+      }
+
       setStatus({ text: 'Partido adicionado com sucesso!', isError: false });
     } else {
       const camposObrigatorios = [
@@ -128,6 +149,15 @@ export default function Admin() {
       if (algumVazio) {
         setStatus({
           text: 'Preencha todos os campos do candidato.',
+          isError: true,
+        });
+        return;
+      }
+
+      const numero = Number(formData.numero);
+      if (numero < 10 || numero > 90) {
+        setStatus({
+          text: 'O número deve estar entre 10 e 90.',
           isError: true,
         });
         return;
@@ -243,9 +273,7 @@ export default function Admin() {
                             placeholder="Número"
                             value={formData.numero}
                             type="number"
-                            onChange={(e) =>
-                              updateField('numero', e.target.value)
-                            }
+                            onChange={handleNumeroChange}
                           />
                           <Textbox
                             placeholder="Presidente"
@@ -321,10 +349,8 @@ export default function Admin() {
                           <Textbox
                             placeholder="Número"
                             value={formData.numero}
-                            type="'number"
-                            onChange={(e) =>
-                              updateField('numero', e.target.value)
-                            }
+                            type="number"
+                            onChange={handleNumeroChange}
                           />
                           <Textbox
                             placeholder="Descrição"
