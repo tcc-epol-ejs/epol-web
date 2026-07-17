@@ -17,7 +17,7 @@ export default function Select({
   options,
   value,
   onChange,
-  bgColor = '#a9a9f6',
+  bgColor = '#e3e3fc',
   textColor = '#1f2a52',
   className = '',
 }: SelectProps) {

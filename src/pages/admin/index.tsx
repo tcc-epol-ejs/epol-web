@@ -242,6 +242,7 @@ export default function Admin() {
                           <Textbox
                             placeholder="Número"
                             value={formData.numero}
+                            type="number"
                             onChange={(e) =>
                               updateField('numero', e.target.value)
                             }
@@ -256,6 +257,7 @@ export default function Admin() {
                           <Textbox
                             placeholder="Fundação"
                             value={formData.fundacao}
+                            type="date"
                             onChange={(e) =>
                               updateField('fundacao', e.target.value)
                             }
@@ -311,6 +313,7 @@ export default function Admin() {
                           <Textbox
                             placeholder="Idade"
                             value={formData.idade}
+                            type="number"
                             onChange={(e) =>
                               updateField('idade', e.target.value)
                             }
@@ -318,6 +321,7 @@ export default function Admin() {
                           <Textbox
                             placeholder="Número"
                             value={formData.numero}
+                            type="'number"
                             onChange={(e) =>
                               updateField('numero', e.target.value)
                             }
