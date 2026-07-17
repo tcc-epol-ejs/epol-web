@@ -78,6 +78,7 @@ export default function Admin() {
 
   const [formData, setFormData] = useState(initialFormState);
   const [status, setStatus] = useState({ text: '', isError: false });
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const updateField = (field: string, value: string) => {
     setFormData((current) => ({ ...current, [field]: value }));
@@ -130,8 +131,6 @@ export default function Admin() {
         });
         return;
       }
-
-      setStatus({ text: 'Partido adicionado com sucesso!', isError: false });
     } else {
       const camposObrigatorios = [
         'nome',
@@ -180,9 +179,18 @@ export default function Admin() {
         });
         return;
       }
-
-      setStatus({ text: 'Candidato adicionado com sucesso!', isError: false });
     }
+    setIsModalOpen(true);
+  };
+
+  const handleConfirmAdd = () => {
+    const mensagem =
+      activeSection === 'partido'
+        ? 'Partido adicionado com sucesso!'
+        : 'Candidato adicionado com sucesso!';
+
+    setStatus({ text: mensagem, isError: false });
+    setIsModalOpen(false); // Fecha o modal
   };
 
   return (
@@ -517,6 +525,36 @@ export default function Admin() {
           </div>
         </div>
       </div>
+
+      {}
+      {isModalOpen && (
+        <div className="fixed inset-0 z-[2000] flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
+          <div className="w-full max-w-sm rounded-[32px] bg-white p-8 shadow-2xl animate-in fade-in zoom-in duration-200">
+            <h3 className="text-xl font-bold text-[#1f2332] mb-2">
+              Confirmar ação
+            </h3>
+            <p className="text-sm text-[#4c557a] mb-8">
+              Deseja mesmo adicionar um novo{' '}
+              {activeSection === 'partido' ? 'partido' : 'candidato'}?
+            </p>
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => setIsModalOpen(false)}
+                className="flex-1 rounded-full border border-[#3f5ca7] px-4 py-3 text-sm font-semibold text-[#3f5ca7] hover:bg-[#eef2ff]"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={handleConfirmAdd}
+                className="flex-1 rounded-full bg-[#3f5ca7] px-4 py-3 text-sm font-semibold text-white hover:bg-[#304885]"
+              >
+                Sim, avançar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 }
