@@ -39,17 +39,17 @@ export default function Admin() {
   };
 
   const [formData, setFormData] = useState(initialFormState);
-  const [statusMessage, setStatusMessage] = useState('');
+  const [status, setStatus] = useState({ text: '', isError: false });
 
   const updateField = (field: string, value: string) => {
     setFormData((current) => ({ ...current, [field]: value }));
-    setStatusMessage('');
+    setStatus({ text: '', isError: false });
   };
 
   const handleSectionChange = (section: 'partido' | 'politico') => {
     setActiveSection(section);
     setFormData(initialFormState);
-    setStatusMessage('');
+    setStatus({ text: '', isError: false });
   };
 
   const handleAdd = () => {
@@ -67,36 +67,14 @@ export default function Admin() {
       );
 
       if (algumVazio) {
-        setStatusMessage('Preencha todos os campos do partido.');
+        setStatus({
+          text: 'Preencha todos os campos do partido.',
+          isError: true,
+        });
         return;
       }
 
-      /* 
-      LÓGICA DE INSERT DOS PARTIDOS
-      const query = `
-        INSERT INTO dados_politicos.partidos (
-          nome_completo, 
-          sigla, 
-          numero_legenda, 
-          presidente_nacional, 
-          data_fundacao, 
-          ideologia
-        ) VALUES (
-          $1, $2, $3, $4, $5, $6
-        ) RETURNING id;
-      `;
-      
-      const values = [
-        formData.nome, 
-        formData.sigla, 
-        parseInt(formData.numero), 
-        formData.presidente, 
-        formData.fundacao,
-        [formData.ideologia]
-      ];
-      */
-
-      setStatusMessage('Partido pronto para envio.');
+      setStatus({ text: 'Partido pronto para envio.', isError: false });
     } else {
       const camposObrigatorios = [
         'nome',
@@ -113,45 +91,20 @@ export default function Admin() {
       );
 
       if (algumVazio) {
-        setStatusMessage('Preencha todos os campos do candidato.');
+        setStatus({
+          text: 'Preencha todos os campos do candidato.',
+          isError: true,
+        });
         return;
       }
 
-      /* 
-      LÓGICA DE INSERT DOS CANDIDATOS
-      const query = `
-        INSERT INTO dados_politicos.candidatos (
-          nome_completo, 
-          nome_politico, 
-          numero_urna, 
-          candidatura, 
-          cargo_atual, 
-          uf_candidatura, 
-          partido_id,
-          feitos_resumo
-        ) VALUES (
-          $1, $2, $3, $4, $5, $6, $7, $8
-        ) RETURNING id;
-      `;
-      
-      const values = [
-        formData.nome,
-        formData.nome,
-        parseInt(formData.numero), 
-        formData.cargo,
-        formData.cargo, 
-        formData.estado,
-        "uuid-do-partido-aqui",
-        [formData.descricao]
-      ];
-      */
-
-      setStatusMessage('Candidato pronto para envio.');
+      setStatus({ text: 'Candidato pronto para envio.', isError: false });
     }
   };
 
   return (
     <section className="relative min-h-[100dvh] bg-[#f8fbff] text-[#1f2332]">
+      {}
       <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
         {bolasConfig.map((b, i) => (
           <div
@@ -172,6 +125,7 @@ export default function Admin() {
       </div>
 
       <div className="relative z-10">
+        {}
         <div className="fixed top-0 left-0 right-0 z-[1000]">
           <div className="mx-[62px] mt-[42px] flex h-[80px] w-[calc(100%-124px)] items-center justify-between rounded-full border-2 border-[#3f5ca7] bg-white pl-[38px] pr-[11.5px] py-[11.5px]">
             <div className="flex items-center gap-4">
@@ -185,7 +139,6 @@ export default function Admin() {
                 </h1>
               </div>
             </div>
-
             <div>
               <button
                 type="button"
@@ -234,48 +187,49 @@ export default function Admin() {
 
                   <div className="rounded-[28px] bg-[#f5f8ff] p-6">
                     <div className="mt-2 grid gap-4 sm:grid-cols-2">
+                      {}
                       {activeSection === 'partido' ? (
                         <>
                           <Textbox
                             placeholder="Nome"
                             value={formData.nome}
-                            onChange={(event) =>
-                              updateField('nome', event.target.value)
+                            onChange={(e) =>
+                              updateField('nome', e.target.value)
                             }
                           />
                           <Textbox
                             placeholder="Sigla"
                             value={formData.sigla}
-                            onChange={(event) =>
-                              updateField('sigla', event.target.value)
+                            onChange={(e) =>
+                              updateField('sigla', e.target.value)
                             }
                           />
                           <Textbox
                             placeholder="Número"
                             value={formData.numero}
-                            onChange={(event) =>
-                              updateField('numero', event.target.value)
+                            onChange={(e) =>
+                              updateField('numero', e.target.value)
                             }
                           />
                           <Textbox
                             placeholder="Presidente"
                             value={formData.presidente}
-                            onChange={(event) =>
-                              updateField('presidente', event.target.value)
+                            onChange={(e) =>
+                              updateField('presidente', e.target.value)
                             }
                           />
                           <Textbox
                             placeholder="Fundação"
                             value={formData.fundacao}
-                            onChange={(event) =>
-                              updateField('fundacao', event.target.value)
+                            onChange={(e) =>
+                              updateField('fundacao', e.target.value)
                             }
                           />
                           <Textbox
                             placeholder="Ideologia"
                             value={formData.ideologia}
-                            onChange={(event) =>
-                              updateField('ideologia', event.target.value)
+                            onChange={(e) =>
+                              updateField('ideologia', e.target.value)
                             }
                           />
                         </>
@@ -284,57 +238,57 @@ export default function Admin() {
                           <Textbox
                             placeholder="Nome"
                             value={formData.nome}
-                            onChange={(event) =>
-                              updateField('nome', event.target.value)
+                            onChange={(e) =>
+                              updateField('nome', e.target.value)
                             }
                           />
                           <Textbox
                             placeholder="Partido"
                             value={formData.partido}
-                            onChange={(event) =>
-                              updateField('partido', event.target.value)
+                            onChange={(e) =>
+                              updateField('partido', e.target.value)
                             }
                           />
                           <Textbox
                             placeholder="Cargo"
                             value={formData.cargo}
-                            onChange={(event) =>
-                              updateField('cargo', event.target.value)
+                            onChange={(e) =>
+                              updateField('cargo', e.target.value)
                             }
                           />
                           <Textbox
                             placeholder="Gênero"
                             value={formData.genero}
-                            onChange={(event) =>
-                              updateField('genero', event.target.value)
+                            onChange={(e) =>
+                              updateField('genero', e.target.value)
                             }
                           />
                           <Textbox
                             placeholder="Estado"
                             value={formData.estado}
-                            onChange={(event) =>
-                              updateField('estado', event.target.value)
+                            onChange={(e) =>
+                              updateField('estado', e.target.value)
                             }
                           />
                           <Textbox
                             placeholder="Idade"
                             value={formData.idade}
-                            onChange={(event) =>
-                              updateField('idade', event.target.value)
+                            onChange={(e) =>
+                              updateField('idade', e.target.value)
                             }
                           />
                           <Textbox
                             placeholder="Número"
                             value={formData.numero}
-                            onChange={(event) =>
-                              updateField('numero', event.target.value)
+                            onChange={(e) =>
+                              updateField('numero', e.target.value)
                             }
                           />
                           <Textbox
                             placeholder="Descrição"
                             value={formData.descricao}
-                            onChange={(event) =>
-                              updateField('descricao', event.target.value)
+                            onChange={(e) =>
+                              updateField('descricao', e.target.value)
                             }
                             className="sm:col-span-2"
                           />
@@ -351,22 +305,31 @@ export default function Admin() {
                         type="button"
                         onClick={() => {
                           setFormData(initialFormState);
-                          setStatusMessage('Campos limpos.');
+                          setStatus({ text: 'Campos limpos.', isError: false });
                         }}
                         className="rounded-full border border-[#3f5ca7] bg-white px-5 py-3 text-sm font-semibold text-[#3f5ca7] transition hover:bg-[#eef2ff]"
                       >
                         Limpar campos
                       </button>
                     </div>
-                    {statusMessage && (
-                      <div className="mt-4 rounded-[20px] bg-[#fee2e2] px-4 py-3 text-sm text-[#dc2626] border border-[#fca5a5]">
-                        {statusMessage}
+
+                    {}
+                    {status.text && (
+                      <div
+                        className={`mt-4 rounded-[20px] px-4 py-3 text-sm border ${
+                          status.isError
+                            ? 'bg-[#fee2e2] text-[#dc2626] border-[#fca5a5]'
+                            : 'bg-[#eef2ff] text-[#3f5ca7] border-[#d7e0ff]'
+                        }`}
+                      >
+                        {status.text}
                       </div>
                     )}
                   </div>
                 </div>
               </div>
 
+              {}
               <aside className="space-y-6">
                 <div className="rounded-[32px] border border-[#d9e2ff] bg-white p-6 shadow-[0_18px_40px_-20px_rgba(15,23,42,0.2)]">
                   <p className="text-sm uppercase tracking-[0.28em] text-[#3f5ca7]">
