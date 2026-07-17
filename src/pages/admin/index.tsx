@@ -135,11 +135,11 @@ export default function Admin() {
     } else {
       const camposObrigatorios = [
         'nome',
-        'partido',
-        'cargo',
+        'datanasc',
         'genero',
         'estado',
-        'datanasc',
+        'partido',
+        'cargo',
         'numero',
       ];
       const algumVazio = camposObrigatorios.some(
@@ -330,23 +330,23 @@ export default function Admin() {
                           </div>
                           <div className="flex flex-col gap-1.5">
                             <label className="text-xs font-semibold text-[#3f5ca7] uppercase tracking-wider ml-1">
-                              Ideologia (Opcional)
-                            </label>
-                            <Textbox
-                              value={formData.ideologia}
-                              onChange={(e) =>
-                                updateField('ideologia', e.target.value)
-                              }
-                            />
-                          </div>
-                          <div className="flex flex-col gap-1.5">
-                            <label className="text-xs font-semibold text-[#3f5ca7] uppercase tracking-wider ml-1">
                               Foto (URL)
                             </label>
                             <Textbox
                               value={formData.foto}
                               onChange={(e) =>
                                 updateField('foto', e.target.value)
+                              }
+                            />
+                          </div>
+                          <div className="flex flex-col gap-1.5 sm:col-span-2">
+                            <label className="text-xs font-semibold text-[#3f5ca7] uppercase tracking-wider ml-1">
+                              Ideologia (Opcional)
+                            </label>
+                            <Textarea
+                              value={formData.ideologia}
+                              onChange={(e) =>
+                                updateField('ideologia', e.target.value)
                               }
                             />
                           </div>
@@ -449,7 +449,7 @@ export default function Admin() {
                           </div>
                           <div className="flex flex-col gap-1.5 sm:col-span-2">
                             <label className="text-xs font-semibold text-[#3f5ca7] uppercase tracking-wider ml-1">
-                              Descrição
+                              Descrição (Opcional)
                             </label>
                             <Textarea
                               value={formData.descricao}
