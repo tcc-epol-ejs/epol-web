@@ -5,6 +5,7 @@ import Botao from '../../components/botoes/botao';
 import Textbox from '../../components/inputs';
 import Select from '../../components/selects';
 import LogoEPOL from '../../assets/SVGs/LogoEPOL.svg';
+import Textarea from '../../components/inputs/textarea';
 
 const bolasConfig = [
   { size: 280, top: '-40px', left: '-30px', opacity: 0.25 },
@@ -446,16 +447,15 @@ export default function Admin() {
                               }
                             />
                           </div>
-                          <div className="flex flex-col gap-1.5">
+                          <div className="flex flex-col gap-1.5 sm:col-span-2">
                             <label className="text-xs font-semibold text-[#3f5ca7] uppercase tracking-wider ml-1">
-                              Descrição (Opcional)
+                              Descrição
                             </label>
-                            <Textbox
+                            <Textarea
                               value={formData.descricao}
                               onChange={(e) =>
                                 updateField('descricao', e.target.value)
                               }
-                              className="sm:col-span-2"
                             />
                           </div>
                         </>
