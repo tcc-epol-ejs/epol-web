@@ -192,7 +192,7 @@ export default function Admin() {
                 onClick={() => navigate('/')}
                 className="rounded-full border border-[#3f5ca7] bg-white px-4 py-4 text-sm font-semibold text-[#3f5ca7] hover:bg-[#eef2ff]"
               >
-                Voltar ao site
+                Voltar ao site principal
               </button>
             </div>
           </div>
