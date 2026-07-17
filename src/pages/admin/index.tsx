@@ -70,7 +70,7 @@ export default function Admin() {
     cargo: '',
     genero: '',
     estado: '',
-    idade: '',
+    datanasc: '',
     descricao: '',
     foto: '',
   };
@@ -138,7 +138,7 @@ export default function Admin() {
         'cargo',
         'genero',
         'estado',
-        'idade',
+        'datanasc',
         'numero',
       ];
       const algumVazio = camposObrigatorios.some(
@@ -157,6 +157,24 @@ export default function Admin() {
       if (numero < 10 || numero > 90) {
         setStatus({
           text: 'O número deve estar entre 10 e 90.',
+          isError: true,
+        });
+        return;
+      }
+
+      const idademin = Number(formData.datanasc);
+      if (idademin < 30) {
+        setStatus({
+          text: 'A idade mínima é de 30 anos.',
+          isError: true,
+        });
+        return;
+      }
+
+      const idademax = Number(formData.datanasc);
+      if (idademax > 99) {
+        setStatus({
+          text: 'A idade máxima é de 99 anos.',
           isError: true,
         });
         return;
@@ -254,125 +272,192 @@ export default function Admin() {
                       {}
                       {activeSection === 'partido' ? (
                         <>
-                          <Textbox
-                            placeholder="Nome"
-                            value={formData.nome}
-                            onChange={(e) =>
-                              updateField('nome', e.target.value)
-                            }
-                          />
-                          <Textbox
-                            placeholder="Sigla"
-                            value={formData.sigla}
-                            onChange={(e) =>
-                              updateField('sigla', e.target.value)
-                            }
-                          />
-                          <Textbox
-                            placeholder="Número"
-                            value={formData.numero}
-                            type="number"
-                            onChange={handleNumeroChange}
-                          />
-                          <Textbox
-                            placeholder="Presidente"
-                            value={formData.presidente}
-                            onChange={(e) =>
-                              updateField('presidente', e.target.value)
-                            }
-                          />
-                          <Textbox
-                            placeholder="Fundação"
-                            value={formData.fundacao}
-                            type="date"
-                            onChange={(e) =>
-                              updateField('fundacao', e.target.value)
-                            }
-                          />
-                          <Textbox
-                            placeholder="Ideologia"
-                            value={formData.ideologia}
-                            onChange={(e) =>
-                              updateField('ideologia', e.target.value)
-                            }
-                          />
-                          <Textbox
-                            placeholder="Foto (URL)"
-                            value={formData.foto}
-                            onChange={(e) =>
-                              updateField('foto', e.target.value)
-                            }
-                          />
+                          <div className="flex flex-col gap-1.5">
+                            <label className="text-xs font-semibold text-[#3f5ca7] uppercase tracking-wider ml-1">
+                              Nome Completo
+                            </label>
+                            <Textbox
+                              value={formData.nome}
+                              onChange={(e) =>
+                                updateField('nome', e.target.value)
+                              }
+                            />
+                          </div>
+                          <div className="flex flex-col gap-1.5">
+                            <label className="text-xs font-semibold text-[#3f5ca7] uppercase tracking-wider ml-1">
+                              Sigla
+                            </label>
+                            <Textbox
+                              value={formData.sigla}
+                              onChange={(e) =>
+                                updateField('sigla', e.target.value)
+                              }
+                            />
+                          </div>
+                          <div className="flex flex-col gap-1.5">
+                            <label className="text-xs font-semibold text-[#3f5ca7] uppercase tracking-wider ml-1">
+                              Número
+                            </label>
+                            <Textbox
+                              value={formData.numero}
+                              type="number"
+                              onChange={handleNumeroChange}
+                            />
+                          </div>
+                          <div className="flex flex-col gap-1.5">
+                            <label className="text-xs font-semibold text-[#3f5ca7] uppercase tracking-wider ml-1">
+                              Presidente
+                            </label>
+                            <Textbox
+                              value={formData.presidente}
+                              onChange={(e) =>
+                                updateField('presidente', e.target.value)
+                              }
+                            />
+                          </div>
+                          <div className="flex flex-col gap-1.5">
+                            <label className="text-xs font-semibold text-[#3f5ca7] uppercase tracking-wider ml-1">
+                              Fundação
+                            </label>
+                            <Textbox
+                              value={formData.fundacao}
+                              type="date"
+                              onChange={(e) =>
+                                updateField('fundacao', e.target.value)
+                              }
+                            />
+                          </div>
+                          <div className="flex flex-col gap-1.5">
+                            <label className="text-xs font-semibold text-[#3f5ca7] uppercase tracking-wider ml-1">
+                              Ideologia (Opcional)
+                            </label>
+                            <Textbox
+                              value={formData.ideologia}
+                              onChange={(e) =>
+                                updateField('ideologia', e.target.value)
+                              }
+                            />
+                          </div>
+                          <div className="flex flex-col gap-1.5">
+                            <label className="text-xs font-semibold text-[#3f5ca7] uppercase tracking-wider ml-1">
+                              Foto (URL)
+                            </label>
+                            <Textbox
+                              value={formData.foto}
+                              onChange={(e) =>
+                                updateField('foto', e.target.value)
+                              }
+                            />
+                          </div>
                         </>
                       ) : (
                         <>
-                          <Textbox
-                            placeholder="Nome"
-                            value={formData.nome}
-                            onChange={(e) =>
-                              updateField('nome', e.target.value)
-                            }
-                          />
-                          <Textbox
-                            placeholder="Partido"
-                            value={formData.partido}
-                            onChange={(e) =>
-                              updateField('partido', e.target.value)
-                            }
-                          />
-                          <Select
-                            placeholder="Cargo"
-                            options={cargos}
-                            value={formData.cargo}
-                            onChange={(e) =>
-                              updateField('cargo', e.target.value)
-                            }
-                          />
-                          <Select
-                            placeholder="Gênero"
-                            options={generos}
-                            value={formData.genero}
-                            onChange={(e) =>
-                              updateField('genero', e.target.value)
-                            }
-                          />
-                          <Select
-                            placeholder="Estado"
-                            options={estadosBrasil}
-                            value={formData.estado}
-                            onChange={(e) =>
-                              updateField('estado', e.target.value)
-                            }
-                          />
-                          <Textbox
-                            placeholder="Idade"
-                            value={formData.idade}
-                            type="number"
-                            onChange={(e) =>
-                              updateField('idade', e.target.value)
-                            }
-                          />
-                          <Textbox
-                            placeholder="Número"
-                            value={formData.numero}
-                            type="number"
-                            onChange={handleNumeroChange}
-                          />
-                          <Textbox
-                            placeholder="Descrição"
-                            value={formData.descricao}
-                            onChange={(e) =>
-                              updateField('descricao', e.target.value)
-                            }
-                            className="sm:col-span-2"
-                          />
-                          <Textbox
-                            placeholder="Foto (URL)"
-                            value={formData.foto}
-                            onChange={(e) =>
-                              updateField('foto', e.target.value)
-                            }
-                          />
+                          <div className="flex flex-col gap-1.5">
+                            <label className="text-xs font-semibold text-[#3f5ca7] uppercase tracking-wider ml-1">
+                              Nome Completo
+                            </label>
+                            <Textbox
+                              value={formData.nome}
+                              onChange={(e) =>
+                                updateField('nome', e.target.value)
+                              }
+                            />
+                          </div>
+                          <div className="flex flex-col gap-1.5">
+                            <label className="text-xs font-semibold text-[#3f5ca7] uppercase tracking-wider ml-1">
+                              Data de Nascimento
+                            </label>
+                            <Textbox
+                              type="date"
+                              value={formData.datanasc}
+                              onChange={(e) =>
+                                updateField('datanasc', e.target.value)
+                              }
+                            />
+                          </div>
+                          <div className="flex flex-col gap-1.5">
+                            <label className="text-xs font-semibold text-[#3f5ca7] uppercase tracking-wider ml-1">
+                              Gênero
+                            </label>
+                            <Select
+                              placeholder=" "
+                              options={generos}
+                              value={formData.genero}
+                              onChange={(e) =>
+                                updateField('genero', e.target.value)
+                              }
+                            />
+                          </div>
+                          <div className="flex flex-col gap-1.5">
+                            <label className="text-xs font-semibold text-[#3f5ca7] uppercase tracking-wider ml-1">
+                              Estado
+                            </label>
+                            <Select
+                              placeholder=" "
+                              options={estadosBrasil}
+                              value={formData.estado}
+                              onChange={(e) =>
+                                updateField('estado', e.target.value)
+                              }
+                            />
+                          </div>
+                          <div className="flex flex-col gap-1.5">
+                            <label className="text-xs font-semibold text-[#3f5ca7] uppercase tracking-wider ml-1">
+                              Partido
+                            </label>
+                            <Textbox
+                              value={formData.partido}
+                              onChange={(e) =>
+                                updateField('partido', e.target.value)
+                              }
+                            />
+                          </div>
+                          <div className="flex flex-col gap-1.5">
+                            <label className="text-xs font-semibold text-[#3f5ca7] uppercase tracking-wider ml-1">
+                              Cargo de Candidatura
+                            </label>
+                            <Select
+                              placeholder=" "
+                              options={cargos}
+                              value={formData.cargo}
+                              onChange={(e) =>
+                                updateField('cargo', e.target.value)
+                              }
+                            />
+                          </div>
+                          <div className="flex flex-col gap-1.5">
+                            <label className="text-xs font-semibold text-[#3f5ca7] uppercase tracking-wider ml-1">
+                              Número da Urna
+                            </label>
+                            <Textbox
+                              value={formData.numero}
+                              type="number"
+                              onChange={handleNumeroChange}
+                            />
+                          </div>
+                          <div className="flex flex-col gap-1.5">
+                            <label className="text-xs font-semibold text-[#3f5ca7] uppercase tracking-wider ml-1">
+                              Foto (URL)
+                            </label>
+                            <Textbox
+                              value={formData.foto}
+                              onChange={(e) =>
+                                updateField('foto', e.target.value)
+                              }
+                            />
+                          </div>
+                          <div className="flex flex-col gap-1.5">
+                            <label className="text-xs font-semibold text-[#3f5ca7] uppercase tracking-wider ml-1">
+                              Descrição (Opcional)
+                            </label>
+                            <Textbox
+                              value={formData.descricao}
+                              onChange={(e) =>
+                                updateField('descricao', e.target.value)
+                              }
+                              className="sm:col-span-2"
+                            />
+                          </div>
                         </>
                       )}
                     </div>
