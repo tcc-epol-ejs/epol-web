@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Botao from '../../components/botoes/botao';
 import Textbox from '../../components/inputs';
+import Select from '../../components/selects';
 import LogoEPOL from '../../assets/SVGs/LogoEPOL.svg';
 
 const bolasConfig = [
@@ -16,6 +17,40 @@ const bolasConfig = [
   { size: 300, bottom: '-60px', right: '-40px', opacity: 0.25 },
   { size: 160, bottom: '120px', right: '200px', opacity: 0.15 },
 ];
+
+const estadosBrasil = [
+  'AC',
+  'AL',
+  'AP',
+  'AM',
+  'BA',
+  'CE',
+  'DF',
+  'ES',
+  'GO',
+  'MA',
+  'MT',
+  'MS',
+  'MG',
+  'PA',
+  'PB',
+  'PR',
+  'PE',
+  'PI',
+  'RJ',
+  'RN',
+  'RS',
+  'RO',
+  'RR',
+  'SC',
+  'SP',
+  'SE',
+  'TO',
+];
+
+const generos = ['Masculino', 'Feminino', 'Não binário', 'Outro'];
+
+const cargos = ['Presidente', 'Vice-presidente', 'Governador'];
 
 export default function Admin() {
   const navigate = useNavigate();
@@ -249,22 +284,25 @@ export default function Admin() {
                               updateField('partido', e.target.value)
                             }
                           />
-                          <Textbox
+                          <Select
                             placeholder="Cargo"
+                            options={cargos}
                             value={formData.cargo}
                             onChange={(e) =>
                               updateField('cargo', e.target.value)
                             }
                           />
-                          <Textbox
+                          <Select
                             placeholder="Gênero"
+                            options={generos}
                             value={formData.genero}
                             onChange={(e) =>
                               updateField('genero', e.target.value)
                             }
                           />
-                          <Textbox
+                          <Select
                             placeholder="Estado"
+                            options={estadosBrasil}
                             value={formData.estado}
                             onChange={(e) =>
                               updateField('estado', e.target.value)
