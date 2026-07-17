@@ -74,7 +74,7 @@ export default function Admin() {
         return;
       }
 
-      setStatus({ text: 'Partido pronto para envio.', isError: false });
+      setStatus({ text: 'Partido adicionado com sucesso!', isError: false });
     } else {
       const camposObrigatorios = [
         'nome',
@@ -98,7 +98,7 @@ export default function Admin() {
         return;
       }
 
-      setStatus({ text: 'Candidato pronto para envio.', isError: false });
+      setStatus({ text: 'Candidato adicionado com sucesso!', isError: false });
     }
   };
 
