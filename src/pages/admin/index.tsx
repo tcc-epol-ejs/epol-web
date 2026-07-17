@@ -54,8 +54,20 @@ export default function Admin() {
 
   const handleAdd = () => {
     if (activeSection === 'partido') {
-      if (!formData.nome.trim() || !formData.sigla.trim()) {
-        setStatusMessage('Preencha nome e sigla do partido.');
+      const camposObrigatorios = [
+        'nome',
+        'sigla',
+        'numero',
+        'presidente',
+        'fundacao',
+        'ideologia',
+      ];
+      const algumVazio = camposObrigatorios.some(
+        (campo) => !formData[campo as keyof typeof formData].trim(),
+      );
+
+      if (algumVazio) {
+        setStatusMessage('Preencha todos os campos do partido.');
         return;
       }
 
@@ -79,15 +91,29 @@ export default function Admin() {
         formData.sigla, 
         parseInt(formData.numero), 
         formData.presidente, 
-        formData.fundacao, // formato YYYY-MM-DD
+        formData.fundacao,
         [formData.ideologia]
       ];
       */
 
       setStatusMessage('Partido pronto para envio.');
     } else {
-      if (!formData.nome.trim() || !formData.partido.trim()) {
-        setStatusMessage('Preencha nome e partido do candidato.');
+      const camposObrigatorios = [
+        'nome',
+        'partido',
+        'cargo',
+        'genero',
+        'estado',
+        'idade',
+        'numero',
+        'descricao',
+      ];
+      const algumVazio = camposObrigatorios.some(
+        (campo) => !formData[campo as keyof typeof formData].trim(),
+      );
+
+      if (algumVazio) {
+        setStatusMessage('Preencha todos os campos do candidato.');
         return;
       }
 
@@ -189,7 +215,6 @@ export default function Admin() {
                     <div className="flex gap-2 rounded-full bg-[#eef2ff] p-1">
                       <button
                         type="button"
-                        // Usando a nova função em vez de setActiveSection direto
                         onClick={() => handleSectionChange('partido')}
                         className={`rounded-full px-4 py-2 text-sm font-semibold transition ${activeSection === 'partido' ? 'bg-[#3f5ca7] text-white' : 'text-[#3f5ca7] hover:bg-[#d7e0ff]'}`}
                       >
@@ -197,7 +222,6 @@ export default function Admin() {
                       </button>
                       <button
                         type="button"
-                        // Usando a nova função em vez de setActiveSection direto
                         onClick={() => handleSectionChange('politico')}
                         className={`rounded-full px-4 py-2 text-sm font-semibold transition ${activeSection === 'politico' ? 'bg-[#3f5ca7] text-white' : 'text-[#3f5ca7] hover:bg-[#d7e0ff]'}`}
                       >
@@ -328,7 +352,7 @@ export default function Admin() {
                       <button
                         type="button"
                         onClick={() => {
-                          setFormData(initialFormState); // Reutilizando o estado inicial para limpar
+                          setFormData(initialFormState);
                           setStatusMessage('Campos limpos.');
                         }}
                         className="rounded-full border border-[#3f5ca7] bg-white px-5 py-3 text-sm font-semibold text-[#3f5ca7] transition hover:bg-[#eef2ff]"
@@ -337,7 +361,7 @@ export default function Admin() {
                       </button>
                     </div>
                     {statusMessage && (
-                      <div className="mt-4 rounded-[20px] bg-[#e8f0ff] px-4 py-3 text-sm text-[#34418a]">
+                      <div className="mt-4 rounded-[20px] bg-[#fee2e2] px-4 py-3 text-sm text-[#dc2626] border border-[#fca5a5]">
                         {statusMessage}
                       </div>
                     )}
