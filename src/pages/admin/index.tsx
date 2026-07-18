@@ -54,6 +54,16 @@ const generos = ['Masculino', 'Feminino', 'Não binário', 'Outro'];
 
 const cargos = ['Presidente', 'Vice-presidente', 'Governador'];
 
+// Função auxiliar para validar URL
+const isValidUrl = (urlString: string) => {
+  try {
+    new URL(urlString);
+    return true;
+  } catch (e) {
+    return false;
+  }
+};
+
 export default function Admin() {
   const navigate = useNavigate();
   const [activeSection, setActiveSection] = useState<'partido' | 'politico'>(
@@ -190,6 +200,16 @@ export default function Admin() {
         return;
       }
     }
+
+    // Validação da Foto (Opcional, mas se preenchida deve ser uma URL válida)
+    if (formData.foto && !isValidUrl(formData.foto)) {
+      setStatus({
+        text: 'A URL da foto é inválida. Certifique-se de começar com http:// ou https://',
+        isError: true,
+      });
+      return;
+    }
+
     setIsModalOpen(true);
   };
 
@@ -557,7 +577,7 @@ export default function Admin() {
               </button>
               <button
                 onClick={handleConfirmAdd}
-                className="flex-1 rounded-full bg-[#3f5ca7] px-4 py-3 text-sm font-semibold text-white hover:bg-[#304885]"
+                className="flex-1 rounded-full bg-[#2a2a72] px-4 py-3 text-sm font-semibold text-white hover:brightness-[.9]"
               >
                 Sim, avançar
               </button>
