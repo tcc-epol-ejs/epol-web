@@ -50,11 +50,20 @@ const estadosBrasil = [
   'TO',
 ];
 
-const generos = ['Masculino', 'Feminino', 'Não binário', 'Outro'];
-
 const cargos = ['Presidente', 'Vice-presidente', 'Governador'];
+const cargos_atuais = [
+  'Presidente',
+  'Vice-presidente',
+  'Governador',
+  'Vice-Governador',
+  'Senador',
+  'Deputado Federal',
+  'Deputado Estadual',
+  'Prefeito',
+  'Vice-prefeito',
+  'Vereador',
+];
 
-// Função auxiliar para validar URL
 const isValidUrl = (urlString: string) => {
   try {
     new URL(urlString);
@@ -74,15 +83,16 @@ export default function Admin() {
     nome: '',
     sigla: '',
     numero: '',
-    presidente: '',
     fundacao: '',
+    presidente: '',
     ideologia: '',
-    partido: '',
     cargo: '',
-    genero: '',
-    estado: '',
-    datanasc: '',
-    descricao: '',
+    nome_politico: '',
+    data_nascimento: '',
+    naturalidade: '',
+    uf_naturalidade: '',
+    cargo_atual: '',
+    feitos: '',
     foto: '',
   };
 
@@ -117,8 +127,8 @@ export default function Admin() {
         'nome',
         'sigla',
         'numero',
-        'presidente',
         'fundacao',
+        'presidente',
       ];
       const algumVazio = camposObrigatorios.some(
         (campo) => !formData[campo as keyof typeof formData].trim(),
@@ -143,12 +153,13 @@ export default function Admin() {
     } else {
       const camposObrigatorios = [
         'nome',
-        'datanasc',
-        'genero',
-        'estado',
-        'partido',
-        'cargo',
         'numero',
+        'cargo',
+        'nome_politico',
+        'data_nascimento',
+        'naturalidade',
+        'uf_naturalidade',
+        'cargo_atual',
       ];
       const algumVazio = camposObrigatorios.some(
         (campo) => !formData[campo as keyof typeof formData].trim(),
@@ -171,7 +182,7 @@ export default function Admin() {
         return;
       }
 
-      const dataNascimento = new Date(formData.datanasc);
+      const dataNascimento = new Date(formData.data_nascimento);
       const hoje = new Date();
 
       let idade = hoje.getFullYear() - dataNascimento.getFullYear();
@@ -201,7 +212,6 @@ export default function Admin() {
       }
     }
 
-    // Validação da Foto (Opcional, mas se preenchida deve ser uma URL válida)
     if (formData.foto && !isValidUrl(formData.foto)) {
       setStatus({
         text: 'A URL da foto é inválida. Certifique-se de começar com http:// ou https://',
@@ -220,7 +230,7 @@ export default function Admin() {
         : 'Candidato adicionado com sucesso!';
 
     setStatus({ text: mensagem, isError: false });
-    setIsModalOpen(false); // Fecha o modal
+    setIsModalOpen(false);
   };
 
   return (
@@ -345,24 +355,24 @@ export default function Admin() {
                           </div>
                           <div className="flex flex-col gap-1.5">
                             <label className="text-xs font-semibold text-[#3f5ca7] uppercase tracking-wider ml-1">
-                              Presidente
-                            </label>
-                            <Textbox
-                              value={formData.presidente}
-                              onChange={(e) =>
-                                updateField('presidente', e.target.value)
-                              }
-                            />
-                          </div>
-                          <div className="flex flex-col gap-1.5">
-                            <label className="text-xs font-semibold text-[#3f5ca7] uppercase tracking-wider ml-1">
-                              Fundação
+                              Data de Fundação
                             </label>
                             <Textbox
                               value={formData.fundacao}
                               type="date"
                               onChange={(e) =>
                                 updateField('fundacao', e.target.value)
+                              }
+                            />
+                          </div>
+                          <div className="flex flex-col gap-1.5">
+                            <label className="text-xs font-semibold text-[#3f5ca7] uppercase tracking-wider ml-1">
+                              Presidente
+                            </label>
+                            <Textbox
+                              value={formData.presidente}
+                              onChange={(e) =>
+                                updateField('presidente', e.target.value)
                               }
                             />
                           </div>
@@ -404,26 +414,24 @@ export default function Admin() {
                           </div>
                           <div className="flex flex-col gap-1.5">
                             <label className="text-xs font-semibold text-[#3f5ca7] uppercase tracking-wider ml-1">
-                              Data de Nascimento
+                              Nome Político
                             </label>
                             <Textbox
-                              type="date"
-                              value={formData.datanasc}
+                              value={formData.nome_politico}
                               onChange={(e) =>
-                                updateField('datanasc', e.target.value)
+                                updateField('nome_politico', e.target.value)
                               }
                             />
                           </div>
                           <div className="flex flex-col gap-1.5">
                             <label className="text-xs font-semibold text-[#3f5ca7] uppercase tracking-wider ml-1">
-                              Gênero
+                              Data de Nascimento
                             </label>
-                            <Select
-                              placeholder=" "
-                              options={generos}
-                              value={formData.genero}
+                            <Textbox
+                              type="date"
+                              value={formData.data_nascimento}
                               onChange={(e) =>
-                                updateField('genero', e.target.value)
+                                updateField('data_nascimento', e.target.value)
                               }
                             />
                           </div>
@@ -434,20 +442,33 @@ export default function Admin() {
                             <Select
                               placeholder=" "
                               options={estadosBrasil}
-                              value={formData.estado}
+                              value={formData.uf_naturalidade}
                               onChange={(e) =>
-                                updateField('estado', e.target.value)
+                                updateField('uf_naturalidade', e.target.value)
                               }
                             />
                           </div>
                           <div className="flex flex-col gap-1.5">
                             <label className="text-xs font-semibold text-[#3f5ca7] uppercase tracking-wider ml-1">
-                              Partido
+                              Cidade
                             </label>
                             <Textbox
-                              value={formData.partido}
+                              value={formData.naturalidade}
                               onChange={(e) =>
-                                updateField('partido', e.target.value)
+                                updateField('naturalidade', e.target.value)
+                              }
+                            />
+                          </div>
+                          <div className="flex flex-col gap-1.5">
+                            <label className="text-xs font-semibold text-[#3f5ca7] uppercase tracking-wider ml-1">
+                              Cargo Atual
+                            </label>
+                            <Select
+                              placeholder=" "
+                              options={cargos_atuais}
+                              value={formData.cargo_atual}
+                              onChange={(e) =>
+                                updateField('cargo_atual', e.target.value)
                               }
                             />
                           </div>
@@ -487,12 +508,12 @@ export default function Admin() {
                           </div>
                           <div className="flex flex-col gap-1.5 sm:col-span-2">
                             <label className="text-xs font-semibold text-[#3f5ca7] uppercase tracking-wider ml-1">
-                              Descrição (Opcional)
+                              Feitos (Opcional)
                             </label>
                             <Textarea
-                              value={formData.descricao}
+                              value={formData.feitos}
                               onChange={(e) =>
-                                updateField('descricao', e.target.value)
+                                updateField('feitos', e.target.value)
                               }
                             />
                           </div>
