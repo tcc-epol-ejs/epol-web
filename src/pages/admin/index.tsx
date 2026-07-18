@@ -88,7 +88,6 @@ export default function Admin() {
   const handleNumeroChange = (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
 
-    // permite só dígitos, com no máximo 2 caracteres
     if (value !== '' && (!/^\d+$/.test(value) || value.length > 2)) {
       return;
     }
@@ -162,8 +161,20 @@ export default function Admin() {
         return;
       }
 
-      const idademin = Number(formData.datanasc);
-      if (idademin < 30) {
+      const dataNascimento = new Date(formData.datanasc);
+      const hoje = new Date();
+
+      let idade = hoje.getFullYear() - dataNascimento.getFullYear();
+      const mesAtual = hoje.getMonth();
+      const diaAtual = hoje.getDate();
+      const mesNasc = dataNascimento.getMonth();
+      const diaNasc = dataNascimento.getDate();
+
+      if (mesAtual < mesNasc || (mesAtual === mesNasc && diaAtual < diaNasc)) {
+        idade--;
+      }
+
+      if (idade < 30) {
         setStatus({
           text: 'A idade mínima é de 30 anos.',
           isError: true,
@@ -171,8 +182,7 @@ export default function Admin() {
         return;
       }
 
-      const idademax = Number(formData.datanasc);
-      if (idademax > 99) {
+      if (idade > 99) {
         setStatus({
           text: 'A idade máxima é de 99 anos.',
           isError: true,
