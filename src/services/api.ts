@@ -9,8 +9,12 @@ export interface Usuario {
 
 export const cadastrar = (dados: {
   nome: string;
+  apelido: string;
   email: string;
+  partido: string;
   senha: string;
+  estado: string;
+  data_nascimento: string;
 }) =>
   request<{ usuario: Usuario }>('/api/auth/cadastro', {
     method: 'POST',
