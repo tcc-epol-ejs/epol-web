@@ -1,6 +1,7 @@
 import { ChangeEvent, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { cadastrar } from '../../services/api';
+import { cadastrar, listarPartidos } from '../../services/api';
+import type { Partido } from '../../services/api';
 import { useAuth } from '../../contexts/AuthContext';
 import Textbox from '../../components/inputs';
 import Botao from '../../components/botoes/botao';
@@ -32,7 +33,7 @@ interface FormData {
   data_nascimento: string;
   email: string;
   confirmEmail: string;
-  partido: string;
+  partido_id: string;
   senha: string;
   confirmSenha: string;
   estado: string;
@@ -44,7 +45,7 @@ const initialFormData: FormData = {
   data_nascimento: '',
   email: '',
   confirmEmail: '',
-  partido: '',
+  partido_id: '',
   senha: '',
   confirmSenha: '',
   estado: '',
@@ -102,11 +103,6 @@ function validarCampo(
       return undefined;
     }
 
-    case 'partido': {
-      if (!dados.partido.trim()) return 'Informe o partido';
-      return undefined;
-    }
-
     case 'senha': {
       const valor = dados.senha;
       if (!valor) return 'Informe uma senha';
@@ -131,11 +127,11 @@ function validarCampo(
   }
 }
 
-// Campos que pertencem a cada passo
+// Campos que pertencem a cada passo (partido não entra aqui: é opcional, sem validação)
 const CAMPOS_POR_PASSO: Record<Passo, (keyof FormData)[]> = {
   1: ['nome', 'apelido', 'data_nascimento'],
   2: ['email', 'confirmEmail', 'estado'],
-  3: ['partido'],
+  3: [],
   4: ['senha', 'confirmSenha'],
 };
 
@@ -325,6 +321,7 @@ function DateField({
   placeholder?: string;
 }) {
   const [aberto, setAberto] = useState(false);
+  // 'dias' = calendário normal | 'anos' = grade rápida de anos (para pular décadas)
   const [visualizacao, setVisualizacao] = useState<'dias' | 'anos'>('dias');
   const dataSelecionada = parseISODate(value);
   const hoje = new Date();
@@ -612,7 +609,7 @@ function EstadoField({
   }
 
   return (
-    <div className="relative w-full custom-scroll" ref={containerRef}>
+    <div className="relative w-full" ref={containerRef}>
       <button
         type="button"
         onClick={() => setAberto((prev) => !prev)}
@@ -655,6 +652,161 @@ function EstadoField({
                 </button>
               );
             })}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// Seletor de partido customizado (mesmo estilo visual do calendário/estado)
+
+// Círculo com as iniciais da sigla, usado quando o partido não tem bandeira_url
+// (ou quando a imagem falha ao carregar)
+function IniciaisPartido({ sigla }: { sigla: string }) {
+  return (
+    <span className="w-6 h-6 rounded-full flex-shrink-0 bg-white/70 flex items-center justify-center text-[9px] font-bold text-[#2a2a72]">
+      {sigla.slice(0, 3)}
+    </span>
+  );
+}
+
+function PartidoField({
+  partidos,
+  carregando,
+  value,
+  onChange,
+  placeholder = 'Partido de preferência (opcional)',
+}: {
+  partidos: Partido[];
+  carregando?: boolean;
+  value: string;
+  onChange: (idPartido: string) => void;
+  placeholder?: string;
+}) {
+  const [aberto, setAberto] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const partidoSelecionado = partidos.find((p) => p.id === value);
+
+  useEffect(() => {
+    function aoClicarFora(event: MouseEvent) {
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(event.target as Node)
+      ) {
+        setAberto(false);
+      }
+    }
+    document.addEventListener('mousedown', aoClicarFora);
+    return () => document.removeEventListener('mousedown', aoClicarFora);
+  }, []);
+
+  function selecionar(idPartido: string) {
+    onChange(idPartido);
+    setAberto(false);
+  }
+
+  return (
+    <div className="relative w-full" ref={containerRef}>
+      <button
+        type="button"
+        onClick={() => setAberto((prev) => !prev)}
+        className="w-full flex items-center justify-between gap-2 rounded-full border border-[#a9a9f6] bg-[#a9a9f6] px-4 py-2.5 font-medium text-sm outline-none transition-all duration-300 focus:brightness-[1.2]"
+      >
+        <span className="flex items-center gap-2 min-w-0">
+          {partidoSelecionado &&
+            (partidoSelecionado.bandeira_url ? (
+              <img
+                src={partidoSelecionado.bandeira_url}
+                alt=""
+                className="w-5 h-5 rounded-full object-cover flex-shrink-0 bg-white"
+                onError={(e) => {
+                  (e.currentTarget as HTMLImageElement).style.display = 'none';
+                }}
+              />
+            ) : (
+              <IniciaisPartido sigla={partidoSelecionado.sigla} />
+            ))}
+          <span
+            className={`truncate ${value ? 'text-[#1f2a52]' : 'text-[#5A5A70]'}`}
+          >
+            {partidoSelecionado
+              ? `${partidoSelecionado.nome_completo} - ${partidoSelecionado.sigla}`
+              : placeholder}
+          </span>
+        </span>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="#2a2a72"
+          strokeWidth={2}
+          className="w-4 h-4 flex-shrink-0"
+        >
+          <path d="M6 9l6 6 6-6" />
+        </svg>
+      </button>
+
+      {aberto && (
+        <div className="absolute z-50 top-full left-0 mt-2 w-full max-h-72 overflow-y-auto rounded-2xl bg-[#A9A9F6] border border-[#8888D3] p-2 shadow-xl">
+          <div className="flex flex-col gap-0.5">
+            <button
+              type="button"
+              onClick={() => selecionar('')}
+              className={`text-left px-3 py-2 rounded-lg text-xs font-semibold transition-colors ${
+                value === ''
+                  ? 'bg-[#FFA400] text-white'
+                  : 'text-[#2a2a72] hover:bg-[#6262AD]/60'
+              }`}
+            >
+              Ainda não tenho um partido
+            </button>
+
+            {carregando && (
+              <p className="px-3 py-2 text-xs text-[#2a2a72]">
+                Carregando partidos...
+              </p>
+            )}
+
+            {!carregando && partidos.length === 0 && (
+              <p className="px-3 py-2 text-xs text-[#2a2a72]">
+                Não foi possível carregar os partidos.
+              </p>
+            )}
+
+            {!carregando &&
+              partidos.map((partido) => {
+                const selecionado = partido.id === value;
+                return (
+                  <button
+                    key={partido.id}
+                    type="button"
+                    onClick={() => selecionar(partido.id)}
+                    className={`flex items-center gap-2 text-left px-3 py-2 rounded-lg text-xs font-medium transition-colors ${
+                      selecionado
+                        ? 'bg-[#FFA400] text-white font-semibold'
+                        : 'text-[#2a2a72] hover:bg-[#6262AD]/60'
+                    }`}
+                  >
+                    {partido.bandeira_url ? (
+                      <img
+                        src={partido.bandeira_url}
+                        alt=""
+                        className="w-6 h-6 rounded-full object-cover flex-shrink-0 bg-white"
+                        onError={(e) => {
+                          (e.currentTarget as HTMLImageElement).style.display =
+                            'none';
+                        }}
+                      />
+                    ) : (
+                      <IniciaisPartido sigla={partido.sigla} />
+                    )}
+                    <span className="truncate">
+                      {partido.nome_completo} - {partido.sigla}
+                    </span>
+                  </button>
+                );
+              })}
           </div>
         </div>
       )}
@@ -718,6 +870,24 @@ function Cadastro() {
   const [toasts, setToasts] = useState<ToastItem[]>([]);
   const [enviando, setEnviando] = useState(false);
 
+  const [partidos, setPartidos] = useState<Partido[]>([]);
+  const [carregandoPartidos, setCarregandoPartidos] = useState(true);
+
+  useEffect(() => {
+    listarPartidos()
+      .then((data: Partido[]) => setPartidos(data))
+      .catch((err: any) => {
+        console.error('Erro ao buscar partidos:', err);
+        mostrarErro(
+          err?.message
+            ? `Não foi possível carregar os partidos: ${err.message}`
+            : 'Não foi possível carregar a lista de partidos.',
+        );
+      })
+      .finally(() => setCarregandoPartidos(false));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   function mostrarErro(mensagem: string) {
     setToasts((prev) => [
       ...prev,
@@ -742,6 +912,10 @@ function Cadastro() {
 
   function handleEstadoChange(nomeEstado: string) {
     setFormData((prev) => ({ ...prev, estado: nomeEstado }));
+  }
+
+  function handlePartidoChange(idPartido: string) {
+    setFormData((prev) => ({ ...prev, partido_id: idPartido }));
   }
 
   function validarPasso(passo: Passo): boolean {
@@ -778,7 +952,7 @@ function Cadastro() {
         apelido: formData.apelido.trim(),
         data_nascimento: formData.data_nascimento,
         email: formData.email.trim(),
-        partido: formData.partido.trim(),
+        partido_preferencia_id: formData.partido_id || null,
         senha: formData.senha,
         estado: formData.estado.trim(),
       });
@@ -908,10 +1082,11 @@ function Cadastro() {
               )}
 
               {step === 3 && (
-                <Textbox
-                  placeholder="Partido"
-                  value={formData.partido}
-                  onChange={handleChange('partido')}
+                <PartidoField
+                  partidos={partidos}
+                  carregando={carregandoPartidos}
+                  value={formData.partido_id}
+                  onChange={handlePartidoChange}
                 />
               )}
 
