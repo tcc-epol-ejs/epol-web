@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { ChangeEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Botao from '../../components/botoes/botao';
@@ -99,6 +99,19 @@ export default function Admin() {
   const [formData, setFormData] = useState(initialFormState);
   const [status, setStatus] = useState({ text: '', isError: false });
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [visible, setVisible] = useState(true);
+  const lastScrollY = useRef(0);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentY = window.scrollY;
+      setVisible(currentY < lastScrollY.current || currentY < 20);
+      lastScrollY.current = currentY;
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const updateField = (field: string, value: string) => {
     setFormData((current) => ({ ...current, [field]: value }));
@@ -258,9 +271,12 @@ export default function Admin() {
       <div className="relative z-10">
         {}
         <div className="fixed top-0 left-0 right-0 z-[1000]">
-          <div className="mx-[62px] mt-[42px] flex h-[80px] w-[calc(100%-124px)] items-center justify-between rounded-full border-2 border-[#3f5ca7] bg-white pl-[38px] pr-[11.5px] py-[11.5px]">
-            <div className="flex items-center gap-4">
+          <div
+            className={`mx-[62px] mt-[42px] flex h-[80px] w-[calc(100%-124px)] items-center justify-between rounded-full border-2 border-[#3f5ca7] bg-white pl-[38px] pr-[11.5px] py-[11.5px] transition-transform duration-[800ms] ease-in-out ${visible ? 'translate-y-0' : '-translate-y-[200px]'}`}
+          >
+            <div className="flex items-center gap-5">
               <img src={LogoEPOL} alt="Logo EPOL" className="w-[90px] mt-1.5" />
+              <div className="h-8 w-[1px] bg-[#CAD3EA]/30" />
               <div>
                 <p className="text-sm uppercase tracking-[0.28em] text-[#3f5ca7]">
                   Administração
@@ -274,7 +290,7 @@ export default function Admin() {
               <button
                 type="button"
                 onClick={() => navigate('/')}
-                className="rounded-full border border-[#3f5ca7] bg-white px-4 py-4 text-sm font-semibold text-[#3f5ca7] hover:bg-[#eef2ff]"
+                className="px-4 py-4 text-sm font-semibold text-[#3f5ca7] hover:underline"
               >
                 Voltar ao site principal
               </button>
