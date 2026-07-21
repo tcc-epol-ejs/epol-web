@@ -7,10 +7,21 @@ export interface Usuario {
   email: string;
 }
 
+export interface Partido {
+  id: string;
+  nome_completo: string;
+  sigla: string;
+  bandeira_url: string | null;
+}
+
 export const cadastrar = (dados: {
   nome: string;
+  apelido: string;
   email: string;
+  partido_preferencia_id: string | null;
   senha: string;
+  estado: string;
+  data_nascimento: string;
 }) =>
   request<{ usuario: Usuario }>('/api/auth/cadastro', {
     method: 'POST',
@@ -22,6 +33,8 @@ export const login = (email: string, senha: string) =>
     method: 'POST',
     body: JSON.stringify({ email, senha }),
   });
+
+export const listarPartidos = () => request<Partido[]>('/api/partidos');
 
 async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   const res = await fetch(`${API_URL}${path}`, {
