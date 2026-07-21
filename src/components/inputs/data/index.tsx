@@ -147,7 +147,7 @@ export default function DateField({
       <button
         type="button"
         onClick={alternarAberto}
-        className="w-full flex items-center justify-between rounded-full border px-4 py-2.5 font-medium text-sm outline-none transition-all duration-300 focus:brightness-[1.05]"
+        className="w-full flex items-center justify-between rounded-full border h-10 px-4 py-2.5 font-medium text-sm outline-none transition-all duration-300 focus:brightness-[1.05]"
         style={{ backgroundColor: corFundoCampo, borderColor: corBordaCampo }}
       >
         <span style={{ color: value ? corTexto : corPlaceholder }}>
@@ -182,7 +182,7 @@ export default function DateField({
                     type="button"
                     onClick={() => mudarAno(-1)}
                     aria-label="Ano anterior"
-                    className="px-1 transition-colors"
+                    className="px-1 transition-colors hover:!text-[#FFA400]"
                     style={{ color: corTexto }}
                   >
                     «
@@ -191,7 +191,7 @@ export default function DateField({
                     type="button"
                     onClick={() => mudarMes(-1)}
                     aria-label="Mês anterior"
-                    className="px-1 transition-colors"
+                    className="px-1 transition-colors hover:!text-[#FFA400]"
                     style={{ color: corTexto }}
                   >
                     ‹
@@ -200,7 +200,7 @@ export default function DateField({
                 <button
                   type="button"
                   onClick={() => setVisualizacao('anos')}
-                  className="text-xs font-semibold capitalize transition-colors"
+                  className="text-xs font-semibold capitalize transition-colors hover:!text-[#FFA400]"
                   style={{ color: corTexto }}
                 >
                   {NOMES_MESES[mes]} {ano}
@@ -210,7 +210,7 @@ export default function DateField({
                     type="button"
                     onClick={() => mudarMes(1)}
                     aria-label="Próximo mês"
-                    className="px-1 transition-colors"
+                    className="px-1 transition-colors hover:!text-[#FFA400]"
                     style={{ color: corTexto }}
                   >
                     ›
@@ -219,7 +219,7 @@ export default function DateField({
                     type="button"
                     onClick={() => mudarAno(1)}
                     aria-label="Próximo ano"
-                    className="px-1 transition-colors"
+                    className="px-1 transition-colors hover:!text-[#FFA400]"
                     style={{ color: corTexto }}
                   >
                     »
@@ -284,7 +284,7 @@ export default function DateField({
                   type="button"
                   onClick={() => mudarIntervaloAnos(-1)}
                   aria-label="Década anterior"
-                  className="px-1 transition-colors"
+                  className="px-1 transition-colors hover:!text-[#FFA400]"
                   style={{ color: corTexto }}
                 >
                   «
@@ -299,7 +299,7 @@ export default function DateField({
                   type="button"
                   onClick={() => mudarIntervaloAnos(1)}
                   aria-label="Próxima década"
-                  className="px-1 transition-colors"
+                  className="px-1 transition-colors hover:!text-[#FFA400]"
                   style={{ color: corTexto }}
                 >
                   »

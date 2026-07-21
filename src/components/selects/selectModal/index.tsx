@@ -63,11 +63,11 @@ export default function ModalSelectField({
   }
 
   return (
-    <div className="relative w-full" ref={containerRef}>
+    <div className="relative w-full custom-scroll" ref={containerRef}>
       <button
         type="button"
         onClick={() => setAberto((prev) => !prev)}
-        className="w-full flex items-center justify-between rounded-full border px-4 py-2.5 font-medium text-sm outline-none transition-all duration-300 focus:brightness-[1.05]"
+        className="w-full flex items-center justify-between rounded-full border h-10 px-4 py-2.5 font-medium text-sm outline-none transition-all duration-300 focus:brightness-[1.05]"
         style={{ backgroundColor: corFundoCampo, borderColor: corBordaCampo }}
       >
         <span style={{ color: value ? corTexto : corPlaceholder }}>

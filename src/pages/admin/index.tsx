@@ -80,14 +80,14 @@ const isValidUrl = (urlString: string) => {
 // Paleta de cores dos campos customizados (DateField / ModalSelectField),
 // pra bater com a identidade visual azul/branco desta página
 const CORES_CAMPO = {
-  corDestaque: '#3f5ca7',
-  corTexto: '#1f2332',
-  corFundoCampo: '#A9A9F6',
-  corBordaCampo: '#d9e2ff',
-  corPlaceholder: '#94a3b8',
-  corFundoPainel: '#ffffff',
-  corBordaPainel: '#d9e2ff',
-  corHover: '#3f5ca7',
+  corDestaque: '#FFA400',
+  corTexto: '#2a2a72',
+  corFundoCampo: '#a9a9f6',
+  corBordaCampo: '#a9a9f6',
+  corPlaceholder: '#5A5A70',
+  corFundoPainel: '#A9A9F6',
+  corBordaPainel: '#8888D3',
+  corHover: '#CBCBFF',
 };
 
 // Formulário de Partido
@@ -916,7 +916,7 @@ export default function Admin() {
                 </div>
               </div>
 
-              <aside className="space-y-6 lg:sticky lg:top-[160px] lg:self-start">
+              <aside className="space-y-6 lg:sticky lg:top-[140px] lg:self-start">
                 <div className="rounded-[32px] border border-[#d9e2ff] bg-white p-6 shadow-[0_18px_40px_-20px_rgba(15,23,42,0.2)]">
                   <p className="text-xs uppercase tracking-[0.28em] text-[#3f5ca7]">
                     Observações
