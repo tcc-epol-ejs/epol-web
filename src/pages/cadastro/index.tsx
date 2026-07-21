@@ -5,6 +5,7 @@ import type { Partido } from '../../services/api';
 import { useAuth } from '../../contexts/AuthContext';
 import Textbox from '../../components/inputs';
 import Botao from '../../components/botoes/botao';
+import Footer from '../../components/footer/footer';
 import LogoEpol from '../../assets/Imagens/Logos/logoepol.png';
 
 const bolasConfig = [
@@ -965,172 +966,155 @@ function Cadastro() {
   }
 
   return (
-    <section className="w-full min-h-[100dvh] bg-[#2a2a72] flex items-center justify-center overflow-hidden relative">
-      <ToastContainer toasts={toasts} onFechar={fecharToast} />
+    <>
+      <section className="w-full min-h-[100dvh] bg-[#2a2a72] flex items-center justify-center overflow-hidden relative">
+        <ToastContainer toasts={toasts} onFechar={fecharToast} />
 
-      {bolasConfig.map((b, i) => (
+        {bolasConfig.map((b, i) => (
+          <div
+            key={i}
+            className="absolute rounded-full"
+            style={{
+              width: b.size,
+              height: b.size,
+              top: 'top' in b ? b.top : undefined,
+              bottom: 'bottom' in b ? b.bottom : undefined,
+              left: 'left' in b ? b.left : undefined,
+              right: 'right' in b ? b.right : undefined,
+              backgroundColor: '#8888D3',
+              opacity: b.opacity,
+              zIndex: 0,
+            }}
+          />
+        ))}
+
         <div
-          key={i}
-          className="absolute rounded-full"
+          className="absolute inset-y-0 left-0 z-10"
           style={{
-            width: b.size,
-            height: b.size,
-            top: 'top' in b ? b.top : undefined,
-            bottom: 'bottom' in b ? b.bottom : undefined,
-            left: 'left' in b ? b.left : undefined,
-            right: 'right' in b ? b.right : undefined,
-            backgroundColor: '#8888D3',
-            opacity: b.opacity,
-            zIndex: 0,
+            width: '50vw',
+            backgroundColor: '#FFA400',
+            clipPath: `polygon(0% 50%, 100% 0%, calc(100% - ${gap}) 50%, 100% 100%)`,
           }}
         />
-      ))}
 
-      <div
-        className="absolute inset-y-0 left-0 z-10"
-        style={{
-          width: '50vw',
-          backgroundColor: '#FFA400',
-          clipPath: `polygon(0% 50%, 100% 0%, calc(100% - ${gap}) 50%, 100% 100%)`,
-        }}
-      />
+        <div
+          className="absolute inset-y-0 right-0 z-10"
+          style={{
+            width: '50vw',
+            backgroundColor: '#FFA400',
+            clipPath: `polygon(${gap} 0%, 100% 50%, ${gap} 100%, 0% 50%)`,
+          }}
+        />
 
-      <div
-        className="absolute inset-y-0 right-0 z-10"
-        style={{
-          width: '50vw',
-          backgroundColor: '#FFA400',
-          clipPath: `polygon(${gap} 0%, 100% 50%, ${gap} 100%, 0% 50%)`,
-        }}
-      />
+        <div
+          className="relative z-20 bg-[#2a2a72] rounded-full flex items-center justify-center flex-shrink-0"
+          style={{ width: circleSize, height: circleSize }}
+        >
+          <div className="flex flex-col items-center gap-4 w-[70%] pt-5 relative">
+            <img
+              className="h-auto w-[100px] absolute -top-[50px]"
+              alt="Logo EPOL"
+              src={LogoEpol}
+            />
 
-      <div
-        className="relative z-20 bg-[#2a2a72] rounded-full flex items-center justify-center flex-shrink-0"
-        style={{ width: circleSize, height: circleSize }}
-      >
-        <div className="flex flex-col items-center gap-4 w-[70%] pt-5 relative">
-          <img
-            className="h-auto w-[100px] absolute -top-[50px]"
-            alt="Logo EPOL"
-            src={LogoEpol}
-          />
+            <h1 className="text-[#FFA400] font-bold text-center text-[22px] leading-tight">
+              Crie sua conta!
+            </h1>
 
-          <h1 className="text-[#FFA400] font-bold text-center text-[22px] leading-tight">
-            Crie sua conta!
-          </h1>
-
-          <p
-            className="text-[#CBCBEC] text-center font-semibold"
-            style={{ fontSize: '11px' }}
-          >
-            Passo {step} de {TOTAL_STEPS}
-          </p>
-
-          <div className="relative w-full">
-            <div
-              aria-hidden="true"
-              className="invisible flex flex-col gap-4 w-full"
+            <p
+              className="text-[#CBCBEC] text-center font-semibold"
+              style={{ fontSize: '11px' }}
             >
-              <Textbox
-                placeholder="Nome completo"
-                value=""
-                onChange={() => {}}
-              />
-              <Textbox placeholder="Apelido" value="" onChange={() => {}} />
-              <DateField value="" onChange={() => {}} />
-            </div>
+              Passo {step} de {TOTAL_STEPS}
+            </p>
 
-            <div className="absolute inset-x-0 top-0 flex flex-col gap-4 w-full">
-              {step === 1 && (
-                <>
-                  <Textbox
-                    placeholder="Nome completo"
-                    value={formData.nome}
-                    onChange={handleChange('nome')}
-                  />
-                  <Textbox
-                    placeholder="Apelido (como você quer ser chamado?)"
-                    value={formData.apelido}
-                    onChange={handleChange('apelido')}
-                  />
-                  <DateField
-                    value={formData.data_nascimento}
-                    onChange={handleDataNascimentoChange}
-                  />
-                </>
-              )}
-
-              {step === 2 && (
-                <>
-                  <Textbox
-                    placeholder="E-mail"
-                    type="email"
-                    value={formData.email}
-                    onChange={handleChange('email')}
-                  />
-                  <Textbox
-                    placeholder="Confirmar e-mail"
-                    type="email"
-                    value={formData.confirmEmail}
-                    onChange={handleChange('confirmEmail')}
-                  />
-                  <EstadoField
-                    value={formData.estado}
-                    onChange={handleEstadoChange}
-                  />
-                </>
-              )}
-
-              {step === 3 && (
-                <PartidoField
-                  partidos={partidos}
-                  carregando={carregandoPartidos}
-                  value={formData.partido_id}
-                  onChange={handlePartidoChange}
-                />
-              )}
-
-              {step === 4 && (
-                <>
-                  <Textbox
-                    showToggle
-                    type="password"
-                    placeholder="Senha"
-                    value={formData.senha}
-                    onChange={handleChange('senha')}
-                  />
-                  <Textbox
-                    showToggle
-                    type="password"
-                    placeholder="Confirmar senha"
-                    value={formData.confirmSenha}
-                    onChange={handleChange('confirmSenha')}
-                  />
-                  <BarraForcaSenha senha={formData.senha} />
-                </>
-              )}
-            </div>
-          </div>
-
-          {step === 1 && (
-            <Botao
-              bgColor="#ffa400"
-              textColor="#ffffff"
-              onClick={handleAvancar}
-            >
-              avançar
-            </Botao>
-          )}
-
-          {step > 1 && step < TOTAL_STEPS && (
-            <div className="flex gap-3 w-full justify-center">
-              <Botao
-                bgColor="#8888D3"
-                textColor="#ffffff"
-                onClick={handleVoltar}
+            <div className="relative w-full">
+              <div
+                aria-hidden="true"
+                className="invisible flex flex-col gap-4 w-full"
               >
-                voltar
-              </Botao>
+                <Textbox
+                  placeholder="Nome completo"
+                  value=""
+                  onChange={() => {}}
+                />
+                <Textbox placeholder="Apelido" value="" onChange={() => {}} />
+                <DateField value="" onChange={() => {}} />
+              </div>
+
+              <div className="absolute inset-x-0 top-0 flex flex-col gap-4 w-full">
+                {step === 1 && (
+                  <>
+                    <Textbox
+                      placeholder="Nome completo"
+                      value={formData.nome}
+                      onChange={handleChange('nome')}
+                    />
+                    <Textbox
+                      placeholder="Apelido (como você quer ser chamado?)"
+                      value={formData.apelido}
+                      onChange={handleChange('apelido')}
+                    />
+                    <DateField
+                      value={formData.data_nascimento}
+                      onChange={handleDataNascimentoChange}
+                    />
+                  </>
+                )}
+
+                {step === 2 && (
+                  <>
+                    <Textbox
+                      placeholder="E-mail"
+                      type="email"
+                      value={formData.email}
+                      onChange={handleChange('email')}
+                    />
+                    <Textbox
+                      placeholder="Confirmar e-mail"
+                      type="email"
+                      value={formData.confirmEmail}
+                      onChange={handleChange('confirmEmail')}
+                    />
+                    <EstadoField
+                      value={formData.estado}
+                      onChange={handleEstadoChange}
+                    />
+                  </>
+                )}
+
+                {step === 3 && (
+                  <PartidoField
+                    partidos={partidos}
+                    carregando={carregandoPartidos}
+                    value={formData.partido_id}
+                    onChange={handlePartidoChange}
+                  />
+                )}
+
+                {step === 4 && (
+                  <>
+                    <Textbox
+                      showToggle
+                      type="password"
+                      placeholder="Senha"
+                      value={formData.senha}
+                      onChange={handleChange('senha')}
+                    />
+                    <Textbox
+                      showToggle
+                      type="password"
+                      placeholder="Confirmar senha"
+                      value={formData.confirmSenha}
+                      onChange={handleChange('confirmSenha')}
+                    />
+                    <BarraForcaSenha senha={formData.senha} />
+                  </>
+                )}
+              </div>
+            </div>
+
+            {step === 1 && (
               <Botao
                 bgColor="#ffa400"
                 textColor="#ffffff"
@@ -1138,43 +1122,63 @@ function Cadastro() {
               >
                 avançar
               </Botao>
-            </div>
-          )}
+            )}
 
-          {step === TOTAL_STEPS && (
-            <div className="flex gap-3 w-full justify-center">
-              <Botao
-                bgColor="#8888D3"
-                textColor="#ffffff"
-                onClick={handleVoltar}
-              >
-                voltar
-              </Botao>
-              <Botao
-                bgColor="#ffa400"
-                textColor="#ffffff"
-                onClick={handleCadastro}
-              >
-                {enviando ? 'cadastrando...' : 'cadastrar'}
-              </Botao>
-            </div>
-          )}
+            {step > 1 && step < TOTAL_STEPS && (
+              <div className="flex gap-3 w-full justify-center">
+                <Botao
+                  bgColor="#8888D3"
+                  textColor="#ffffff"
+                  onClick={handleVoltar}
+                >
+                  voltar
+                </Botao>
+                <Botao
+                  bgColor="#ffa400"
+                  textColor="#ffffff"
+                  onClick={handleAvancar}
+                >
+                  avançar
+                </Botao>
+              </div>
+            )}
 
-          <p
-            className="text-white text-center"
-            style={{ fontSize: 'clamp(11px, 2vw, 14px)' }}
-          >
-            Já tem uma conta?{' '}
-            <span
-              onClick={() => navigate('/login')}
-              className="text-[#CBCBEC] font-semibold cursor-pointer hover:underline"
+            {step === TOTAL_STEPS && (
+              <div className="flex gap-3 w-full justify-center">
+                <Botao
+                  bgColor="#8888D3"
+                  textColor="#ffffff"
+                  onClick={handleVoltar}
+                >
+                  voltar
+                </Botao>
+                <Botao
+                  bgColor="#ffa400"
+                  textColor="#ffffff"
+                  onClick={handleCadastro}
+                >
+                  {enviando ? 'cadastrando...' : 'cadastrar'}
+                </Botao>
+              </div>
+            )}
+
+            <p
+              className="text-white text-center"
+              style={{ fontSize: 'clamp(11px, 2vw, 14px)' }}
             >
-              Entrar
-            </span>
-          </p>
+              Já tem uma conta?{' '}
+              <span
+                onClick={() => navigate('/login')}
+                className="text-[#CBCBEC] font-semibold cursor-pointer hover:underline"
+              >
+                Entrar
+              </span>
+            </p>
+          </div>
         </div>
-      </div>
-    </section>
+      </section>
+      <Footer />
+    </>
   );
 }
 
