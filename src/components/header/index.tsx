@@ -28,7 +28,13 @@ export default function Header() {
       `}
     >
       <div>
-        <img src={LogoEPOL} alt="" className="w-[90px] mt-1.5" />
+        <img
+          src={LogoEPOL}
+          alt=""
+          className="w-[90px] mt-1.5"
+          //retirar esse onClick futuramente ↴
+          onClick={() => navigate('/admin')}
+        />
       </div>
 
       <div className="flex gap-5">
