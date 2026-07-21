@@ -8,6 +8,7 @@ import LogoEPOL from '../../assets/SVGs/LogoEPOL.svg';
 import { ToastContainer, useToasts } from '../../components/toast';
 import DateField from '../../components/inputs/data';
 import ModalSelectField from '../../components/selects/selectModal';
+import { cadastrarCandidato, cadastrarPartido } from '../../services/api';
 
 const bolasConfig = [
   { size: 280, top: '-40px', left: '-30px', opacity: 0.25 },
@@ -77,8 +78,7 @@ const isValidUrl = (urlString: string) => {
   }
 };
 
-// Paleta de cores dos campos customizados (DateField / ModalSelectField),
-// pra bater com a identidade visual azul/branco desta página
+// Paleta de cores dos campos customizados (DateField / ModalSelectField)
 const CORES_CAMPO = {
   corDestaque: '#FFA400',
   corTexto: '#2a2a72',
@@ -381,17 +381,58 @@ export default function Admin() {
     setIsModalOpen(true);
   }
 
-  function handleConfirmAdd() {
-    // TODO: chamar aqui a API real (POST /api/partidos ou /api/candidatos),
-    // convertendo os campos de textarea em array com textareaParaArray(...)
-    // antes de enviar (ex: fundadores: textareaParaArray(partidoForm.fundadores)).
-    const mensagem =
-      activeSection === 'partido'
-        ? 'Partido adicionado com sucesso!'
-        : 'Candidato adicionado com sucesso!';
+  async function handleConfirmAdd() {
+    try {
+      if (activeSection === 'partido') {
+        const payloadPartido = {
+          ...partidoForm,
+          numero_legenda: Number(partidoForm.numero_legenda),
+          fundadores: textareaParaArray(partidoForm.fundadores),
+          ideologia: textareaParaArray(partidoForm.ideologia),
+          propostas_url: textareaParaArray(partidoForm.propostas_url),
+          propostas_resumo: textareaParaArray(partidoForm.propostas_resumo),
+          tag: textareaParaArray(partidoForm.tag),
+          apelido_gentilico: partidoForm.apelido_gentilico || null,
+          data_deferimento: partidoForm.data_deferimento || null,
+          presidente_nacional: partidoForm.presidente_nacional || null,
+          bandeira_url: partidoForm.bandeira_url || null,
+          uf_sede: partidoForm.uf_sede || null,
+        };
 
-    mostrarSucesso(mensagem);
-    setIsModalOpen(false);
+        await cadastrarPartido(payloadPartido);
+        mostrarSucesso('Partido adicionado com sucesso!');
+        setPartidoForm(initialPartidoForm);
+      } else {
+        const payloadCandidato = {
+          ...candidatoForm,
+          numero_urna: candidatoForm.numero_urna
+            ? Number(candidatoForm.numero_urna)
+            : null,
+          tempo_atuacao_anos: candidatoForm.tempo_atuacao_anos
+            ? Number(candidatoForm.tempo_atuacao_anos)
+            : 0,
+          formacao_academica: textareaParaArray(
+            candidatoForm.formacao_academica,
+          ),
+          feitos_url: textareaParaArray(candidatoForm.feitos_url),
+          feitos_resumo: textareaParaArray(candidatoForm.feitos_resumo),
+          numero_candidatura: candidatoForm.numero_candidatura || null,
+          uf_candidatura: candidatoForm.uf_candidatura || null,
+          vice: candidatoForm.vice || null,
+          profissao_anterior: candidatoForm.profissao_anterior || null,
+          foto_url: candidatoForm.foto_url || null,
+        };
+
+        await cadastrarCandidato(payloadCandidato);
+        mostrarSucesso('Candidato adicionado com sucesso!');
+        setCandidatoForm(initialCandidatoForm);
+      }
+
+      setIsModalOpen(false);
+    } catch (err: any) {
+      mostrarErro(err.message || 'Erro ao realizar o cadastro.');
+      setIsModalOpen(false);
+    }
   }
 
   function handleLimparCampos() {

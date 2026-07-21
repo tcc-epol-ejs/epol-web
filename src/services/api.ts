@@ -14,6 +14,25 @@ export interface Partido {
   bandeira_url: string | null;
 }
 
+export interface Candidato {
+  id: string;
+  candidatura: string;
+  nome_completo: string;
+  nome_politico: string;
+}
+
+export const cadastrarPartido = (dados: any) =>
+  request<Partido>('/api/partidos', {
+    method: 'POST',
+    body: JSON.stringify(dados),
+  });
+
+export const cadastrarCandidato = (dados: any) =>
+  request<Candidato>('/api/candidatos', {
+    method: 'POST',
+    body: JSON.stringify(dados),
+  });
+
 export const cadastrar = (dados: {
   nome: string;
   apelido: string;
