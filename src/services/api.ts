@@ -14,6 +14,11 @@ export interface Partido {
   bandeira_url: string | null;
 }
 
+export const me = (token: string) =>
+  request<{ usuario: Usuario }>('/api/auth/me', {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+
 export const cadastrar = (dados: {
   nome: string;
   apelido: string;
