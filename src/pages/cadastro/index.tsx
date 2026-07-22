@@ -609,7 +609,7 @@ function EstadoField({
   }
 
   return (
-    <div className="relative w-full" ref={containerRef}>
+    <div className="relative w-full custom-scroll" ref={containerRef}>
       <button
         type="button"
         onClick={() => setAberto((prev) => !prev)}
