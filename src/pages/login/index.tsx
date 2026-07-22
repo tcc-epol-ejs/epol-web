@@ -4,6 +4,7 @@ import { login } from '../../services/api';
 import { useAuth } from '../../contexts/AuthContext';
 import Textbox from '../../components/inputs';
 import Botao from '../../components/botoes/botao';
+import Footer from '../../components/footer/footer';
 import LogoEpol from '../../assets/Imagens/Logos/LogoEPOLPreta.png';
 
 const bolasConfig = [
@@ -186,6 +187,7 @@ export default function Login() {
           </div>
         </div>
       </section>
+      <Footer />
     </div>
   );
 }

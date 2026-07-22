@@ -4,6 +4,7 @@ import Textbox from '../../components/inputs';
 import Botao from '../../components/botoes/botao';
 import Confirmar from '../../components/botoes/botaoRecuperar/confirmar';
 import Voltar from '../../components/botoes/botaoRecuperar/voltar';
+import Footer from '../../components/footer/footer';
 import { recuperarSenha, redefinirSenha } from '../../services/api';
 import LogoEpol from '../../assets/Imagens/Logos/LogoEPOLPreta.png';
 
@@ -212,7 +213,7 @@ function RecuperarSenha({ onSuccess }: RecuperarSenhaProps) {
           </div>
         </div>
       </section>
-
+      <Footer />
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
           <div className="relative w-full max-w-md rounded-[32px] bg-white p-6 text-[#2d2d6b] shadow-[0_35px_60px_-15px_rgba(0,0,0,0.45)]">
