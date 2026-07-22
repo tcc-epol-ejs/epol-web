@@ -1013,6 +1013,7 @@ function Cadastro() {
             className="h-auto w-[100px] absolute -top-[50px]"
             alt="Logo EPOL"
             src={LogoEpol}
+            onClick={() => navigate('/')}
           />
 
           <h1 className="text-[#FFA400] font-bold text-center text-[22px] leading-tight">
