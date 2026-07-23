@@ -311,13 +311,6 @@ export default function Admin() {
       return false;
     }
 
-    if (partidoForm.bandeira_url && !isValidUrl(partidoForm.bandeira_url)) {
-      mostrarErro(
-        'A URL da bandeira é inválida. Certifique-se de começar com http:// ou https://',
-      );
-      return false;
-    }
-
     return true;
   }
 
@@ -637,7 +630,7 @@ export default function Admin() {
                           </div>
                           <div className="flex flex-col gap-1.5">
                             <label className="text-xs font-semibold text-[#3f5ca7] uppercase tracking-wider ml-1">
-                              Bandeira (URL) (Opcional)
+                              Bandeira (Opcional)
                             </label>
                             <Textbox
                               value={partidoForm.bandeira_url}
@@ -981,6 +974,16 @@ export default function Admin() {
                         Campos como Fundadores, Ideologia, Tags e Feitos aceitam
                         múltiplos valores: digite um item por linha (aperte
                         Enter pra separar).
+                      </p>
+                    </div>
+                    <div>
+                      <p className="font-semibold text-[#1f2332]">
+                        CAMPO BANDEIRA (PARTIDO)
+                      </p>
+                      <p>
+                        Siga esse padrão ao preencher esse campo:
+                        /logos/partidos/*sigla-partido*.svg
+                        (Ex:/logos/partidos/avante.svg)
                       </p>
                     </div>
                   </div>
