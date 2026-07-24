@@ -12,6 +12,7 @@ export interface Partido {
   nome_completo: string;
   sigla: string;
   bandeira_url: string | null;
+  numero_legenda: number;
 }
 
 export interface Candidato {

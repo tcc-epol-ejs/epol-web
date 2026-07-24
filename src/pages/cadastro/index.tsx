@@ -225,7 +225,7 @@ function EstadoField({
       </button>
 
       {aberto && (
-        <div className="absolute z-50 top-full left-0 mt-2 w-full max-h-60 overflow-y-auto rounded-2xl bg-[#A9A9F6] border border-[#8888D3] p-2 shadow-xl">
+        <div className="absolute z-50 top-full left-0 mt-2 w-full max-h-60 overflow-y-auto rounded-2xl bg-[#A9A9F6] border border-[#8888D3] p-2 shadow-xl custom-scroll">
           <div className="flex flex-col gap-0.5">
             {ESTADOS_BR.map((estado) => {
               const selecionado = estado.nome === value;
@@ -307,16 +307,24 @@ function PartidoField({
       >
         <span className="flex items-center gap-2 min-w-0">
           {partidoSelecionado &&
-            (partidoSelecionado.bandeira_url ? (
-              <img
-                src={partidoSelecionado.bandeira_url}
-                alt=""
-                className="w-5 h-5 rounded-full object-cover flex-shrink-0 bg-white"
+            (partidoSelecionado.numero_legenda ? (
+              <div
+                className="w-5 h-5 text-[12px] text-[#2A2A72] font-semibold rounded-full object-cover flex-shrink-0 bg-[#F3C994]"
                 onError={(e) => {
                   (e.currentTarget as HTMLImageElement).style.display = 'none';
                 }}
-              />
+              >
+                {partidoSelecionado.numero_legenda}
+              </div>
             ) : (
+              // <img
+              //   src={partidoSelecionado.bandeira_url}
+              //   alt=""
+              //   className="w-5 h-5 rounded-full object-cover flex-shrink-0 bg-white"
+              //   onError={(e) => {
+              //     (e.currentTarget as HTMLImageElement).style.display = 'none';
+              //   }}
+              // />
               <IniciaisPartido sigla={partidoSelecionado.sigla} />
             ))}
           <span
@@ -340,7 +348,7 @@ function PartidoField({
       </button>
 
       {aberto && (
-        <div className="absolute z-50 top-full left-0 mt-2 w-full max-h-72 overflow-y-auto rounded-2xl bg-[#A9A9F6] border border-[#8888D3] p-2 shadow-xl">
+        <div className="absolute z-50 top-full left-0 mt-2 w-full max-h-72 overflow-y-auto rounded-2xl bg-[#A9A9F6] border border-[#8888D3] p-2 shadow-xl custom-scroll">
           <div className="flex flex-col gap-0.5">
             <button
               type="button"
@@ -380,17 +388,26 @@ function PartidoField({
                         : 'text-[#2a2a72] hover:bg-[#6262AD]/60'
                     }`}
                   >
-                    {partido.bandeira_url ? (
-                      <img
-                        src={partido.bandeira_url}
-                        alt=""
-                        className="w-6 h-6 rounded-full object-cover flex-shrink-0 bg-white"
+                    {partido.numero_legenda ? (
+                      <div
+                        className="w-5 h-5 text-[11px] rounded-full flex items-center justify-center flex-shrink-0 bg-[#F3C994]"
                         onError={(e) => {
                           (e.currentTarget as HTMLImageElement).style.display =
                             'none';
                         }}
-                      />
+                      >
+                        {partido.numero_legenda}
+                      </div>
                     ) : (
+                      // <img
+                      //   src={partido.bandeira_url}
+                      //   alt=""
+                      //   className="w-6 h-6 rounded-full object-cover flex-shrink-0 bg-white"
+                      //   onError={(e) => {
+                      //     (e.currentTarget as HTMLImageElement).style.display =
+                      //       'none';
+                      //   }}
+                      // />
                       <IniciaisPartido sigla={partido.sigla} />
                     )}
                     <span className="truncate">
