@@ -1,62 +1,94 @@
-import { ChangeEvent, useState } from 'react';
+import { useState } from 'react';
 import Header from '../../components/header';
 import CardCarrossel from '../../components/cardCarrossel';
 import VisualizadorGeografico from '../../assets/GIFs/visualizadorGeografico.gif';
+import MatchPolitico from '../../assets/GIFs/matchPolitico.gif';
+import SimuladorUrna from '../../assets/GIFs/simuladorUrna.gif';
+
+const cards = [
+  {
+    asset: MatchPolitico,
+    title: 'match político',
+    text: 'textinho flnd um pouco do visualizador geográfico textinho flnd um pouco do visualizador geográfico',
+  },
+  {
+    asset: VisualizadorGeografico,
+    title: 'visualizador geográfico',
+    text: 'textinho flnd um pouco do visualizador geográfico textinho flnd um pouco do visualizador geográfico',
+  },
+  {
+    asset: SimuladorUrna,
+    title: 'simulador de urna',
+    text: 'textinho flnd um pouco do visualizador geográfico textinho flnd um pouco do visualizador geográfico',
+  },
+];
+
+const CARD_WIDTH = 378;
+const GAP = 65;
+const SET_SHIFT = cards.length * (CARD_WIDTH + GAP);
 
 export default function Main() {
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+
   return (
     <>
+      <style>{`
+        @keyframes carrossel-loop {
+          0% { transform: translateX(0); }
+          100% { transform: translateX(-${SET_SHIFT}px); }
+        }
+        .carrossel-track {
+          animation: carrossel-loop 25s linear infinite;
+          width: max-content;
+        }
+        .carrossel-track:hover {
+          animation-play-state: paused;
+        }
+        .carrossel-card {
+          transition: transform 0.35s ease, opacity 0.35s ease, filter 0.35s ease;
+        }
+      `}</style>
+
       <section className="w-full h-[100dvh]">
         <div className="w-full fixed top-0 z-[1000]">
           <Header />
         </div>
 
         {/* PRIMEIRA PARTE SEÇÃO */}
-        <div className="w-full h-full flex gap-[100px] justify-between overflow-hidden">
-          <div className="flex-1 flex flex-col gap-[50px] pl-[65px] justify-center">
-            <div className="w-full flex gap-[65px] mt-10">
-              <div className="w-[378px] flex flex-col justify-center items-center gap-1">
-                <CardCarrossel
-                  width={350}
-                  height={350}
-                  asset={VisualizadorGeografico}
-                />
-                <h2 className="font-black uppercase forced-small-caps leading-10 tracking-wider text-[20px] text-[#333]">
-                  visualizador geográfico
-                </h2>
-                <p className="tracking-wider text-center font-medium text-[14px] text-[#333]">
-                  textinho flnd um pouco do visualizador geográfico textinho
-                  flnd um pouco do visualizador geográfico
-                </p>
-              </div>
-              <div className="w-[378px] flex flex-col justify-center items-center gap-1">
-                <CardCarrossel
-                  width={350}
-                  height={350}
-                  asset={VisualizadorGeografico}
-                />
-                <h2 className="font-black uppercase forced-small-caps leading-10 tracking-wider text-[20px] text-[#333]">
-                  match político
-                </h2>
-                <p className="tracking-wider text-center font-medium text-[14px] text-[#333]">
-                  textinho flnd um pouco do visualizador geográfico textinho
-                  flnd um pouco do visualizador geográfico
-                </p>
-              </div>
-              <div className="w-[378px] flex flex-col justify-center items-center gap-1">
-                <CardCarrossel
-                  width={350}
-                  height={350}
-                  asset={VisualizadorGeografico}
-                />
-                <h2 className="font-black uppercase forced-small-caps leading-10 tracking-wider text-[20px] text-[#333]">
-                  simulador de urna
-                </h2>
-                <p className="tracking-wider text-center font-medium text-[14px] text-[#333]">
-                  textinho flnd um pouco do visualizador geográfico textinho
-                  flnd um pouco do visualizador geográfico
-                </p>
-              </div>
+        <div className="w-full h-full flex flex-col justify-center overflow-hidden">
+          <div className="w-full overflow-x-hidden py-8">
+            <div className="carrossel-track flex gap-[65px]">
+              {[...cards, ...cards].map((card, index) => {
+                const isHovered = hoveredIndex === index;
+                const isDimmed = hoveredIndex !== null && !isHovered;
+
+                return (
+                  <div
+                    key={index}
+                    onMouseEnter={() => setHoveredIndex(index)}
+                    onMouseLeave={() => setHoveredIndex(null)}
+                    className="carrossel-card w-[378px] flex flex-col justify-center items-center gap-1 shrink-0 cursor-pointer"
+                    style={{
+                      transform: isHovered ? 'scale(1.06)' : 'scale(1)',
+                      opacity: isDimmed ? 0.4 : 1,
+                      filter: isDimmed ? 'grayscale(30%)' : 'none',
+                      zIndex: isHovered ? 10 : 1,
+                    }}
+                  >
+                    <CardCarrossel
+                      width={350}
+                      height={350}
+                      asset={card.asset}
+                    />
+                    <h2 className="font-black uppercase forced-small-caps leading-10 tracking-wider text-[20px] text-[#333]">
+                      {card.title}
+                    </h2>
+                    <p className="tracking-wider text-center font-medium text-[14px] text-[#333]">
+                      {card.text}
+                    </p>
+                  </div>
+                );
+              })}
             </div>
           </div>
         </div>

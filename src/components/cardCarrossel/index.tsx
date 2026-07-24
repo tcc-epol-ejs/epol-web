@@ -3,6 +3,8 @@ interface CardCarrosselProps {
   borderColor?: string;
   width?: number;
   height?: number;
+  classNameSection?: string;
+  classNameImg?: string;
 }
 
 export default function CardCarrossel({
@@ -10,11 +12,13 @@ export default function CardCarrossel({
   height = 392,
   asset,
   borderColor = '#FFA400',
+  classNameSection = '',
+  classNameImg = '',
 }: CardCarrosselProps) {
   return (
     <>
       <section
-        className="rounded-[20px] overflow-hidden shrink-0"
+        className={`rounded-[20px] overflow-hidden shrink-0 ${classNameSection}`.trim()}
         style={{
           width,
           height,
@@ -24,6 +28,7 @@ export default function CardCarrossel({
         <img
           src={asset}
           alt=""
+          className={`${classNameImg}`.trim()}
           style={{
             width: '100%',
             height: '100%',
