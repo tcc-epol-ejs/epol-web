@@ -1,7 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
 import LogoEPOL from '../../assets/SVGs/LogoEPOL.svg';
+import LogoEpolBranco from '../../assets/Imagens/Logos/logoepol.png'
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+
+interface HeaderProps {
+  isBgWhite?: boolean;
+}
 
 interface NavItem {
   label: string;
@@ -16,7 +21,7 @@ const NAV_ITEMS: NavItem[] = [
   { label: 'Título de Eleitor', path: '/titulo-de-eleitor' },
 ];
 
-export default function Header() {
+export default function Header({ isBgWhite }: HeaderProps) {
   const [visible, setVisible] = useState(true);
   const lastScrollY = useRef(0);
   const navigate = useNavigate();
@@ -40,13 +45,13 @@ export default function Header() {
     <header
       className={`
         w-[calc(100%-124px)] mx-[62px] mt-[42px] h-[80px] pl-[38px] pr-[11.5px] py-[11.5px]
-        bg-white rounded-full shadow-xl flex items-center justify-between border-2 border-[#FFA400]
+         rounded-full shadow-xl flex items-center justify-between border-2 border-[#FFA400]
         transition-transform duration-[800ms] ease-in-out
-        ${visible ? 'translate-y-0' : '-translate-y-[200px]'}
+        ${visible ? 'translate-y-0' : '-translate-y-[200px]'} ${isBgWhite ? 'bg-[#2A2A72]' : 'bg-white'}
       `}
     >
       <div className="flex items-center gap-10">
-        <img src={LogoEPOL} alt="" className="w-[90px] mt-1.5 shrink-0" />
+        {isBgWhite ?  <img src={LogoEpolBranco} alt="" className="w-[90px] mt-1.5 shrink-0" /> :  <img src={LogoEPOL} alt="" className="w-[90px] mt-1.5 shrink-0" />}
 
         {usuario && !carregando && (
           <nav className="hidden md:flex items-center gap-7">
@@ -59,8 +64,7 @@ export default function Header() {
                   className={`
                     border-none outline-none bg-transparent text-[14px] font-semibold whitespace-nowrap
                     transition-colors
-                    ${isActive ? 'text-[#FFA400]' : 'text-[#333] hover:text-[#FFA400]'}
-                  `}
+                    ${isActive ? 'text-[#FFA400]' : isBgWhite ? 'text-[#FFFBF2]' : 'text-[#333]'} hover:text-[#FFA400] `}
                 >
                   {item.label}
                 </button>
@@ -75,9 +79,9 @@ export default function Header() {
       ) : usuario ? (
         <button
           onClick={() => navigate('/perfil')}
-          className="flex items-center gap-2.5 pr-2 pl-1.5 py-1.5 rounded-full hover:bg-[#FFF6E8] transition-colors border-none outline-none"
+          className={`flex items-center gap-2.5 pr-2 pl-1.5 py-1.5 rounded-full ${isBgWhite ? 'hover:bg-[#383899]' : 'hover:bg-[#FFF6E8]'}  transition-colors border-none outline-none`}
         >
-          <span className="text-[14px] font-semibold text-[#333]">
+          <span className={`text-[14px] font-semibold ${isBgWhite ? 'text-[#FFFBF2]' : 'text-[#333]'} `}>
             {nomeExibido}
           </span>
           <div className="w-[40px] h-[40px] rounded-full bg-[#FFA400] flex items-center justify-center shrink-0">

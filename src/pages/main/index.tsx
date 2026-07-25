@@ -55,7 +55,7 @@ export default function Main() {
 
       <section className="w-full h-[100dvh]">
         <div className="w-full fixed top-0 z-[1000]">
-          <Header />
+          <Header isBgWhite />
         </div>
 
         {/* PRIMEIRA PARTE SEÇÃO */}
