@@ -5,6 +5,7 @@ import VisualizadorGeografico from '../../assets/GIFs/visualizadorGeografico.gif
 import MatchPolitico from '../../assets/GIFs/matchPolitico.gif';
 import SimuladorUrna from '../../assets/GIFs/simuladorUrna.gif';
 import PipoDuvida from '../../assets/Imagens/pipoDuvida.png';
+import PipoFeliz from '../../assets/Imagens/pipoFeliz.png';
 import { GiStarFlag } from 'react-icons/gi';
 import { FaArrowRightLong, FaPeopleGroup } from 'react-icons/fa6';
 
@@ -12,17 +13,17 @@ const cards = [
   {
     asset: MatchPolitico,
     title: 'match político',
-    text: 'textinho flnd um pouco do visualizador geográfico textinho flnd um pouco do visualizador geográfico',
+    text: 'Descubra quais partidos mais combinam com suas ideias em poucos minutos.',
   },
   {
     asset: VisualizadorGeografico,
     title: 'visualizador geográfico',
-    text: 'textinho flnd um pouco do visualizador geográfico textinho flnd um pouco do visualizador geográfico',
+    text: 'Navegue pelo mapa do Brasil e conheça os representantes de cada estado.',
   },
   {
     asset: SimuladorUrna,
     title: 'simulador de urna',
-    text: 'textinho flnd um pouco do visualizador geográfico textinho flnd um pouco do visualizador geográfico',
+    text: 'Treine seu voto em uma simulação da urna eletrônica.',
   },
 ];
 
@@ -134,7 +135,7 @@ export default function Main() {
                       votar?
                     </span>
                   </h1>
-                  <p className="text-base font-medium text-[#333]/65 leading-relaxed text-[#1B1B3A]/70 max-w-[34ch] mt-4">
+                  <p className="text-base font-medium text-[#333]/65 leading-relaxed max-w-[34ch] mt-4">
                     Pesquise partidos e políticos e decida com informação — não
                     com achismo.
                   </p>
@@ -181,7 +182,7 @@ export default function Main() {
                     Aqui no <b className="text-[#333] font-semibold">EPOL</b>,
                     você descobre.
                   </span>
-                  <button className="font-sans flex items-center gap-2 bg-[#2A2A72] hover:bg-[#202056] text-[#FFFBF2] font-bold text-sm tracking-wide px-5 py-3.5 rounded-full transition-all hover:-translate-y-px focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-ink-2 focus-visible:outline-offset-2 whitespace-nowrap">
+                  <button className="font-sans flex items-center gap-2 bg-[#2A2A72] hover:bg-[#202056] text-[#FFFBF2] font-bold text-sm tracking-wide px-5 py-3.5 rounded-full transition-all hover:-translate-y-px whitespace-nowrap">
                     Pesquisar
                     <FaArrowRightLong />
                   </button>
@@ -194,80 +195,82 @@ export default function Main() {
         {/* TERCEIRA PARTE SEÇÃO */}
         <div className="w-full h-full bg-[#EAF6FF] flex gap-[100px] justify-between overflow-hidden">
           <div className="flex-1 flex flex-col gap-[50px] px-[65px] justify-center relative">
-          <div className="flex absolute top-10 items-center gap-2.5 text-[13px] font-bold uppercase tracking-[0.18em] text-ink-2 mb-7">
+            <div className="flex absolute top-10 items-center gap-2.5 text-[13px] font-bold uppercase tracking-[0.18em] text-ink-2 mb-7">
               <span className="w-[26px] h-[2px] bg-[#333] inline-block" />
               Título de Eleitor
             </div>
             <div className="grid grid-cols-1 md:grid-cols-[1.05fr_0.95fr] gap-12 md:gap-16 items-center">
+              <div className="order-2 md:order-1">
+                <div className="flex items-center gap-5 mb-7">
+                  <span className="text-[100px] sm:text-[128px] leading-[0.8] font-black text-[#FFA400] -ml-1">
+                    16
+                  </span>
+                  <p className="text-lg sm:text-xl font-semibold text-[#333] max-w-[24ch] leading-snug">
+                    anos é a idade mínima pra tirar seu título de eleitor e
+                    começar a exercer sua cidadania.
+                  </p>
+                </div>
 
-            <div className="order-2 md:order-1">
+                <div className="flex flex-wrap gap-3 mb-9">
+                  {[
+                    { label: 'Gratuito' },
+                    { label: '100% online' },
+                    { label: 'Leva 5 minutos' },
+                  ].map((item) => (
+                    <span
+                      key={item.label}
+                      className="flex items-center gap-2 bg-[#BDC3EA] border border-[#2A2A72]/10 rounded-full px-4 py-2 text-[13px] font-bold text-[#333] shadow-sm"
+                    >
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#2A2A72]" />
+                      {item.label}
+                    </span>
+                  ))}
+                </div>
+                <p className="text-[15px] font-medium sm:text-base leading-relaxed text-[#333]/65 max-w-[48ch] mb-6">
+                  No EPOL, você aprende de forma simples e direta como dar esse
+                  primeiro passo, entendendo seus direitos e a importância da
+                  participação política. Aqui, a informação vira ação.
+                </p>
 
-<div className="flex items-center gap-5 mb-7">
-  <span className="text-[100px] sm:text-[128px] leading-[0.8] font-black text-[#FFA400] -ml-1">
-    16
-  </span>
-  <p className="text-lg sm:text-xl font-semibold text-[#333] max-w-[24ch] leading-snug">
-    anos é a idade mínima pra tirar seu título de eleitor e começar a exercer sua cidadania.
-  </p>
-</div>
-
-<div className="flex flex-wrap gap-3 mb-9">
-  {[
-    { label: 'Gratuito' },
-    { label: '100% online' },
-    { label: 'Leva 5 minutos' },
-  ].map((item) => (
-    <span
-      key={item.label}
-      className="flex items-center gap-2 bg-[#BDC3EA] border border-[#2A2A72]/10 rounded-full px-4 py-2 text-[13px] font-bold text-[#333] shadow-sm"
-    >
-      <span className="w-1.5 h-1.5 rounded-full bg-[#2A2A72]" />
-      {item.label}
-    </span>
-  ))}
-</div>
-<p className="text-[15px] font-medium sm:text-base leading-relaxed text-[#333]/65 max-w-[48ch] mb-6">
-  No EPOL, você aprende de forma simples e direta como dar esse primeiro passo, entendendo seus direitos e a importância da participação política. Aqui, a informação vira ação.
-</p>
-
-{/* selos rápidos — preenchem o espaço com info útil, ecoando o chip da foto */}
-
-<button className="flex items-center font-sans gap-2 bg-[#2A2A72] hover:bg-[#202056] text-[#FFFBF2] font-bold text-sm tracking-wide px-7 py-4 rounded-full transition-all hover:-translate-y-px w-fit">
-  Descobrir mais
-  <FaArrowRightLong />
-</button>
-</div>
+                <button className="flex items-center font-sans gap-2 bg-[#2A2A72] hover:bg-[#202056] text-[#FFFBF2] font-bold text-sm tracking-wide px-7 py-4 rounded-full transition-all hover:-translate-y-px w-fit">
+                  Descobrir mais
+                  <FaArrowRightLong />
+                </button>
+              </div>
 
               <div className="order-1 md:order-2 relative">
-
-                <div className="absolute left-10 -top-5 w-16 h-16 bg-[#D18800] rounded-xl rotate-6 -z-10" />
-                <div className="absolute left-20 top-2 w-14 h-14 bg-[#FFA400] rounded-xl -rotate-6 -z-10" />
-
-                <div className="relative rounded-[28px] overflow-hidden shadow-xl aspect-[5/5] bg-gradient-to-br from-[#FFA400] to-[#2A2A72] flex items-center justify-center">
+                <div className="relative rounded-[28px] overflow-hidden shadow-xl aspect-[5/5] bg-gradient-to-br to-[#FFA400] from-[#2A2A72] flex ">
                   <img
-                    src=""
+                    src={PipoFeliz}
                     alt="Jovem eleitor mostrando o título de eleitor"
-                    className="w-full h-full object-cover hidden"
+                    className="absolute right-0 bottom-0 w-[420px]"
                   />
-                  <div className="flex flex-col items-center gap-3 text-white/70 px-8 text-center">
-                    <svg className="w-14 h-14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                      <rect x="3" y="3" width="18" height="18" rx="2" /><circle cx="9" cy="9" r="2" /><path d="M21 15l-5-5L5 21" />
-                    </svg>
-                    <span className="text-xs font-medium">
-                      Espaço para a foto
-                    </span>
-                  </div>
+                  <div className="flex flex-col items-center gap-3 text-white/70 px-8 text-center"></div>
                 </div>
 
                 <div className="absolute -bottom-6 -left-4 sm:left-6 bg-white rounded-2xl shadow-xl border border-[#2A2A72]/10 px-4 py-3 flex items-center gap-3 max-w-[230px]">
                   <div className="w-9 h-9 rounded-full bg-[#FFA400]/15 text-[#D18800] flex items-center justify-center flex-none">
-                    <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <rect x="2" y="5" width="20" height="14" rx="2" /><path d="M6 15h4M14 9h4M14 12h4M14 15h2" /><circle cx="8" cy="10.5" r="1.6" />
+                    <svg
+                      className="w-5 h-5"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <rect x="2" y="5" width="20" height="14" rx="2" />
+                      <path d="M6 15h4M14 9h4M14 12h4M14 15h2" />
+                      <circle cx="8" cy="10.5" r="1.6" />
                     </svg>
                   </div>
                   <div>
-                    <p className="text-[11px] font-mono tracking-[0.06em] text-[#333]/45 leading-none mb-1">· EPOL</p>
-                    <p className="text-[13px] font-bold text-[#333] leading-tight">Título de Eleitor</p>
+                    <p className="text-[11px] font-mono tracking-[0.06em] text-[#333]/45 leading-none mb-1">
+                      · EPOL
+                    </p>
+                    <p className="text-[13px] font-bold text-[#333] leading-tight">
+                      Título de Eleitor
+                    </p>
                   </div>
                 </div>
               </div>
