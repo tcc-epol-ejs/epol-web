@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import LogoEPOL from '../../assets/SVGs/LogoEPOL.svg';
-import LogoEpolBranco from '../../assets/Imagens/Logos/logoepol.png'
+import LogoEpolBranco from '../../assets/Imagens/Logos/logoepol.png';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 
@@ -28,11 +28,12 @@ export default function Header({ isBgWhite }: HeaderProps) {
   const location = useLocation();
   const { usuario, carregando } = useAuth();
 
+  const HEADER_REVEAL_THRESHOLD = 20; // distância do topo (em px) pra reaparecer
+
   useEffect(() => {
     const handleScroll = () => {
       const currentY = window.scrollY;
-      setVisible(currentY < lastScrollY.current || currentY < 20);
-      lastScrollY.current = currentY;
+      setVisible(currentY < HEADER_REVEAL_THRESHOLD);
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
@@ -51,7 +52,15 @@ export default function Header({ isBgWhite }: HeaderProps) {
       `}
     >
       <div className="flex items-center gap-10">
-        {isBgWhite ?  <img src={LogoEpolBranco} alt="" className="w-[90px] mt-1.5 shrink-0" /> :  <img src={LogoEPOL} alt="" className="w-[90px] mt-1.5 shrink-0" />}
+        {isBgWhite ? (
+          <img
+            src={LogoEpolBranco}
+            alt=""
+            className="w-[90px] mt-1.5 shrink-0"
+          />
+        ) : (
+          <img src={LogoEPOL} alt="" className="w-[90px] mt-1.5 shrink-0" />
+        )}
 
         {usuario && !carregando && (
           <nav className="hidden md:flex items-center gap-7">
@@ -81,7 +90,9 @@ export default function Header({ isBgWhite }: HeaderProps) {
           onClick={() => navigate('/perfil')}
           className={`flex items-center gap-2.5 pr-2 pl-1.5 py-1.5 rounded-full ${isBgWhite ? 'hover:bg-[#383899]' : 'hover:bg-[#FFF6E8]'}  transition-colors border-none outline-none`}
         >
-          <span className={`text-[14px] font-semibold ${isBgWhite ? 'text-[#FFFBF2]' : 'text-[#333]'} `}>
+          <span
+            className={`text-[14px] font-semibold ${isBgWhite ? 'text-[#FFFBF2]' : 'text-[#333]'} `}
+          >
             {nomeExibido}
           </span>
           <div className="w-[40px] h-[40px] rounded-full bg-[#FFA400] flex items-center justify-center shrink-0">

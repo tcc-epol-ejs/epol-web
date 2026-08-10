@@ -6,6 +6,7 @@ import MatchPolitico from '../../assets/GIFs/matchPolitico.gif';
 import SimuladorUrna from '../../assets/GIFs/simuladorUrna.gif';
 import PipoDuvida from '../../assets/Imagens/pipoDuvida.png';
 import PipoFeliz from '../../assets/Imagens/pipoFeliz.png';
+import PipoTituloEleitor from '../../assets/Imagens/pipoTituloEleitor.png';
 import { GiStarFlag } from 'react-icons/gi';
 import { FaArrowRightLong, FaPeopleGroup } from 'react-icons/fa6';
 
@@ -241,9 +242,9 @@ export default function Main() {
               <div className="order-1 md:order-2 relative">
                 <div className="relative rounded-[28px] overflow-hidden shadow-xl aspect-[5/5] bg-gradient-to-br to-[#FFA400] from-[#2A2A72] flex ">
                   <img
-                    src={PipoFeliz}
+                    src={PipoTituloEleitor}
                     alt="Jovem eleitor mostrando o título de eleitor"
-                    className="absolute right-0 bottom-0 w-[420px]"
+                    className="absolute right-0 -bottom-4 w-[520px]"
                   />
                   <div className="flex flex-col items-center gap-3 text-white/70 px-8 text-center"></div>
                 </div>
