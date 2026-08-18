@@ -1,4 +1,5 @@
 import Header from '../../components/header';
+import CarrosselEtitulo from '../../components/carrosselEtitulo';
 import pipo_fechado from '../../assets/Imagens/pipo_fechado.png';
 import etitulo from '../../assets/Imagens/etitulo.png';
 import retanguloazul from '../../assets/Imagens/retanguloazul.png';
@@ -66,13 +67,10 @@ function Etitulo() {
           </div>
         </div>
 
-        <div className="relative w-full h-[100dvh] bg-[#BDC3EA] overflow-hidden">
-          <img
-            src={comoobter}
-            alt="comoobter"
-            className="absolute top-[15%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-[45%] max-w-none"
-          />
+        <div className="relative w-full h-[100dvh] bg-[#BDC3EA] overflow-hidden flex flex-col items-center pt-[140px] gap-[60px]">
+          <img src={comoobter} alt="comoobter" className="w-[35%] max-w-none" />
 
+          <CarrosselEtitulo />
           {bolasConfig.map((b, i) => (
             <div
               key={i}
