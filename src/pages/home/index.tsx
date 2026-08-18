@@ -151,7 +151,7 @@ function Home() {
           </div>
         </div>
         {/* TERCEIRA PARTE SEÇÃO */}
-        <div className="w-full h-full bg-[#FFA400] flex gap-[100px] justify-between overflow-hidden">
+        <div className="w-full h-full bg-[#BDC3EA] flex gap-[100px] justify-between overflow-hidden">
           <div className="flex-1 flex flex-col gap-[50px] pl-[65px] items-center justify-center">
             <div className="w-full flex flex-col gap-[15px]">
               <h1 className="font-black uppercase forced-small-caps leading-10 tracking-wider text-[36px] text-[#472E00]">
