@@ -24,26 +24,27 @@ function Etitulo() {
 
   return (
     <>
-      <section className="w-full">
+      <section className="w-full h-[100dvh]">
         <div className="w-full fixed top-0 z-[1000]">
           <Header />
         </div>
 
         {/* PRIMEIRA PARTE SEÇÃO */}
-        <div className="w-full bg-[#eaf6ff] flex justify-between items-start overflow-hidden pt-[140px] pb-[80px]">
+        <div className="w-full h-full bg-[#eaf6ff] flex justify-between items-start overflow-hidden pt-[140px] pb-[80px]">
           {/* COLUNA ESQUERDA - IMAGEM COM TEXTO */}
-          <div className="flex flex-col items-start pl-[1px] max-w-[1200px]">
-            <img src={etitulo} alt="etitulo" className="w-full max-w-none" />
+          <div className="flex flex-col items-start pl-[1px] max-w-[1500px] mt-[50px]">
+            <img
+              src={etitulo}
+              alt="etitulo"
+              className="w-full max-w-none scale-110"
+            />
           </div>
 
           {/* COLUNA DIREITA - MASCOTE */}
-          <div
-            className="shrink-0 flex justify-end pr-[65px]"
-            style={{ width: 378 + 65 }}
-          >
+          <div className="shrink-0 flex justify-end" style={{ width: 378 }}>
             <div
               ref={trackRef}
-              className="relative"
+              className="relative mt-[40px]"
               style={{ width: 378, height: 392 }}
             >
               <img
@@ -56,10 +57,10 @@ function Etitulo() {
                 alt="pipo_fechado"
                 className="absolute"
                 style={{
-                  bottom: ' -25%',
-                  left: '20%',
+                  bottom: '-35%',
+                  left: '15%',
                   width: '200%',
-                  height: '130%',
+                  height: '140%',
                   objectFit: 'cover',
                 }}
               />
@@ -67,10 +68,13 @@ function Etitulo() {
           </div>
         </div>
 
-        <div className="relative w-full h-[100dvh] bg-[#BDC3EA] overflow-hidden flex flex-col items-center pt-[140px] gap-[60px]">
+        <div className="relative w-full h-[100dvh] bg-[#BDC3EA] overflow-hidden flex flex-col items-center pt-[40px] gap-[60px]">
           <img src={comoobter} alt="comoobter" className="w-[35%] max-w-none" />
 
-          <CarrosselEtitulo />
+          <div className="relative z-10">
+            <CarrosselEtitulo />
+          </div>
+
           {bolasConfig.map((b, i) => (
             <div
               key={i}
