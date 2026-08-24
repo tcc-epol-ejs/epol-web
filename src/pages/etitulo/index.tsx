@@ -30,22 +30,22 @@ function Etitulo() {
         </div>
 
         {/* PRIMEIRA PARTE SEÇÃO */}
-        <div className="w-full h-full bg-[#eaf6ff] flex justify-between items-start overflow-hidden pt-[140px] pb-[80px]">
+        <div className="w-full h-full bg-[#eaf6ff] flex justify-between items-start overflow-hidden pt-[200px] pb-[80px]">
           {/* COLUNA ESQUERDA - IMAGEM COM TEXTO */}
-          <div className="flex flex-col items-start pl-[1px] max-w-[1500px] mt-[50px]">
+          <div className="flex flex-col items-start pl-[100px] max-w-[1800px] mt-[100px]">
             <img
               src={etitulo}
               alt="etitulo"
-              className="w-full max-w-none scale-110"
+              className="w-full max-w-none scale-125"
             />
           </div>
 
           {/* COLUNA DIREITA - MASCOTE */}
-          <div className="shrink-0 flex justify-end" style={{ width: 378 }}>
+          <div className="shrink-0 flex justify-end" style={{ width: 500 }}>
             <div
               ref={trackRef}
               className="relative mt-[40px]"
-              style={{ width: 378, height: 392 }}
+              style={{ width: 480, height: 500 }} // era 378 x 392
             >
               <img
                 src={retanguloazul}

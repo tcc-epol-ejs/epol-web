@@ -77,8 +77,11 @@ export default function StepCarousel() {
   const step = steps[index];
 
   return (
-    <div className="w-full flex flex-col items-center gap-[24px]">
-      <div className="relative w-full max-w-[900px] flex items-center gap-[16px]">
+    <div className="w-full flex flex-col items-center gap-[24px] mt-[60px]">
+      {/* mt-[60px] empurra o carrossel inteiro pra baixo */}
+      <div className="relative w-full max-w-[1100px] flex items-center gap-[16px]">
+        {/* era max-w-[900px] -> agora maior */}
+
         {/* SETA ESQUERDA */}
         <button
           onClick={goPrev}
@@ -90,7 +93,9 @@ export default function StepCarousel() {
 
         {/* CARD */}
         <div className="relative flex-1 bg-white rounded-[24px] border-[10px] border-[#2a2a72] overflow-hidden shadow-md">
-          <div className="flex items-stretch min-h-[400px]">
+          <div className="flex items-stretch min-h-[500px]">
+            {/* era min-h-[400px] -> agora maior */}
+
             {/* TEXTO */}
             <div className="flex-1 flex flex-col justify-center gap-[16px] px-[40px] py-[32px]">
               <h3 className="text-[20px] font-bold text-[#232528]">
@@ -119,7 +124,8 @@ export default function StepCarousel() {
             </div>
 
             {/* IMAGEM */}
-            <div className="relative w-[280px] shrink-0 bg-[#f2f2f7]">
+            <div className="relative w-[340px] shrink-0 bg-[#f2f2f7]">
+              {/* era w-[280px] -> agora maior */}
               <img
                 src={step.image}
                 alt={step.title}
