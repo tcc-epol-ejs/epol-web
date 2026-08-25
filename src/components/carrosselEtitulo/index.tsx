@@ -10,35 +10,47 @@ type Step = {
   textAfter: string;
   image: string;
   tagLabel?: string;
+  imageFit?: 'cover' | 'contain'; // NOVO
 };
 
 const steps: Step[] = [
   {
     number: 1,
+    title: 'Obrigatoriedade',
+    textBefore:
+      'Voto é obrigatório ou facultativo? O voto é obrigatório para todos os cidadãos brasileiros alfabetizados com idade entre 18 e 70 anos. Para os jovens de 16 e 17 anos, o voto é facultativo, ou seja, você pode escolher se quer ou não votar.',
+    textAfter:
+      'Sem título, depois dos 18 anos a pessoa não consegue tirar passaporte, se inscrever em concurso público, matricular em faculdade pública, entre outras coisas. Então, se você tem 16 ou 17 anos, aproveite para tirar seu título de eleitor e garantir que sua voz seja ouvida nas próximas eleições!',
+    image: '/src/assets/Imagens/pipotitulo.png',
+    tagLabel: 'VAMOS LÁ!',
+    imageFit: 'contain',
+  },
+  {
+    number: 2,
     title: 'Requisitos',
-    textBefore: `1. Comparecer ao Cartório Eleitoral, posto de atendimento ou preencher formulário de pré-atendimento Título Net, disponível na página do TRE-SP: `,
+    textBefore: `1. Você pode tirar seu título de duas formas: indo pessoalmente ao Cartório Eleitoral ou preenchendo o formulário online pelo Título Net: `,
     link: {
       url: 'https://www.tse.jus.br/servicos-eleitorais/autoatendimento-eleitoral#/atendimento-eleitor',
       label: 'Acessar Título Net',
     },
-    textAfter: `2. Idade mínima de 15 anos. O exercício do voto para as pessoas que se alistarem aos 15 anos somente será garantido à pessoa que completar 16 anos até a data do 1º turno da eleição subsequente.`,
+    textAfter: `2. Idade mínima: 15 anos. Só que se você tirar o título com 15, só vai poder votar de verdade quando completar 16 até a próxima eleição.`,
     image: '/src/assets/Imagens/passo1.png',
     tagLabel: 'ATENCAO!',
   },
   {
-    number: 2,
+    number: 3,
     title: 'Documentos necessários',
     textBefore:
-      '1. Documento oficial de identificação. Podem ser aceitos: RG, Certidão de Nascimento (se pessoa solteira) ou de Casamento, Passaporte, Carteira de Trabalho.',
-    textAfter: `2. Comprovante de domicílio eleitoral - original, digital ou cópia, preferencialmente em nome da pessoa interessada, emitido ou expedido nos 3 meses anteriores à data do atendimento, se possível.`,
+      '1. Separe um documento oficial com foto: RG, Certidão de Nascimento (se for solteiro/a), Certidão de Casamento, Passaporte ou Carteira de Trabalho.',
+    textAfter: `2. Leve também um comprovante de endereço (pode ser digital ou cópia), de preferência no seu nome ou dos seus pais e emitido nos últimos 3 meses.`,
     image: '/src/assets/Imagens/passo2.png',
     tagLabel: 'NAO ESQUEÇA!',
   },
   {
-    number: 3,
+    number: 4,
     title: 'Acesse o site da Justiça Eleitoral',
     textBefore:
-      'Com os documentos em mãos, o próximo passo é entrar no site oficial da Justiça Eleitoral. Lá, você deve procurar pela opção de alistamento eleitoral ou emissão do título de eleitor. ',
+      'Com os documentos separados, entre no site oficial da Justiça Eleitoral e procure a opção de alistamento eleitoral (é assim que se chama o processo de tirar o título). ',
     textAfter: '',
     link: {
       url: 'https://www.tse.jus.br/servicos-eleitorais/autoatendimento-eleitoral#/atendimento-eleitor',
@@ -48,22 +60,32 @@ const steps: Step[] = [
     tagLabel: 'AGENDE SEU HORÁRIO!',
   },
   {
-    number: 4,
+    number: 5,
     title: 'Preencha seus dados',
     textBefore:
-      'Na página de alistamento, você precisará preencher um formulário com seus dados pessoais, como nome completo, data de nascimento, endereço e informações de contato. Certifique-se de fornecer informações precisas e atualizadas.',
+      'Agora é só preencher o formulário com seus dados: nome completo, data de nascimento, endereço e contato. Confira tudo direitinho antes de enviar pois dado errado pode atrasar seu processo!',
     textAfter: '',
     image: '/src/assets/Imagens/passo3.png',
     tagLabel: 'MUITO IMPORTANTE!',
   },
   {
-    number: 5,
+    number: 6,
     title: 'Confirmação e envio',
     textBefore:
-      'Após preencher o formulário, revise todas as informações fornecidas para garantir que estão corretas. Em seguida, envie o formulário para processamento. Você receberá uma confirmação de que sua solicitação foi recebida.',
+      'Revisou tudo? Então é só enviar. Você vai receber uma confirmação por e-mail avisando que seu pedido foi recebido. Depois disso é só aguardar a liberação do seu título.',
     textAfter: '',
     image: '/src/assets/Imagens/',
-    tagLabel: 'Tire seu título',
+    tagLabel: 'Tire seu título!',
+  },
+  {
+    number: 7,
+    title: 'E agora?',
+    textBefore:
+      'Depois que seu título for aprovado, você vai receber um e-mail de confirmação. A partir daí, você já pode baixar o app e-Título para acompanhar sua situação eleitoral e descobrir seu local de votação antes do dia da eleição.',
+    textAfter:
+      'Utilize o app e-Título para acessar seu título digital, verificar se está apto a votar, conferir seu local de votação e muito mais. É uma forma prática e segura de manter tudo em dia com a Justiça Eleitoral!',
+    image: '/src/assets/Imagens/passo6.png',
+    tagLabel: 'FICA A DICA!',
   },
   // ... continue os demais passos aqui
 ];
@@ -78,6 +100,27 @@ export default function StepCarousel() {
 
   return (
     <div className="w-full flex flex-col items-center gap-[24px] mt-[60px]">
+      {/* Animações customizadas das setas */}
+      <style>{`
+        @keyframes pulseLeft {
+          0%, 100% { transform: translateX(0); }
+          50% { transform: translateX(-6px); }
+        }
+        @keyframes pulseRight {
+          0%, 100% { transform: translateX(0); }
+          50% { transform: translateX(6px); }
+        }
+        .arrow-left {
+          animation: pulseLeft 1.4s ease-in-out infinite;
+        }
+        .arrow-right {
+          animation: pulseRight 1.4s ease-in-out infinite;
+        }
+        .arrow-left:hover, .arrow-right:hover {
+          animation-play-state: paused;
+        }
+      `}</style>
+
       {/* mt-[60px] empurra o carrossel inteiro pra baixo */}
       <div className="relative w-full max-w-[1100px] flex items-center gap-[16px]">
         {/* era max-w-[900px] -> agora maior */}
@@ -85,7 +128,7 @@ export default function StepCarousel() {
         {/* SETA ESQUERDA */}
         <button
           onClick={goPrev}
-          className="shrink-0 text-[#2a2a72] hover:opacity-60 transition"
+          className="arrow-left shrink-0 text-[#2a2a72] rounded-full p-[6px] hover:scale-125 hover:shadow-[0_0_16px_4px_rgba(42,42,114,0.4)] active:scale-95 transition-transform duration-200 ease-out"
           aria-label="Anterior"
         >
           <ChevronLeft size={28} />
@@ -98,11 +141,11 @@ export default function StepCarousel() {
 
             {/* TEXTO */}
             <div className="flex-1 flex flex-col justify-center gap-[16px] px-[40px] py-[32px]">
-              <h3 className="text-[20px] font-bold text-[#232528]">
+              <h3 className="text-[26px] font-bold text-[#232528]">
                 {step.number}. {step.title}
               </h3>
 
-              <p className="text-[15px] leading-[1.6] text-[#232528] indent-6 text-justify">
+              <p className="text-[18px] leading-[1.7] text-[#232528] indent-6 text-justify">
                 {step.textBefore}
                 {step.link && (
                   <a
@@ -117,19 +160,22 @@ export default function StepCarousel() {
               </p>
 
               {step.textAfter && (
-                <p className="text-[15px] leading-[1.6] text-[#232528] indent-6 text-justify">
+                <p className="text-[18px] leading-[1.7] text-[#232528] indent-6 text-justify">
                   {step.textAfter}
                 </p>
               )}
             </div>
 
             {/* IMAGEM */}
-            <div className="relative w-[340px] shrink-0 bg-[#f2f2f7]">
-              {/* era w-[280px] -> agora maior */}
+            <div className="relative w-[340px] shrink-0 bg-[#f2f2f7] flex items-center justify-center p-4">
               <img
                 src={step.image}
                 alt={step.title}
-                className="w-full h-full object-cover"
+                className={
+                  step.imageFit === 'contain'
+                    ? 'max-w-full max-h-full object-contain'
+                    : 'w-full h-full object-cover'
+                }
               />
               {step.tagLabel && (
                 <span className="absolute bottom-4 left-4 bg-[#2a2a72] text-white text-[12px] font-medium px-[14px] py-[6px] rounded-full">
@@ -143,7 +189,7 @@ export default function StepCarousel() {
         {/* SETA DIREITA */}
         <button
           onClick={goNext}
-          className="shrink-0 text-[#2a2a72] hover:opacity-60 transition"
+          className="arrow-right shrink-0 text-[#2a2a72] rounded-full p-[6px] hover:scale-125 hover:shadow-[0_0_16px_4px_rgba(42,42,114,0.4)] active:scale-95 transition-transform duration-200 ease-out"
           aria-label="Próximo"
         >
           <ChevronRight size={28} />

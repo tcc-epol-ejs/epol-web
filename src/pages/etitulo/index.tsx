@@ -21,6 +21,11 @@ const bolasConfig = [
 
 function Etitulo() {
   const trackRef = useRef<HTMLDivElement>(null);
+  const secondSectionRef = useRef<HTMLDivElement>(null);
+
+  const scrollToNextSection = () => {
+    secondSectionRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
 
   return (
     <>
@@ -30,13 +35,13 @@ function Etitulo() {
         </div>
 
         {/* PRIMEIRA PARTE SEÇÃO */}
-        <div className="w-full h-full bg-[#eaf6ff] flex justify-between items-start overflow-hidden pt-[200px] pb-[80px]">
+        <div className="relative w-full h-full bg-[#eaf6ff] flex justify-between items-start overflow-hidden pt-[200px] pb-[80px]">
           {/* COLUNA ESQUERDA - IMAGEM COM TEXTO */}
-          <div className="flex flex-col items-start pl-[100px] max-w-[1800px] mt-[100px]">
+          <div className="flex flex-col items-start pl-[150px] max-w-[1800px] mt-[100px]">
             <img
               src={etitulo}
               alt="etitulo"
-              className="w-full max-w-none scale-125"
+              className="w-full max-w-none scale-150"
             />
           </div>
 
@@ -66,9 +71,32 @@ function Etitulo() {
               />
             </div>
           </div>
+
+          {/* SETA ANIMADA */}
+          <button
+            onClick={scrollToNextSection}
+            aria-label="Rolar para a próxima seção"
+            className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center animate-bounce z-[1] cursor-pointer"
+          >
+            <svg
+              width="32"
+              height="32"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="#4A4A8A"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M6 9l6 6 6-6" />
+            </svg>
+          </button>
         </div>
 
-        <div className="relative w-full h-[100dvh] bg-[#BDC3EA] overflow-hidden flex flex-col items-center pt-[40px] gap-[60px]">
+        <div
+          ref={secondSectionRef}
+          className="relative w-full h-[100dvh] bg-[#BDC3EA] overflow-hidden flex flex-col items-center pt-[40px] gap-[60px]"
+        >
           <img src={comoobter} alt="comoobter" className="w-[35%] max-w-none" />
 
           <div className="relative z-10">
