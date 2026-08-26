@@ -99,7 +99,7 @@ function Etitulo() {
         >
           <img src={comoobter} alt="comoobter" className="w-[35%] max-w-none" />
 
-          <div className="relative z-10">
+          <div className="relative z-1000 w-[1200px] h-[550px] flex items-center justify-center gap-[40px]">
             <CarrosselEtitulo />
           </div>
 

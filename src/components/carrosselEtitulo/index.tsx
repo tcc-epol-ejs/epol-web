@@ -34,7 +34,7 @@ const steps: Step[] = [
       label: 'Acessar Título Net',
     },
     textAfter: `2. Idade mínima: 15 anos. Só que se você tirar o título com 15, só vai poder votar de verdade quando completar 16 até a próxima eleição.`,
-    image: '/src/assets/Imagens/passo1.png',
+    image: '/src/assets/Imagens/passos.png',
     tagLabel: 'ATENCAO!',
   },
   {
@@ -56,7 +56,7 @@ const steps: Step[] = [
       url: 'https://www.tse.jus.br/servicos-eleitorais/autoatendimento-eleitoral#/atendimento-eleitor',
       label: 'Acessar Título Net',
     },
-    image: '/src/assets/Imagens/passo3.png',
+    image: '/src/assets/Imagens/site.png',
     tagLabel: 'AGENDE SEU HORÁRIO!',
   },
   {
@@ -74,7 +74,7 @@ const steps: Step[] = [
     textBefore:
       'Revisou tudo? Então é só enviar. Você vai receber uma confirmação por e-mail avisando que seu pedido foi recebido. Depois disso é só aguardar a liberação do seu título.',
     textAfter: '',
-    image: '/src/assets/Imagens/',
+    image: '/src/assets/Imagens/passo4.png',
     tagLabel: 'Tire seu título!',
   },
   {
@@ -84,7 +84,7 @@ const steps: Step[] = [
       'Depois que seu título for aprovado, você vai receber um e-mail de confirmação. A partir daí, você já pode baixar o app e-Título para acompanhar sua situação eleitoral e descobrir seu local de votação antes do dia da eleição.',
     textAfter:
       'Utilize o app e-Título para acessar seu título digital, verificar se está apto a votar, conferir seu local de votação e muito mais. É uma forma prática e segura de manter tudo em dia com a Justiça Eleitoral!',
-    image: '/src/assets/Imagens/passo6.png',
+    image: '/src/assets/Imagens/app.png',
     tagLabel: 'FICA A DICA!',
   },
   // ... continue os demais passos aqui
