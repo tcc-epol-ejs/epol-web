@@ -4,6 +4,7 @@ import Login from './pages/login';
 import Cadastro from './pages/cadastro';
 import RecuperarSenha from './pages/recuperar_senha';
 import Admin from './pages/admin';
+import SearchPol from './pages/searchpol';
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
         <Route path="/cadastro" element={<Cadastro />} />
         <Route path="/recuperar-senha" element={<RecuperarSenha />} />
         <Route path="/admin" element={<Admin />} />
+        <Route path="/searchpol" element={<SearchPol />} />
       </Routes>
     </BrowserRouter>
   );
