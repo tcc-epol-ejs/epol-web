@@ -13,6 +13,7 @@ const candidates = [
     numero: '6767',
     estado: 'São Paulo',
     candidatura: 'Deputado Federal',
+    isPokemon: false,
     foto: Pipo1,
   },
   {
@@ -22,6 +23,7 @@ const candidates = [
     numero: '25',
     estado: 'Rio de Janeiro',
     candidatura: 'Governador',
+    isPokemon: true,
     foto: Drago,
   },
   {
@@ -31,6 +33,7 @@ const candidates = [
     numero: '17',
     estado: 'São Paulo',
     candidatura: 'Presidente',
+    isPokemon: false,
     foto: Nico,
   },
   {
@@ -40,6 +43,7 @@ const candidates = [
     numero: '67123',
     estado: 'Acre',
     candidatura: 'Vereador',
+    isPokemon: true,
     foto: Irmao,
   },
 ];
@@ -47,6 +51,10 @@ const candidates = [
 function SearchPol() {
   const [search, setSearch] = useState('');
   const [searchedTerm, setSearchedTerm] = useState('');
+  const [onlyPokemon, setOnlyPokemon] = useState(false);
+  const [selectedCandidatura, setSelectedCandidatura] = useState('');
+  const [selectedEstado, setSelectedEstado] = useState('');
+  const [selectedPartido, setSelectedPartido] = useState('');
 
   const handleSearch = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -58,7 +66,13 @@ function SearchPol() {
       firstCandidate.nome.localeCompare(secondCandidate.nome, 'pt-BR'),
     )
     .filter(
-      (candidate) => searchedTerm === '' || candidate.keyword === searchedTerm,
+      (candidate) =>
+        (searchedTerm === '' || candidate.keyword === searchedTerm) &&
+        (!onlyPokemon || candidate.isPokemon) &&
+        (!selectedCandidatura ||
+          candidate.candidatura === selectedCandidatura) &&
+        (!selectedEstado || candidate.estado === selectedEstado) &&
+        (!selectedPartido || candidate.partido === selectedPartido),
     );
 
   return (
@@ -75,6 +89,68 @@ function SearchPol() {
             <FiFilter aria-hidden="true" className="text-[22px]" />
             Filtrar
           </h2>
+
+          <div className="mt-6 flex flex-col gap-5">
+            <label className="flex items-center gap-2 text-[13px] text-[#333]">
+              <input
+                type="checkbox"
+                checked={onlyPokemon}
+                onChange={(event) => setOnlyPokemon(event.target.checked)}
+                className="h-4 w-4 accent-[#2A2A72]"
+              />
+              Pokémon
+            </label>
+
+            <label className="flex flex-col gap-2 text-[12px] font-bold uppercase tracking-[0.08em] text-[#2A2A72]">
+              Tipo de candidatura
+              <select
+                value={selectedCandidatura}
+                onChange={(event) => setSelectedCandidatura(event.target.value)}
+                className="h-10 rounded-lg border border-[#2A2A72]/30 bg-white px-3 text-[12px] font-medium normal-case tracking-normal text-[#333] outline-none"
+              >
+                <option value="">Todos os tipos</option>
+                <option value="Deputado Federal">Deputado Federal</option>
+                <option value="Governador">Governador</option>
+                <option value="Presidente">Presidente</option>
+                <option value="Vereador">Vereador</option>
+              </select>
+            </label>
+
+            <label className="flex flex-col gap-2 text-[12px] font-bold uppercase tracking-[0.08em] text-[#2A2A72]">
+              Estado
+              <select
+                value={selectedEstado}
+                onChange={(event) => setSelectedEstado(event.target.value)}
+                className="h-10 rounded-lg border border-[#2A2A72]/30 bg-white px-3 text-[12px] font-medium normal-case tracking-normal text-[#333] outline-none"
+              >
+                <option value="">Todos os estados</option>
+                <option value="Acre">Acre</option>
+                <option value="Rio de Janeiro">Rio de Janeiro</option>
+                <option value="São Paulo">São Paulo</option>
+              </select>
+            </label>
+
+            <label className="flex flex-col gap-2 text-[12px] font-bold uppercase tracking-[0.08em] text-[#2A2A72]">
+              Partido
+              <select
+                value={selectedPartido}
+                onChange={(event) => setSelectedPartido(event.target.value)}
+                className="h-10 rounded-lg border border-[#2A2A72]/30 bg-white px-3 text-[12px] font-medium normal-case tracking-normal text-[#333] outline-none"
+              >
+                <option value="">Todos os partidos</option>
+                <option value="PARTIDO DOS IRMÃOZINHOS">
+                  Partido dos Irmãozinhos
+                </option>
+                <option value="PARTIDO DRAGÕES DA SILVA">
+                  Partido Dragões da Silva
+                </option>
+                <option value="PARTIDO EPOL">Partido EPOL</option>
+                <option value="PARTIDO DOS LIXOCOCOS">
+                  Partido dos Lixococos
+                </option>
+              </select>
+            </label>
+          </div>
         </aside>
 
         <div className="flex w-full flex-1 flex-col items-stretch gap-4 lg:pl-10">
