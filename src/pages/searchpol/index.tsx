@@ -1,5 +1,6 @@
 import { FiFilter, FiSearch } from 'react-icons/fi';
 import { FormEvent, useState } from 'react';
+import Header from '../../components/header';
 import Pipo1 from '../../assets/GIFs/pipo1.gif';
 import Drago from '../../assets/Imagens/dragonite.png';
 import Nico from '../../assets/Imagens/nico.png';
@@ -101,13 +102,10 @@ function SearchPol() {
     );
 
   return (
-    <main className="min-h-screen bg-[#eaf6ff]">
-      <header className="flex items-center justify-center bg-[#FFA400] px-6 py-1 sm:px-10 lg:px-[62px]">
-        <h1 className="text-[22px] font-black uppercase tracking-[0.12em] text-white sm:text-[30px]">
-          SearchPol
-        </h1>
-      </header>
-
+    <>
+      <div className="w-full">
+        <Header />
+      </div>
       <section className="mx-auto flex min-h-[calc(100vh-64px)] w-full max-w-[1200px] flex-col px-6 pt-8 sm:px-10 sm:pt-10 lg:flex-row lg:px-0">
         <aside className="w-full pb-8 lg:w-1/4 lg:border-r-2 lg:border-[#2A2A72]/30 lg:pb-0 lg:pl-8 lg:pr-8">
           <h2 className="flex items-center gap-3 text-[18px] font-bold uppercase tracking-[0.12em] text-[#2A2A72]">
@@ -270,7 +268,7 @@ function SearchPol() {
           </div>
         </div>
       </section>
-    </main>
+    </>
   );
 }
 
