@@ -2,6 +2,8 @@ import { FiFilter, FiSearch } from 'react-icons/fi';
 import { FormEvent, useState } from 'react';
 import Pipo1 from '../../assets/GIFs/pipo1.gif';
 import Drago from '../../assets/Imagens/dragonite.png';
+import Nico from '../../assets/Imagens/nico.png';
+import Irmao from '../../assets/Imagens/irmao.png';
 
 const candidates = [
   {
@@ -22,6 +24,24 @@ const candidates = [
     candidatura: 'Governador',
     foto: Drago,
   },
+  {
+    keyword: 'lixococo',
+    nome: 'Nicolas Rodrigues',
+    partido: 'PARTIDO DOS LIXOCOCOS',
+    numero: '17',
+    estado: 'São Paulo',
+    candidatura: 'Presidente',
+    foto: Nico,
+  },
+  {
+    keyword: 'irmao',
+    nome: 'Irmãozinho',
+    partido: 'PARTIDO DOS IRMÃOZINHOS',
+    numero: '67123',
+    estado: 'Acre',
+    candidatura: 'Vereador',
+    foto: Irmao,
+  },
 ];
 
 function SearchPol() {
@@ -33,9 +53,13 @@ function SearchPol() {
     setSearchedTerm(search.trim().toLowerCase());
   };
 
-  const results = candidates.filter(
-    (candidate) => candidate.keyword === searchedTerm,
-  );
+  const results = [...candidates]
+    .sort((firstCandidate, secondCandidate) =>
+      firstCandidate.nome.localeCompare(secondCandidate.nome, 'pt-BR'),
+    )
+    .filter(
+      (candidate) => searchedTerm === '' || candidate.keyword === searchedTerm,
+    );
 
   return (
     <main className="min-h-screen bg-[#eaf6ff]">
