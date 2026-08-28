@@ -4,8 +4,9 @@ import Pipo1 from '../../assets/GIFs/pipo1.gif';
 import Drago from '../../assets/Imagens/dragonite.png';
 import Nico from '../../assets/Imagens/nico.png';
 import Irmao from '../../assets/Imagens/irmao.png';
+import Bacana from '../../assets/Imagens/bacanas.png';
 
-const candidates = [
+const candidatos = [
   {
     keyword: 'pipo',
     nome: 'Pipo',
@@ -48,6 +49,17 @@ const candidates = [
   },
 ];
 
+const partidos = [
+  {
+    keyword: 'bacana',
+    nome: 'PARTIDO BACANA',
+    presidente: 'Bacana da Silva',
+    numero: '10',
+    estado: 'São Paulo',
+    foto: Bacana,
+  },
+];
+
 function SearchPol() {
   const [search, setSearch] = useState('');
   const [searchedTerm, setSearchedTerm] = useState('');
@@ -61,7 +73,7 @@ function SearchPol() {
     setSearchedTerm(search.trim().toLowerCase());
   };
 
-  const results = [...candidates]
+  const results = [...candidatos]
     .sort((firstCandidate, secondCandidate) =>
       firstCandidate.nome.localeCompare(secondCandidate.nome, 'pt-BR'),
     )
@@ -73,6 +85,19 @@ function SearchPol() {
           candidate.candidatura === selectedCandidatura) &&
         (!selectedEstado || candidate.estado === selectedEstado) &&
         (!selectedPartido || candidate.partido === selectedPartido),
+    );
+
+  const results2 = [...partidos]
+    .sort((firstParty, secondParty) =>
+      firstParty.nome.localeCompare(secondParty.nome, 'pt-BR'),
+    )
+    .filter(
+      (party) =>
+        (searchedTerm === '' || party.keyword === searchedTerm) &&
+        !onlyPokemon &&
+        !selectedCandidatura &&
+        (!selectedEstado || party.estado === selectedEstado) &&
+        (!selectedPartido || party.nome === selectedPartido),
     );
 
   return (
@@ -208,6 +233,36 @@ function SearchPol() {
                   </p>
                   <p className="text-[15px] font-semibold text-[#333]">
                     Candidato a: {candidate.candidatura}
+                  </p>
+                </div>
+              </article>
+            ))}
+
+            {results2.map((party) => (
+              <article
+                key={party.keyword}
+                className="flex w-full items-center gap-4 rounded-2xl border-2 border-[#2A2A72]/30 bg-white p-3"
+              >
+                <img
+                  src={party.foto}
+                  alt={`Logo de ${party.nome}`}
+                  className="h-32 w-32 shrink-0 rounded-xl object-cover"
+                />
+
+                <div className="flex flex-col gap-0 text-[#2A2A72]">
+                  <div className="flex items-center gap-2">
+                    <h2 className="truncate text-[22px] font-bold uppercase tracking-[0.06em]">
+                      {party.nome} -
+                    </h2>
+                    <span className="shrink-0 text-[22px] font-black text-[#FFA400]">
+                      {party.numero}
+                    </span>
+                  </div>
+                  <p className="text-[17px] font-semibold leading-tight text-[#333]">
+                    Presidente: {party.presidente}
+                  </p>
+                  <p className="mt-6 text-[15px] font-semibold text-[#333]">
+                    {party.estado}
                   </p>
                 </div>
               </article>
