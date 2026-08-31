@@ -118,6 +118,12 @@ export const redefinirSenha = (token: string, novaSenha: string) =>
 
 export const listarPartidos = () => request<Partido[]>('/api/partidos');
 
+export const cadastrarPartido = (dados: any) =>
+  request<Partido>('/api/partidos', {
+    method: 'POST',
+    body: JSON.stringify(dados),
+  });
+
 // ---------- CANDIDATOS ----------
 
 export const listarCandidatos = () => request<Candidato[]>('/api/candidatos');
