@@ -1,6 +1,13 @@
 import { useState, useRef, useMemo, useEffect } from 'react';
 import type { PointerEvent as ReactPointerEvent } from 'react';
-import { FiX, FiMinus, FiHeart, FiChevronLeft } from 'react-icons/fi';
+import {
+  FiX,
+  FiMinus,
+  FiHeart,
+  FiChevronLeft,
+  FiFlag,
+  FiTarget,
+} from 'react-icons/fi';
 import Header from '../../components/header';
 import RoundButton from '../../components/botoes/roundButton';
 import PipoCoracao from '../../assets/Imagens/pipoCoracao.png';
@@ -337,6 +344,70 @@ function Blobs({ tint }: { tint?: string | null }) {
   );
 }
 // -----------------------------------------------------------------------------
+// TELA 0 — INTRODUÇÃO
+// -----------------------------------------------------------------------------
+interface IntroScreenProps {
+  onStart: () => void;
+}
+
+function IntroScreen({ onStart }: IntroScreenProps) {
+  return (
+    <div className="relative w-full h-full min-h-[640px] bg-[#2E2A6B] overflow-hidden flex items-center justify-center px-4 py-8">
+      <Blobs />
+      <div className="relative z-10 bg-white rounded-[28px] p-7 sm:p-9 w-full max-w-[560px] shadow-[0_30px_60px_rgba(15,12,60,0.35)] text-center">
+        {/* <Pipo mood="happy" size={130} /> */}
+
+        <h1 className="[font-family:'Sora',sans-serif] font-extrabold text-[24px] sm:text-[28px] text-[#1B1B3A] mt-4 mb-2">
+          Descubra seu{' '}
+          <em className="italic text-[#FF9F1C] not-italic">match</em> político
+        </h1>
+        <p className="text-[14px] text-[#5b5776] leading-[1.5] mb-6 max-w-[420px] mx-auto">
+          Você vai responder algumas perguntas rápidas sobre economia, educação,
+          saúde e outros temas. No final, mostramos com qual partido suas
+          respostas mais combinam.
+        </p>
+
+        <div className="flex flex-col gap-3 text-left max-w-[400px] mx-auto mb-7">
+          <div className="flex items-center gap-3 bg-[#F7F5FF] rounded-2xl px-4 py-3">
+            <span className="shrink-0 w-9 h-9 rounded-full bg-[#EDE9FE] text-[#6F68C9] flex items-center justify-center">
+              <FiFlag size={16} strokeWidth={2.5} />
+            </span>
+            <span className="text-[13px] text-[#2E2A47] font-semibold">
+              Perguntas rápidas sobre vários temas da política
+            </span>
+          </div>
+
+          <div className="flex items-center gap-3 bg-[#F7F5FF] rounded-2xl px-4 py-3">
+            <span className="shrink-0 w-9 h-9 rounded-full bg-[#EDE9FE] text-[#6F68C9] flex items-center justify-center gap-0.5">
+              <FiHeart size={16} strokeWidth={2.5} />
+            </span>
+            <span className="text-[13px] text-[#2E2A47] font-semibold">
+              Arraste ou toque nos botões: discordo, neutro ou concordo
+            </span>
+          </div>
+
+          {/* <div className="flex items-center gap-3 bg-[#F7F5FF] rounded-2xl px-4 py-3">
+            <span className="shrink-0 w-9 h-9 rounded-full bg-[#EDE9FE] text-[#6F68C9] flex items-center justify-center">
+              <FiTarget size={16} strokeWidth={2.5} />
+            </span>
+            <span className="text-[13px] text-[#2E2A47] font-semibold">
+              No fim, veja seu partido mais compatível e o porquê
+            </span>
+          </div> */}
+        </div>
+
+        <button
+          onClick={onStart}
+          className="w-full max-w-[280px] mx-auto block bg-[#2E2A47] text-white [font-family:'Sora',sans-serif] font-bold text-[15px] tracking-[0.02em] py-3.5 rounded-full shadow-[0_5px_0_#16142a] transition-transform duration-150 hover:-translate-y-0.5 active:translate-y-1 active:shadow-[0_1px_0_#16142a]"
+        >
+          Começar
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// -----------------------------------------------------------------------------
 // TELA 1 — QUIZ
 // -----------------------------------------------------------------------------
 interface QuizScreenProps {
@@ -645,12 +716,15 @@ function ResultScreen({ respostas, onRestart }: ResultScreenProps) {
 // -----------------------------------------------------------------------------
 // PÁGINA — MatchPolitico
 // -----------------------------------------------------------------------------
-type View = 'quiz' | 'result';
+type View = 'intro' | 'quiz' | 'result';
 
 export default function MatchPolitico() {
-  const [view, setView] = useState<View>('quiz');
+  const [view, setView] = useState<View>('intro');
   const [respostas, setRespostas] = useState<Resposta[]>([]);
 
+  function handleStart() {
+    setView('quiz');
+  }
   function handleFinish(novas: Resposta[]) {
     setRespostas(novas);
     setTimeout(() => setView('result'), 150);
@@ -666,9 +740,9 @@ export default function MatchPolitico() {
         <Header />
       </div>
       <div className="w-full h-full">
-        {view === 'quiz' ? (
-          <QuizScreen onFinish={handleFinish} />
-        ) : (
+        {view === 'intro' && <IntroScreen onStart={handleStart} />}
+        {view === 'quiz' && <QuizScreen onFinish={handleFinish} />}
+        {view === 'result' && (
           <ResultScreen respostas={respostas} onRestart={handleRestart} />
         )}
       </div>
