@@ -6,6 +6,8 @@ import { useAuth } from '../../contexts/AuthContext';
 import Textbox from '../../components/inputs';
 import Botao from '../../components/botoes/botao';
 import LogoEpol from '../../assets/Imagens/Logos/logoepol.png';
+import { ToastContainer, useToasts } from '../../components/toast';
+import DateField from '../../components/inputs/data';
 
 const bolasConfig = [
   { size: 280, top: '-40px', left: '-30px', opacity: 1 },
@@ -135,416 +137,6 @@ const CAMPOS_POR_PASSO: Record<Passo, (keyof FormData)[]> = {
   4: ['senha', 'confirmSenha'],
 };
 
-// Toast de erro (canto superior direito, com barra regressiva)
-
-const TOAST_DURACAO_MS = 5000;
-
-interface ToastItem {
-  id: number;
-  mensagem: string;
-}
-
-function ToastErro({
-  mensagem,
-  duracao = TOAST_DURACAO_MS,
-  onFechar,
-}: {
-  mensagem: string;
-  duracao?: number;
-  onFechar: () => void;
-}) {
-  const DURACAO_ANIMACAO_MS = 300;
-
-  const [pausado, setPausado] = useState(false);
-  const [saindo, setSaindo] = useState(false);
-  const restanteRef = useRef(duracao);
-  const inicioRef = useRef(Date.now());
-  const timeoutRef = useRef<ReturnType<typeof setTimeout>>();
-  const saidaTimeoutRef = useRef<ReturnType<typeof setTimeout>>();
-
-  function iniciarSaida() {
-    setSaindo(true);
-    saidaTimeoutRef.current = setTimeout(onFechar, DURACAO_ANIMACAO_MS);
-  }
-
-  function iniciarTimer(tempoRestante: number) {
-    inicioRef.current = Date.now();
-    timeoutRef.current = setTimeout(iniciarSaida, tempoRestante);
-  }
-
-  useEffect(() => {
-    iniciarTimer(restanteRef.current);
-    return () => {
-      clearTimeout(timeoutRef.current);
-      clearTimeout(saidaTimeoutRef.current);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  function pausar() {
-    if (saindo) return;
-    clearTimeout(timeoutRef.current);
-    const decorrido = Date.now() - inicioRef.current;
-    restanteRef.current = Math.max(restanteRef.current - decorrido, 0);
-    setPausado(true);
-  }
-
-  function retomar() {
-    if (saindo) return;
-    setPausado(false);
-    iniciarTimer(restanteRef.current);
-  }
-
-  return (
-    <div
-      onMouseEnter={pausar}
-      onMouseLeave={retomar}
-      style={{
-        animationName: saindo ? 'epol-toast-saida' : 'epol-toast-entrada',
-        animationDuration: `${DURACAO_ANIMACAO_MS}ms`,
-        animationTimingFunction: saindo ? 'ease-in' : 'ease-out',
-        animationFillMode: 'forwards',
-      }}
-      className="pointer-events-auto w-72 overflow-hidden rounded-xl bg-white shadow-xl border border-[#ffcccc]"
-    >
-      <div className="h-1 w-full bg-red-100">
-        <div
-          className="h-full bg-red-500"
-          style={{
-            animationName: 'epol-toast-shrink',
-            animationDuration: `${duracao}ms`,
-            animationTimingFunction: 'linear',
-            animationFillMode: 'forwards',
-            animationPlayState: pausado ? 'paused' : 'running',
-          }}
-        />
-      </div>
-      <div className="flex items-start gap-2 px-4 py-3">
-        <p className="flex-1 text-sm text-[#2a2a72] font-medium leading-snug">
-          {mensagem}
-        </p>
-        <button
-          type="button"
-          onClick={iniciarSaida}
-          aria-label="Fechar aviso"
-          className="mt-0.5 text-[#8888D3] hover:text-red-500 transition-colors text-sm leading-none flex-shrink-0"
-        >
-          ✕
-        </button>
-      </div>
-    </div>
-  );
-}
-
-function ToastContainer({
-  toasts,
-  onFechar,
-}: {
-  toasts: ToastItem[];
-  onFechar: (id: number) => void;
-}) {
-  return (
-    <>
-      <style>{`
-        @keyframes epol-toast-shrink {
-          from { width: 100%; }
-          to { width: 0%; }
-        }
-        @keyframes epol-toast-entrada {
-          from { transform: translateX(100%); opacity: 0; }
-          to { transform: translateX(0); opacity: 1; }
-        }
-        @keyframes epol-toast-saida {
-          from { transform: translateX(0); opacity: 1; }
-          to { transform: translateX(100%); opacity: 0; }
-        }
-      `}</style>
-      <div className="fixed top-4 right-4 z-[100] flex flex-col gap-3 pointer-events-none">
-        {toasts.map((toast) => (
-          <ToastErro
-            key={toast.id}
-            mensagem={toast.mensagem}
-            onFechar={() => onFechar(toast.id)}
-          />
-        ))}
-      </div>
-    </>
-  );
-}
-
-// Seletor de data customizado
-
-const NOMES_MESES = [
-  'janeiro',
-  'fevereiro',
-  'março',
-  'abril',
-  'maio',
-  'junho',
-  'julho',
-  'agosto',
-  'setembro',
-  'outubro',
-  'novembro',
-  'dezembro',
-];
-
-function toISODate(data: Date): string {
-  const ano = data.getFullYear();
-  const mes = String(data.getMonth() + 1).padStart(2, '0');
-  const dia = String(data.getDate()).padStart(2, '0');
-  return `${ano}-${mes}-${dia}`;
-}
-
-function parseISODate(iso: string): Date | null {
-  if (!iso) return null;
-  const [ano, mes, dia] = iso.split('-').map(Number);
-  if (!ano || !mes || !dia) return null;
-  return new Date(ano, mes - 1, dia);
-}
-
-function formatarDataExibicao(iso: string): string {
-  const data = parseISODate(iso);
-  if (!data) return '';
-  return `${String(data.getDate()).padStart(2, '0')}/${String(
-    data.getMonth() + 1,
-  ).padStart(2, '0')}/${data.getFullYear()}`;
-}
-
-function DateField({
-  value,
-  onChange,
-  placeholder = 'Data de nascimento',
-}: {
-  value: string;
-  onChange: (isoDate: string) => void;
-  placeholder?: string;
-}) {
-  const [aberto, setAberto] = useState(false);
-  // 'dias' = calendário normal | 'anos' = grade rápida de anos (para pular décadas)
-  const [visualizacao, setVisualizacao] = useState<'dias' | 'anos'>('dias');
-  const dataSelecionada = parseISODate(value);
-  const hoje = new Date();
-  const [dataVisualizada, setDataVisualizada] = useState<Date>(
-    dataSelecionada ?? new Date(hoje.getFullYear() - 18, hoje.getMonth(), 1),
-  );
-  const containerRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    function aoClicarFora(event: MouseEvent) {
-      if (
-        containerRef.current &&
-        !containerRef.current.contains(event.target as Node)
-      ) {
-        setAberto(false);
-        setVisualizacao('dias');
-      }
-    }
-    document.addEventListener('mousedown', aoClicarFora);
-    return () => document.removeEventListener('mousedown', aoClicarFora);
-  }, []);
-
-  function alternarAberto() {
-    setAberto((prev) => {
-      const novoEstado = !prev;
-      if (!novoEstado) setVisualizacao('dias');
-      return novoEstado;
-    });
-  }
-
-  const ano = dataVisualizada.getFullYear();
-  const mes = dataVisualizada.getMonth();
-  const totalDiasMes = new Date(ano, mes + 1, 0).getDate();
-  const primeiroDiaSemana = new Date(ano, mes, 1).getDay();
-  const celulas: (number | null)[] = [
-    ...Array(primeiroDiaSemana).fill(null),
-    ...Array.from({ length: totalDiasMes }, (_, i) => i + 1),
-  ];
-
-  const inicioIntervaloAnos = Math.floor(ano / 12) * 12;
-  const anosDoIntervalo = Array.from(
-    { length: 12 },
-    (_, i) => inicioIntervaloAnos + i,
-  );
-
-  function mudarMes(delta: number) {
-    setDataVisualizada(new Date(ano, mes + delta, 1));
-  }
-
-  function mudarAno(delta: number) {
-    setDataVisualizada(new Date(ano + delta, mes, 1));
-  }
-
-  function mudarIntervaloAnos(delta: number) {
-    setDataVisualizada(new Date(ano + delta * 12, mes, 1));
-  }
-
-  function selecionarAno(anoEscolhido: number) {
-    setDataVisualizada(new Date(anoEscolhido, mes, 1));
-    setVisualizacao('dias');
-  }
-
-  function selecionarDia(dia: number) {
-    onChange(toISODate(new Date(ano, mes, dia)));
-    setAberto(false);
-    setVisualizacao('dias');
-  }
-
-  return (
-    <div className="relative w-full" ref={containerRef}>
-      <button
-        type="button"
-        onClick={alternarAberto}
-        className="w-full flex items-center justify-between rounded-full border border-[#a9a9f6] bg-[#a9a9f6] px-4 py-2.5 font-medium text-sm outline-none transition-all duration-300 focus:brightness-[1.2]"
-      >
-        <span className={value ? 'text-[#1f2a52]' : 'text-[#5A5A70]'}>
-          {value ? formatarDataExibicao(value) : placeholder}
-        </span>
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="#2a2a72"
-          strokeWidth={2}
-          className="w-4 h-4 flex-shrink-0"
-        >
-          <rect x="3" y="4" width="18" height="18" rx="3" />
-          <path d="M16 2v4M8 2v4M3 10h18" />
-        </svg>
-      </button>
-
-      {aberto && (
-        <div className="absolute z-50 top-full left-0 mt-2 w-full min-w-[240px] rounded-2xl bg-[#A9A9F6] border border-[#8888D3] p-3 shadow-xl">
-          {visualizacao === 'dias' ? (
-            <>
-              <div className="flex items-center justify-between mb-2 text-white">
-                <div className="flex items-center">
-                  <button
-                    type="button"
-                    onClick={() => mudarAno(-1)}
-                    aria-label="Ano anterior"
-                    className="px-1 text-[#2a2a72] hover:text-[#FFA400] transition-colors"
-                  >
-                    «
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => mudarMes(-1)}
-                    aria-label="Mês anterior"
-                    className="px-1 text-[#2a2a72] hover:text-[#FFA400] transition-colors"
-                  >
-                    ‹
-                  </button>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setVisualizacao('anos')}
-                  className="text-xs text-[#2a2a72] font-semibold capitalize hover:text-[#FFA400] transition-colors"
-                >
-                  {NOMES_MESES[mes]} {ano}
-                </button>
-                <div className="flex items-center">
-                  <button
-                    type="button"
-                    onClick={() => mudarMes(1)}
-                    aria-label="Próximo mês"
-                    className="px-1 text-[#2a2a72] hover:text-[#FFA400] transition-colors"
-                  >
-                    ›
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => mudarAno(1)}
-                    aria-label="Próximo ano"
-                    className="px-1 text-[#2a2a72] hover:text-[#FFA400] transition-colors"
-                  >
-                    »
-                  </button>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-7 gap-1">
-                {celulas.map((dia, idx) => {
-                  if (dia === null) return <span key={`vazio-${idx}`} />;
-
-                  const selecionado =
-                    dataSelecionada &&
-                    dataSelecionada.getFullYear() === ano &&
-                    dataSelecionada.getMonth() === mes &&
-                    dataSelecionada.getDate() === dia;
-
-                  const ehHoje =
-                    hoje.getFullYear() === ano &&
-                    hoje.getMonth() === mes &&
-                    hoje.getDate() === dia;
-
-                  return (
-                    <button
-                      key={dia}
-                      type="button"
-                      onClick={() => selecionarDia(dia)}
-                      className={`w-7 h-7 rounded-full text-xs flex items-center justify-center transition-colors ${
-                        selecionado
-                          ? 'bg-[#FFA400] text-white font-semibold'
-                          : ehHoje
-                            ? 'border border-[#FFA400] text-white'
-                            : 'text-[#2a2a72] font-medium hover:bg-[#6262AD]/60'
-                      }`}
-                    >
-                      {dia}
-                    </button>
-                  );
-                })}
-              </div>
-            </>
-          ) : (
-            <>
-              <div className="flex items-center justify-between mb-2 text-white">
-                <button
-                  type="button"
-                  onClick={() => mudarIntervaloAnos(-1)}
-                  aria-label="Década anterior"
-                  className="px-1 text-[#2a2a72] hover:text-[#FFA400] transition-colors"
-                >
-                  «
-                </button>
-                <span className="text-xs text-[#2a2a72] font-semibold">
-                  {anosDoIntervalo[0]} – {anosDoIntervalo[11]}
-                </span>
-                <button
-                  type="button"
-                  onClick={() => mudarIntervaloAnos(1)}
-                  aria-label="Próxima década"
-                  className="px-1 text-[#2a2a72] hover:text-[#FFA400] transition-colors"
-                >
-                  »
-                </button>
-              </div>
-
-              <div className="grid grid-cols-3 gap-1">
-                {anosDoIntervalo.map((anoOpcao) => (
-                  <button
-                    key={anoOpcao}
-                    type="button"
-                    onClick={() => selecionarAno(anoOpcao)}
-                    className={`py-1.5 rounded-full text-xs font-medium transition-colors ${
-                      anoOpcao === ano
-                        ? 'bg-[#FFA400] text-white font-semibold'
-                        : 'text-[#2a2a72] hover:bg-[#6262AD]/60'
-                    }`}
-                  >
-                    {anoOpcao}
-                  </button>
-                ))}
-              </div>
-            </>
-          )}
-        </div>
-      )}
-    </div>
-  );
-}
-
 // Seletor de estado customizado (mesmo estilo visual do calendário)
 
 const ESTADOS_BR = [
@@ -633,7 +225,7 @@ function EstadoField({
       </button>
 
       {aberto && (
-        <div className="absolute z-50 top-full left-0 mt-2 w-full max-h-60 overflow-y-auto rounded-2xl bg-[#A9A9F6] border border-[#8888D3] p-2 shadow-xl">
+        <div className="absolute z-50 top-full left-0 mt-2 w-full max-h-60 overflow-y-auto rounded-2xl bg-[#A9A9F6] border border-[#8888D3] p-2 shadow-xl custom-scroll">
           <div className="flex flex-col gap-0.5">
             {ESTADOS_BR.map((estado) => {
               const selecionado = estado.nome === value;
@@ -715,16 +307,24 @@ function PartidoField({
       >
         <span className="flex items-center gap-2 min-w-0">
           {partidoSelecionado &&
-            (partidoSelecionado.bandeira_url ? (
-              <img
-                src={partidoSelecionado.bandeira_url}
-                alt=""
-                className="w-5 h-5 rounded-full object-cover flex-shrink-0 bg-white"
+            (partidoSelecionado.numero_legenda ? (
+              <div
+                className="w-5 h-5 text-[12px] text-[#2A2A72] font-semibold rounded-full object-cover flex-shrink-0 bg-[#F3C994]"
                 onError={(e) => {
                   (e.currentTarget as HTMLImageElement).style.display = 'none';
                 }}
-              />
+              >
+                {partidoSelecionado.numero_legenda}
+              </div>
             ) : (
+              // <img
+              //   src={partidoSelecionado.bandeira_url}
+              //   alt=""
+              //   className="w-5 h-5 rounded-full object-cover flex-shrink-0 bg-white"
+              //   onError={(e) => {
+              //     (e.currentTarget as HTMLImageElement).style.display = 'none';
+              //   }}
+              // />
               <IniciaisPartido sigla={partidoSelecionado.sigla} />
             ))}
           <span
@@ -748,7 +348,7 @@ function PartidoField({
       </button>
 
       {aberto && (
-        <div className="absolute z-50 top-full left-0 mt-2 w-full max-h-72 overflow-y-auto rounded-2xl bg-[#A9A9F6] border border-[#8888D3] p-2 shadow-xl">
+        <div className="absolute z-50 top-full left-0 mt-2 w-full max-h-72 overflow-y-auto rounded-2xl bg-[#A9A9F6] border border-[#8888D3] p-2 shadow-xl custom-scroll">
           <div className="flex flex-col gap-0.5">
             <button
               type="button"
@@ -788,17 +388,26 @@ function PartidoField({
                         : 'text-[#2a2a72] hover:bg-[#6262AD]/60'
                     }`}
                   >
-                    {partido.bandeira_url ? (
-                      <img
-                        src={partido.bandeira_url}
-                        alt=""
-                        className="w-6 h-6 rounded-full object-cover flex-shrink-0 bg-white"
+                    {partido.numero_legenda ? (
+                      <div
+                        className="w-5 h-5 text-[11px] rounded-full flex items-center justify-center flex-shrink-0 bg-[#F3C994]"
                         onError={(e) => {
                           (e.currentTarget as HTMLImageElement).style.display =
                             'none';
                         }}
-                      />
+                      >
+                        {partido.numero_legenda}
+                      </div>
                     ) : (
+                      // <img
+                      //   src={partido.bandeira_url}
+                      //   alt=""
+                      //   className="w-6 h-6 rounded-full object-cover flex-shrink-0 bg-white"
+                      //   onError={(e) => {
+                      //     (e.currentTarget as HTMLImageElement).style.display =
+                      //       'none';
+                      //   }}
+                      // />
                       <IniciaisPartido sigla={partido.sigla} />
                     )}
                     <span className="truncate">
@@ -867,7 +476,7 @@ function Cadastro() {
 
   const [step, setStep] = useState<Passo>(1);
   const [formData, setFormData] = useState<FormData>(initialFormData);
-  const [toasts, setToasts] = useState<ToastItem[]>([]);
+  const { toasts, mostrarErro, fecharToast } = useToasts();
   const [enviando, setEnviando] = useState(false);
 
   const [partidos, setPartidos] = useState<Partido[]>([]);
@@ -887,17 +496,6 @@ function Cadastro() {
       .finally(() => setCarregandoPartidos(false));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  function mostrarErro(mensagem: string) {
-    setToasts((prev) => [
-      ...prev,
-      { id: Date.now() + Math.random(), mensagem },
-    ]);
-  }
-
-  function fecharToast(id: number) {
-    setToasts((prev) => prev.filter((t) => t.id !== id));
-  }
 
   function handleChange(campo: keyof FormData) {
     return (event: ChangeEvent<HTMLInputElement>) => {
@@ -1056,6 +654,7 @@ function Cadastro() {
                   <DateField
                     value={formData.data_nascimento}
                     onChange={handleDataNascimentoChange}
+                    placeholder="Data de Nascimento"
                   />
                 </>
               )}
