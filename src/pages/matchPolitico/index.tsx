@@ -3,7 +3,9 @@ import type { PointerEvent as ReactPointerEvent } from 'react';
 import { FiX, FiMinus, FiHeart, FiChevronLeft } from 'react-icons/fi';
 import Header from '../../components/header';
 import RoundButton from '../../components/botoes/roundButton';
-import Mascote from '../../components/mascoteMatchPolitico';
+import PipoCoracao from '../../assets/Imagens/pipoCoracao.png';
+import PipoDefault from '../../assets/Imagens/pipoDefault.png';
+import PipoTriste from '../../assets/Imagens/pipoTriste.png';
 
 // -----------------------------------------------------------------------------
 // TIPOS
@@ -32,6 +34,64 @@ interface PartidoComScore extends Partido {
 interface Resposta {
   tags: string[];
   valor: Valor;
+}
+
+// -----------------------------------------------------------------------------
+// MASCOTE — Pipo (imagens, no lugar do SVG antigo do componente Mascote)
+// -----------------------------------------------------------------------------
+// happy = concordou (coração), neutral = parado/abstenção, sad = discordou
+const PIPO_IMAGES: Record<Mood, string> = {
+  happy: PipoCoracao,
+  neutral: PipoDefault,
+  sad: PipoTriste,
+};
+
+interface PipoProps {
+  mood?: Mood;
+  size?: number;
+  /** Desliga o flutuar suave — útil pros mascotes pequenos dos cards de resultado. */
+  animated?: boolean;
+}
+
+function Pipo({ mood = 'neutral', size = 120, animated = true }: PipoProps) {
+  const wrapperRef = useRef<HTMLDivElement>(null);
+  const phaseRef = useRef(Math.random() * Math.PI * 2); // fase aleatória: vários Pipos na tela não boiam em sincronia
+
+  useEffect(() => {
+    if (!animated) return;
+    let frameId: number;
+    function loop(now: number) {
+      const t = now / 1000;
+      const dy = Math.sin(t * 1.2 + phaseRef.current) * 3;
+      const scale = 1 + Math.sin(t * 1.2 + phaseRef.current) * 0.015;
+      if (wrapperRef.current) {
+        wrapperRef.current.style.transform = `translateY(${dy}px) scale(${scale})`;
+      }
+      frameId = requestAnimationFrame(loop);
+    }
+    frameId = requestAnimationFrame(loop);
+    return () => cancelAnimationFrame(frameId);
+  }, [animated]);
+
+  return (
+    <div
+      ref={wrapperRef}
+      style={{
+        display: 'inline-block',
+        width: size,
+        height: size,
+        willChange: 'transform',
+      }}
+    >
+      <img
+        src={PIPO_IMAGES[mood]}
+        alt="Pipo"
+        width={size}
+        height={size}
+        style={{ width: size, height: size, objectFit: 'contain' }}
+      />
+    </div>
+  );
 }
 
 // -----------------------------------------------------------------------------
@@ -329,14 +389,20 @@ function QuizScreen({ onFinish }: QuizScreenProps) {
   }
 
   const rotate = dragX / 18;
-  const likeOpacity = Math.min(Math.max(dragX / 90, 0), 1);
-  const dislikeOpacity = Math.min(Math.max(-dragX / 90, 0), 1);
+  const likeOpacity =
+    exit === 'like' ? 1 : Math.min(Math.max(dragX / 90, 0), 1);
+  const dislikeOpacity =
+    exit === 'dislike' ? 1 : Math.min(Math.max(-dragX / 90, 0), 1);
   const tint: string | null =
-    dragX > 10
-      ? `radial-gradient(circle at 70% 50%, #FF9F1C55, transparent 60%)`
-      : dragX < -10
-        ? `radial-gradient(circle at 30% 50%, #FF5C7A55, transparent 60%)`
-        : null;
+    exit === 'like'
+      ? `radial-gradient(circle at 70% 50%, #22c55e, transparent 60%)`
+      : exit === 'dislike'
+        ? `radial-gradient(circle at 30% 50%, #ef4444, transparent 60%)`
+        : dragX > 10
+          ? `radial-gradient(circle at 70% 50%, #22c55e, transparent 60%)`
+          : dragX < -10
+            ? `radial-gradient(circle at 30% 50%, #ef4444, transparent 60%)`
+            : null;
 
   const exitTransform: string | null =
     exit === 'like'
@@ -350,7 +416,7 @@ function QuizScreen({ onFinish }: QuizScreenProps) {
   return (
     <div className="relative w-full h-full min-h-[640px] bg-[#2E2A6B] overflow-hidden flex items-center justify-center px-4 py-8">
       <Blobs tint={tint} />
-      <div className="relative z-10 bg-white rounded-[28px] p-7 w-full max-w-[620px] shadow-[0_30px_60px_rgba(15,12,60,0.35)]">
+      <div className="relative z-10 bg-white rounded-[28px] p-7 min-h-[394px] w-full max-w-[620px] shadow-[0_30px_60px_rgba(15,12,60,0.35)]">
         <div className="flex flex-col sm:flex-row gap-7 items-center sm:items-start flex-wrap">
           <div className="w-[220px] sm:w-[240px]">
             <div className="relative w-[220px] sm:w-[240px] h-[268px]">
@@ -389,13 +455,13 @@ function QuizScreen({ onFinish }: QuizScreenProps) {
                   </span>
                 </div>
                 <div
-                  className="absolute top-5 right-[14px] [font-family:'Sora',sans-serif] font-extrabold text-[15px] px-[12px] py-[5px] rounded-lg border-[3px] text-green-500 border-green-500 [transform:rotate(12deg)]"
+                  className="absolute top-5 right-[14px] [font-family:'Sora',sans-serif] font-extrabold text-[15px] px-[12px] py-[5px] rounded-lg border-[3px] text-green-500 border-green-500 [transform:rotate(12deg)] transition-opacity duration-150"
                   style={{ opacity: likeOpacity }}
                 >
                   CONCORDO
                 </div>
                 <div
-                  className="absolute top-5 left-[14px] [font-family:'Sora',sans-serif] font-extrabold text-[15px] px-[12px] py-[5px] rounded-lg border-[3px] text-red-500 border-red-500 [transform:rotate(-12deg)]"
+                  className="absolute top-5 left-[14px] [font-family:'Sora',sans-serif] font-extrabold text-[15px] px-[12px] py-[5px] rounded-lg border-[3px] text-red-500 border-red-500 [transform:rotate(-12deg)] transition-opacity duration-150"
                   style={{ opacity: dislikeOpacity }}
                 >
                   DISCORDO
@@ -428,7 +494,7 @@ function QuizScreen({ onFinish }: QuizScreenProps) {
           </div>
 
           <div className="flex-1 min-w-[200px] flex flex-col items-center text-center gap-[10px] pt-[10px]">
-            <Mascote mood={mood} size={150} />
+            <Pipo mood={mood} size={150} />
             <div className="w-full max-w-[220px] h-2 bg-[#ECEAFB] rounded-full overflow-hidden">
               <div
                 className="h-full bg-[#FF9F1C] transition-[width] duration-300"
@@ -499,12 +565,12 @@ function ResultScreen({ respostas, onRestart }: ResultScreenProps) {
     <div className="relative w-full h-full min-h-[640px] bg-[#2E2A6B] overflow-hidden flex items-center justify-center px-4 py-8">
       <Blobs />
       <div
-        className={`relative z-10 bg-white rounded-[28px] p-7 w-full max-w-[680px] shadow-[0_30px_60px_rgba(15,12,60,0.35)] transition-all duration-[400ms] ease-[cubic-bezier(0.2,0.8,0.2,1)] ${
+        className={`relative z-10 bg-white rounded-[28px] p-7 min-h-[394px] w-full max-w-[680px] shadow-[0_30px_60px_rgba(15,12,60,0.35)] transition-all duration-[400ms] ease-[cubic-bezier(0.2,0.8,0.2,1)] ${
           reveal ? 'scale-100 opacity-100' : 'scale-[0.92] opacity-40'
         }`}
       >
         <button
-          className="bg-transparent border-none text-[#8B84D6] text-[12px] font-semibold flex items-center gap-0.5 cursor-pointer mb-[10px] p-0"
+          className="bg-transparent border-none text-[#8B84D6] text-[12px] font-semibold flex items-center gap-0.5 cursor-pointer mb-[10px] p-0 hover:underline"
           onClick={onRestart}
         >
           <FiChevronLeft size={16} /> refazer
@@ -548,21 +614,21 @@ function ResultScreen({ respostas, onRestart }: ResultScreenProps) {
             </span>
           </div>
 
-          <div className="flex flex-col gap-[14px] items-center">
+          <div className="min-w-[180px] flex flex-col gap-[14px] items-center">
             <div
-              className="w-[150px] h-[150px] rounded-[22px] flex items-center justify-center"
+              className="w-[180px] h-[180px] rounded-[22px] flex items-center justify-center"
               style={{ background: top.cor }}
             >
-              <Mascote mood="happy" size={110} color="#EFEDFF" />
+              <Pipo mood="happy" size={110} />
             </div>
             <div className="flex gap-[10px]">
               {[second, third].map((p) => (
                 <div
                   key={p.sigla}
-                  className="w-[68px] h-[68px] rounded-2xl flex flex-col items-center justify-center gap-0.5"
+                  className="w-[83px] h-[83px] rounded-2xl flex flex-col items-center justify-center gap-0.5"
                   style={{ background: p.cor }}
                 >
-                  <Mascote mood="neutral" size={40} color="#ffffffcc" />
+                  <Pipo mood="neutral" size={40} />
                   <span className="text-white font-extrabold text-[15px] [font-family:'Sora',sans-serif]">
                     {p.pct}%
                   </span>
