@@ -75,6 +75,20 @@ export type CandidatoInput = Omit<
   'id' | 'created_at' | 'updated_at' | 'partidos'
 >;
 
+// ---------- PERGUNTAS ----------
+
+export interface Pergunta {
+  id: string;
+  texto: string;
+  categoria: string;
+  tag: string[] | null;
+  ativa: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export type PerguntaInput = Omit<Pergunta, 'id' | 'created_at' | 'updated_at'>;
+
 // ---------- AUTH ----------
 
 export const me = (token: string) =>
@@ -148,6 +162,34 @@ export const atualizarCandidato = (
 
 export const excluirCandidato = (id: string) =>
   request<{ mensagem: string }>(`/api/candidatos/${id}`, {
+    method: 'DELETE',
+  });
+
+// ---------- PERGUNTAS ----------
+
+// Por padrão o backend já filtra ativa = true. Passe { todas: true } pra trazer também as desativadas
+export const listarPerguntas = (opcoes?: { todas?: boolean }) => {
+  const query = opcoes?.todas ? '?todas=true' : '';
+  return request<Pergunta[]>(`/api/perguntas${query}`);
+};
+
+export const buscarPergunta = (id: string) =>
+  request<Pergunta>(`/api/perguntas/${id}`);
+
+export const cadastrarPergunta = (dados: PerguntaInput) =>
+  request<Pergunta>('/api/perguntas', {
+    method: 'POST',
+    body: JSON.stringify(dados),
+  });
+
+export const atualizarPergunta = (id: string, dados: Partial<PerguntaInput>) =>
+  request<Pergunta>(`/api/perguntas/${id}`, {
+    method: 'PUT',
+    body: JSON.stringify(dados),
+  });
+
+export const excluirPergunta = (id: string) =>
+  request<{ mensagem: string }>(`/api/perguntas/${id}`, {
     method: 'DELETE',
   });
 

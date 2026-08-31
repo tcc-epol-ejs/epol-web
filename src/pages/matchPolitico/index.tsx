@@ -355,8 +355,6 @@ function IntroScreen({ onStart }: IntroScreenProps) {
     <div className="relative w-full h-full min-h-[640px] bg-[#2E2A6B] overflow-hidden flex items-center justify-center px-4 py-8">
       <Blobs />
       <div className="relative z-10 bg-white rounded-[28px] p-7 sm:p-9 w-full max-w-[560px] shadow-[0_30px_60px_rgba(15,12,60,0.35)] text-center">
-        {/* <Pipo mood="happy" size={130} /> */}
-
         <h1 className="[font-family:'Sora',sans-serif] font-extrabold text-[24px] sm:text-[28px] text-[#1B1B3A] mt-4 mb-2">
           Descubra seu{' '}
           <em className="italic text-[#FF9F1C] not-italic">match</em> político
@@ -373,7 +371,7 @@ function IntroScreen({ onStart }: IntroScreenProps) {
               <FiFlag size={16} strokeWidth={2.5} />
             </span>
             <span className="text-[13px] text-[#2E2A47] font-semibold">
-              Perguntas rápidas sobre vários temas da política
+              Perguntas sobre vários temas da política
             </span>
           </div>
 
@@ -385,15 +383,6 @@ function IntroScreen({ onStart }: IntroScreenProps) {
               Arraste ou toque nos botões: discordo, neutro ou concordo
             </span>
           </div>
-
-          {/* <div className="flex items-center gap-3 bg-[#F7F5FF] rounded-2xl px-4 py-3">
-            <span className="shrink-0 w-9 h-9 rounded-full bg-[#EDE9FE] text-[#6F68C9] flex items-center justify-center">
-              <FiTarget size={16} strokeWidth={2.5} />
-            </span>
-            <span className="text-[13px] text-[#2E2A47] font-semibold">
-              No fim, veja seu partido mais compatível e o porquê
-            </span>
-          </div> */}
         </div>
 
         <button
