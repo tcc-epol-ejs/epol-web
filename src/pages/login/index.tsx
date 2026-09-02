@@ -47,7 +47,6 @@ export default function Login() {
   const [senha, setSenha] = useState('');
   const [showError, setShowError] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
-  const [loginSucesso, setLoginSucesso] = useState(false);
 
   function handleEmailOuUsuarioChange(event: ChangeEvent<HTMLInputElement>) {
     setEmailOuUsuario(event.target.value);
@@ -73,7 +72,7 @@ export default function Login() {
     try {
       const { usuario, token } = await login(emailOuUsuario, senha);
       salvarSessao(usuario, token);
-      setLoginSucesso(true);
+      navigate('/main');
     } catch (err: any) {
       setErrorMessage(err.message || 'E-mail ou senha inválidos');
       setShowError(true);
@@ -128,6 +127,7 @@ export default function Login() {
               className="h-auto w-[100px] absolute -top-[60px]"
               alt="Logo EPOL"
               src={LogoEpol}
+              onClick={() => navigate('/')}
             />
 
             <h1 className="text-[#2d2d6b] font-bold text-center text-[22px] leading-tight">
@@ -158,11 +158,6 @@ export default function Login() {
               entrar
             </Botao>
 
-            {loginSucesso && (
-              <p className="text-green-500 text-[12px] font-semibold text-center">
-                Logado com sucesso!
-              </p>
-            )}
             <p
               className="text-[#2d2d6b] text-center cursor-pointer font-semibold hover:underline"
               style={{ fontSize: 'clamp(11px, 2vw, 14px)' }}
