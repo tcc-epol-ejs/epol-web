@@ -43,7 +43,7 @@ const steps: Step[] = [
     textBefore:
       '1. Separe um documento oficial com foto: RG, Certidão de Nascimento (se for solteiro/a), Certidão de Casamento, Passaporte ou Carteira de Trabalho.',
     textAfter: `2. Leve também um comprovante de endereço (pode ser digital ou cópia), de preferência no seu nome ou dos seus pais e emitido nos últimos 3 meses.`,
-    image: '/src/assets/Imagens/passo2.png',
+    image: '/src/assets/Imagens/passo3.png',
     tagLabel: 'NAO ESQUEÇA!',
   },
   {
@@ -65,7 +65,7 @@ const steps: Step[] = [
     textBefore:
       'Agora é só preencher o formulário com seus dados: nome completo, data de nascimento, endereço e contato. Confira tudo direitinho antes de enviar pois dado errado pode atrasar seu processo!',
     textAfter: '',
-    image: '/src/assets/Imagens/passo3.png',
+    image: '/src/assets/Imagens/passo2.png',
     tagLabel: 'MUITO IMPORTANTE!',
   },
   {
