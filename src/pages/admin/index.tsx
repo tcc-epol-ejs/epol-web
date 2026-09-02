@@ -1,11 +1,14 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { ChangeEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Botao from '../../components/botoes/botao';
 import Textbox from '../../components/inputs';
-import Select from '../../components/selects';
-import LogoEPOL from '../../assets/SVGs/LogoEPOL.svg';
 import Textarea from '../../components/inputs/textarea';
+import LogoEPOL from '../../assets/SVGs/LogoEPOL.svg';
+import { ToastContainer, useToasts } from '../../components/toast';
+import DateField from '../../components/inputs/data';
+import ModalSelectField from '../../components/selects/selectModal';
+import { cadastrarCandidato, cadastrarPartido } from '../../services/api';
 
 const bolasConfig = [
   { size: 280, top: '-40px', left: '-30px', opacity: 0.25 },
@@ -50,7 +53,9 @@ const estadosBrasil = [
   'TO',
 ];
 
-const cargos = ['Presidente', 'Vice-presidente', 'Governador'];
+// CHECK constraint do banco: candidatura só aceita 'Presidente' ou 'Governador'
+const OPCOES_CANDIDATURA = ['Presidente', 'Governador'];
+
 const cargos_atuais = [
   'Presidente',
   'Vice-presidente',
@@ -73,168 +78,369 @@ const isValidUrl = (urlString: string) => {
   }
 };
 
+// Paleta de cores dos campos customizados (DateField / ModalSelectField)
+const CORES_CAMPO = {
+  corDestaque: '#FFA400',
+  corTexto: '#2a2a72',
+  corFundoCampo: '#a9a9f6',
+  corBordaCampo: '#a9a9f6',
+  corPlaceholder: '#5A5A70',
+  corFundoPainel: '#A9A9F6',
+  corBordaPainel: '#8888D3',
+  corHover: '#CBCBFF',
+};
+
+// Formulário de Partido
+
+interface PartidoFormData {
+  nome_completo: string;
+  sigla: string;
+  apelido_gentilico: string;
+  numero_legenda: string;
+  data_fundacao: string;
+  data_deferimento: string;
+  fundadores: string; // textarea: um nome por linha
+  presidente_nacional: string;
+  propostas_url: string; // textarea: uma URL por linha
+  propostas_resumo: string; // textarea: uma proposta por linha
+  ideologia: string; // textarea: uma ideologia por linha
+  bandeira_url: string;
+  uf_sede: string;
+  tag: string; // textarea: uma tag por linha
+}
+
+const initialPartidoForm: PartidoFormData = {
+  nome_completo: '',
+  sigla: '',
+  apelido_gentilico: '',
+  numero_legenda: '',
+  data_fundacao: '',
+  data_deferimento: '',
+  fundadores: '',
+  presidente_nacional: '',
+  propostas_url: '',
+  propostas_resumo: '',
+  ideologia: '',
+  bandeira_url: '',
+  uf_sede: '',
+  tag: '',
+};
+
+const ROTULOS_PARTIDO: Record<keyof PartidoFormData, string> = {
+  nome_completo: 'Nome Completo',
+  sigla: 'Sigla',
+  apelido_gentilico: 'Apelido/Gentílico',
+  numero_legenda: 'Número da Legenda',
+  data_fundacao: 'Data de Fundação',
+  data_deferimento: 'Data de Deferimento',
+  fundadores: 'Fundadores',
+  presidente_nacional: 'Presidente Nacional',
+  propostas_url: 'URLs das Propostas',
+  propostas_resumo: 'Resumo das Propostas',
+  ideologia: 'Ideologia',
+  bandeira_url: 'Bandeira (URL)',
+  uf_sede: 'UF da Sede',
+  tag: 'Tags',
+};
+
+const CAMPOS_OBRIGATORIOS_PARTIDO: (keyof PartidoFormData)[] = [
+  'nome_completo',
+  'sigla',
+  'numero_legenda',
+  'data_fundacao',
+  'data_deferimento',
+  'fundadores',
+  'presidente_nacional',
+];
+
+// Formulário de Candidato
+
+interface CandidatoFormData {
+  candidatura: string;
+  numero_candidatura: string;
+  numero_urna: string;
+  nome_completo: string;
+  nome_politico: string;
+  data_nascimento: string;
+  naturalidade: string;
+  uf_naturalidade: string;
+  formacao_academica: string; // textarea: "Curso - Instituição - Ano" por linha
+  profissao_anterior: string;
+  foto_url: string;
+  cargo_atual: string;
+  uf_candidatura: string; // obrigatório quando candidatura === 'Governador'
+  vice: string;
+  tempo_atuacao_anos: string;
+  feitos_url: string; // textarea: uma URL por linha
+  feitos_resumo: string; // textarea: um feito por linha
+}
+
+const initialCandidatoForm: CandidatoFormData = {
+  candidatura: '',
+  numero_candidatura: '',
+  numero_urna: '',
+  nome_completo: '',
+  nome_politico: '',
+  data_nascimento: '',
+  naturalidade: '',
+  uf_naturalidade: '',
+  formacao_academica: '',
+  profissao_anterior: '',
+  foto_url: '',
+  cargo_atual: '',
+  uf_candidatura: '',
+  vice: '',
+  tempo_atuacao_anos: '',
+  feitos_url: '',
+  feitos_resumo: '',
+};
+
+const ROTULOS_CANDIDATO: Record<keyof CandidatoFormData, string> = {
+  candidatura: 'Candidatura',
+  numero_candidatura: 'Número de Candidatura (TSE)',
+  numero_urna: 'Número da Urna',
+  nome_completo: 'Nome Completo',
+  nome_politico: 'Nome Político',
+  data_nascimento: 'Data de Nascimento',
+  naturalidade: 'Naturalidade',
+  uf_naturalidade: 'UF de Naturalidade',
+  formacao_academica: 'Formação Acadêmica',
+  profissao_anterior: 'Profissão Anterior',
+  foto_url: 'Foto (URL)',
+  cargo_atual: 'Cargo Atual',
+  uf_candidatura: 'UF de Candidatura',
+  vice: 'Vice',
+  tempo_atuacao_anos: 'Tempo de Atuação (anos)',
+  feitos_url: 'URLs dos Feitos',
+  feitos_resumo: 'Resumo dos Feitos',
+};
+
+const CAMPOS_OBRIGATORIOS_CANDIDATO: (keyof CandidatoFormData)[] = [
+  'candidatura',
+  'nome_completo',
+  'nome_politico',
+  'data_nascimento',
+  'naturalidade',
+  'uf_naturalidade',
+  'cargo_atual',
+];
+
+function textareaParaArray(texto: string): string[] {
+  return texto
+    .split('\n')
+    .map((linha) => linha.trim())
+    .filter(Boolean);
+}
+
 export default function Admin() {
   const navigate = useNavigate();
   const [activeSection, setActiveSection] = useState<'partido' | 'politico'>(
     'partido',
   );
 
-  const initialFormState = {
-    nome: '',
-    sigla: '',
-    numero: '',
-    fundacao: '',
-    presidente: '',
-    ideologia: '',
-    cargo: '',
-    nome_politico: '',
-    data_nascimento: '',
-    naturalidade: '',
-    uf_naturalidade: '',
-    cargo_atual: '',
-    feitos: '',
-    foto: '',
-  };
+  const [partidoForm, setPartidoForm] =
+    useState<PartidoFormData>(initialPartidoForm);
+  const [candidatoForm, setCandidatoForm] =
+    useState<CandidatoFormData>(initialCandidatoForm);
 
-  const [formData, setFormData] = useState(initialFormState);
-  const [status, setStatus] = useState({ text: '', isError: false });
+  const { toasts, mostrarErro, mostrarSucesso, fecharToast } = useToasts();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [visible, setVisible] = useState(true);
+  const lastScrollY = useRef(0);
 
-  const updateField = (field: string, value: string) => {
-    setFormData((current) => ({ ...current, [field]: value }));
-    setStatus({ text: '', isError: false });
-  };
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentY = window.scrollY;
+      setVisible(currentY < lastScrollY.current || currentY < 20);
+      lastScrollY.current = currentY;
+    };
 
-  const handleNumeroChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
-    if (value !== '' && (!/^\d+$/.test(value) || value.length > 2)) {
-      return;
-    }
+  function updatePartidoField(campo: keyof PartidoFormData, valor: string) {
+    setPartidoForm((prev) => ({ ...prev, [campo]: valor }));
+  }
 
-    updateField('numero', value);
-  };
+  function updateCandidatoField(campo: keyof CandidatoFormData, valor: string) {
+    setCandidatoForm((prev) => ({ ...prev, [campo]: valor }));
+  }
 
-  const handleSectionChange = (section: 'partido' | 'politico') => {
+  function criarHandleNumero(
+    atualizar: (valor: string) => void,
+    maxDigitos: number,
+  ) {
+    return (e: ChangeEvent<HTMLInputElement>) => {
+      const valor = e.target.value;
+      if (valor !== '' && (!/^\d+$/.test(valor) || valor.length > maxDigitos)) {
+        return;
+      }
+      atualizar(valor);
+    };
+  }
+
+  const handleNumeroLegendaChange = criarHandleNumero(
+    (v) => updatePartidoField('numero_legenda', v),
+    2,
+  );
+  const handleNumeroUrnaChange = criarHandleNumero(
+    (v) => updateCandidatoField('numero_urna', v),
+    5,
+  );
+  const handleTempoAtuacaoChange = criarHandleNumero(
+    (v) => updateCandidatoField('tempo_atuacao_anos', v),
+    3,
+  );
+
+  function handleSectionChange(section: 'partido' | 'politico') {
     setActiveSection(section);
-    setFormData(initialFormState);
-    setStatus({ text: '', isError: false });
-  };
+  }
 
-  const handleAdd = () => {
-    if (activeSection === 'partido') {
-      const camposObrigatorios = [
-        'nome',
-        'sigla',
-        'numero',
-        'fundacao',
-        'presidente',
-      ];
-      const algumVazio = camposObrigatorios.some(
-        (campo) => !formData[campo as keyof typeof formData].trim(),
-      );
-
-      if (algumVazio) {
-        setStatus({
-          text: 'Preencha todos os campos do partido.',
-          isError: true,
-        });
-        return;
-      }
-
-      const numero = Number(formData.numero);
-      if (numero < 10 || numero > 90) {
-        setStatus({
-          text: 'O número deve estar entre 10 e 90.',
-          isError: true,
-        });
-        return;
-      }
-    } else {
-      const camposObrigatorios = [
-        'nome',
-        'numero',
-        'cargo',
-        'nome_politico',
-        'data_nascimento',
-        'naturalidade',
-        'uf_naturalidade',
-        'cargo_atual',
-      ];
-      const algumVazio = camposObrigatorios.some(
-        (campo) => !formData[campo as keyof typeof formData].trim(),
-      );
-
-      if (algumVazio) {
-        setStatus({
-          text: 'Preencha todos os campos do candidato.',
-          isError: true,
-        });
-        return;
-      }
-
-      const numero = Number(formData.numero);
-      if (numero < 10 || numero > 90) {
-        setStatus({
-          text: 'O número deve estar entre 10 e 90.',
-          isError: true,
-        });
-        return;
-      }
-
-      const dataNascimento = new Date(formData.data_nascimento);
-      const hoje = new Date();
-
-      let idade = hoje.getFullYear() - dataNascimento.getFullYear();
-      const mesAtual = hoje.getMonth();
-      const diaAtual = hoje.getDate();
-      const mesNasc = dataNascimento.getMonth();
-      const diaNasc = dataNascimento.getDate();
-
-      if (mesAtual < mesNasc || (mesAtual === mesNasc && diaAtual < diaNasc)) {
-        idade--;
-      }
-
-      if (idade < 30) {
-        setStatus({
-          text: 'A idade mínima é de 30 anos.',
-          isError: true,
-        });
-        return;
-      }
-
-      if (idade > 99) {
-        setStatus({
-          text: 'A idade máxima é de 99 anos.',
-          isError: true,
-        });
-        return;
+  function validarPartido(): boolean {
+    for (const campo of CAMPOS_OBRIGATORIOS_PARTIDO) {
+      if (!partidoForm[campo].trim()) {
+        mostrarErro(`Preencha o campo "${ROTULOS_PARTIDO[campo]}".`);
+        return false;
       }
     }
 
-    if (formData.foto && !isValidUrl(formData.foto)) {
-      setStatus({
-        text: 'A URL da foto é inválida. Certifique-se de começar com http:// ou https://',
-        isError: true,
-      });
-      return;
+    const numero = Number(partidoForm.numero_legenda);
+    if (Number.isNaN(numero) || numero < 10 || numero > 99) {
+      mostrarErro('O número da legenda deve estar entre 10 e 99.');
+      return false;
     }
 
+    return true;
+  }
+
+  function validarCandidato(): boolean {
+    for (const campo of CAMPOS_OBRIGATORIOS_CANDIDATO) {
+      if (!candidatoForm[campo].trim()) {
+        mostrarErro(`Preencha o campo "${ROTULOS_CANDIDATO[campo]}".`);
+        return false;
+      }
+    }
+
+    // Regra de negócio do dicionário de dados: uf_candidatura é obrigatório
+    // quando candidatura = 'Governador'
+    if (
+      candidatoForm.candidatura === 'Governador' &&
+      !candidatoForm.uf_candidatura.trim()
+    ) {
+      mostrarErro(
+        'UF de Candidatura é obrigatória para candidatos a Governador.',
+      );
+      return false;
+    }
+
+    const dataNascimento = new Date(candidatoForm.data_nascimento);
+    const hoje = new Date();
+
+    let idade = hoje.getFullYear() - dataNascimento.getFullYear();
+    const mesAtual = hoje.getMonth();
+    const diaAtual = hoje.getDate();
+    const mesNasc = dataNascimento.getMonth();
+    const diaNasc = dataNascimento.getDate();
+
+    if (mesAtual < mesNasc || (mesAtual === mesNasc && diaAtual < diaNasc)) {
+      idade--;
+    }
+
+    if (idade < 30) {
+      mostrarErro('A idade mínima é de 30 anos.');
+      return false;
+    }
+
+    if (idade > 99) {
+      mostrarErro('A idade máxima é de 99 anos.');
+      return false;
+    }
+
+    if (candidatoForm.foto_url && !isValidUrl(candidatoForm.foto_url)) {
+      mostrarErro(
+        'A URL da foto é inválida. Certifique-se de começar com http:// ou https://',
+      );
+      return false;
+    }
+
+    return true;
+  }
+
+  function handleAdd() {
+    const valido =
+      activeSection === 'partido' ? validarPartido() : validarCandidato();
+    if (!valido) return;
     setIsModalOpen(true);
-  };
+  }
 
-  const handleConfirmAdd = () => {
-    const mensagem =
-      activeSection === 'partido'
-        ? 'Partido adicionado com sucesso!'
-        : 'Candidato adicionado com sucesso!';
+  async function handleConfirmAdd() {
+    try {
+      if (activeSection === 'partido') {
+        const payloadPartido = {
+          ...partidoForm,
+          numero_legenda: Number(partidoForm.numero_legenda),
+          fundadores: textareaParaArray(partidoForm.fundadores),
+          ideologia: textareaParaArray(partidoForm.ideologia),
+          propostas_url: textareaParaArray(partidoForm.propostas_url),
+          propostas_resumo: textareaParaArray(partidoForm.propostas_resumo),
+          tag: textareaParaArray(partidoForm.tag),
+          apelido_gentilico: partidoForm.apelido_gentilico || null,
+          data_deferimento: partidoForm.data_deferimento || null,
+          presidente_nacional: partidoForm.presidente_nacional || null,
+          bandeira_url: partidoForm.bandeira_url || null,
+          uf_sede: partidoForm.uf_sede || null,
+        };
 
-    setStatus({ text: mensagem, isError: false });
-    setIsModalOpen(false);
-  };
+        await cadastrarPartido(payloadPartido);
+        mostrarSucesso('Partido adicionado com sucesso!');
+        setPartidoForm(initialPartidoForm);
+      } else {
+        const payloadCandidato = {
+          ...candidatoForm,
+          numero_urna: candidatoForm.numero_urna
+            ? Number(candidatoForm.numero_urna)
+            : null,
+          tempo_atuacao_anos: candidatoForm.tempo_atuacao_anos
+            ? Number(candidatoForm.tempo_atuacao_anos)
+            : 0,
+          formacao_academica: textareaParaArray(
+            candidatoForm.formacao_academica,
+          ),
+          feitos_url: textareaParaArray(candidatoForm.feitos_url),
+          feitos_resumo: textareaParaArray(candidatoForm.feitos_resumo),
+          numero_candidatura: candidatoForm.numero_candidatura || null,
+          uf_candidatura: candidatoForm.uf_candidatura || null,
+          vice: candidatoForm.vice || null,
+          profissao_anterior: candidatoForm.profissao_anterior || null,
+          foto_url: candidatoForm.foto_url || null,
+        };
+
+        await cadastrarCandidato(payloadCandidato);
+        mostrarSucesso('Candidato adicionado com sucesso!');
+        setCandidatoForm(initialCandidatoForm);
+      }
+
+      setIsModalOpen(false);
+    } catch (err: any) {
+      mostrarErro(err.message || 'Erro ao realizar o cadastro.');
+      setIsModalOpen(false);
+    }
+  }
+
+  function handleLimparCampos() {
+    if (activeSection === 'partido') {
+      setPartidoForm(initialPartidoForm);
+    } else {
+      setCandidatoForm(initialCandidatoForm);
+    }
+    mostrarSucesso('Campos limpos.');
+  }
 
   return (
     <section className="relative min-h-[100dvh] bg-[#f8fbff] text-[#1f2332]">
+      <ToastContainer toasts={toasts} onFechar={fecharToast} />
+
       {}
       <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
         {bolasConfig.map((b, i) => (
@@ -258,14 +464,17 @@ export default function Admin() {
       <div className="relative z-10">
         {}
         <div className="fixed top-0 left-0 right-0 z-[1000]">
-          <div className="mx-[62px] mt-[42px] flex h-[80px] w-[calc(100%-124px)] items-center justify-between rounded-full border-2 border-[#3f5ca7] bg-white pl-[38px] pr-[11.5px] py-[11.5px]">
-            <div className="flex items-center gap-4">
+          <div
+            className={`mx-[62px] mt-[42px] flex h-[80px] w-[calc(100%-124px)] items-center justify-between rounded-full border-2 border-[#3f5ca7] bg-white pl-[38px] pr-[11.5px] py-[11.5px] transition-transform duration-[800ms] ease-in-out ${visible ? 'translate-y-0' : '-translate-y-[200px]'}`}
+          >
+            <div className="flex items-center gap-5">
               <img src={LogoEPOL} alt="Logo EPOL" className="w-[90px] mt-1.5" />
+              <div className="h-8 w-[1px] bg-[#CAD3EA]/30" />
               <div>
-                <p className="text-sm uppercase tracking-[0.28em] text-[#3f5ca7]">
+                <p className="text-xs uppercase tracking-[0.28em] text-[#3f5ca7]">
                   Administração
                 </p>
-                <h1 className="mt-1 text-lg font-bold text-[#1f2332]">
+                <h1 className="mt-1 text-base font-semibold text-[#1f2332]">
                   Cadastro de dados políticos
                 </h1>
               </div>
@@ -274,7 +483,7 @@ export default function Admin() {
               <button
                 type="button"
                 onClick={() => navigate('/')}
-                className="rounded-full border border-[#3f5ca7] bg-white px-4 py-4 text-sm font-semibold text-[#3f5ca7] hover:bg-[#eef2ff]"
+                className="px-4 py-4 text-xs font-semibold text-[#3f5ca7] hover:underline"
               >
                 Voltar ao site principal
               </button>
@@ -284,15 +493,15 @@ export default function Admin() {
 
         <div className="pt-[140px]">
           <div className="mx-[62px] w-[calc(100%-124px)] pb-10">
-            <div className="grid gap-6 lg:grid-cols-[1fr_360px]">
+            <div className="grid gap-6 lg:grid-cols-[1fr_360px] lg:items-start">
               <div className="rounded-[32px] border border-[#d9e2ff] bg-white p-6 shadow-[0_18px_40px_-20px_rgba(15,23,42,0.2)]">
                 <div className="flex flex-col gap-5">
                   <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <div>
-                      <p className="text-sm uppercase tracking-[0.28em] text-[#3f5ca7]">
+                      <p className="text-xs uppercase tracking-[0.28em] text-[#3f5ca7]">
                         O que quer adicionar?
                       </p>
-                      <h2 className="mt-2 text-2xl font-bold">
+                      <h2 className="mt-2 text-lg font-bold">
                         {activeSection === 'partido'
                           ? 'Novo partido'
                           : 'Novo candidato'}
@@ -302,14 +511,14 @@ export default function Admin() {
                       <button
                         type="button"
                         onClick={() => handleSectionChange('partido')}
-                        className={`rounded-full px-4 py-2 text-sm font-semibold transition ${activeSection === 'partido' ? 'bg-[#3f5ca7] text-white' : 'text-[#3f5ca7] hover:bg-[#d7e0ff]'}`}
+                        className={`rounded-full px-4 py-2 text-xs font-semibold transition ${activeSection === 'partido' ? 'bg-[#3f5ca7] text-white' : 'text-[#3f5ca7] hover:bg-[#d7e0ff]'}`}
                       >
                         Partido
                       </button>
                       <button
                         type="button"
                         onClick={() => handleSectionChange('politico')}
-                        className={`rounded-full px-4 py-2 text-sm font-semibold transition ${activeSection === 'politico' ? 'bg-[#3f5ca7] text-white' : 'text-[#3f5ca7] hover:bg-[#d7e0ff]'}`}
+                        className={`rounded-full px-4 py-2 text-xs font-semibold transition ${activeSection === 'politico' ? 'bg-[#3f5ca7] text-white' : 'text-[#3f5ca7] hover:bg-[#d7e0ff]'}`}
                       >
                         Candidato
                       </button>
@@ -318,7 +527,6 @@ export default function Admin() {
 
                   <div className="rounded-[28px] bg-[#f5f8ff] p-6">
                     <div className="mt-2 grid gap-4 sm:grid-cols-2">
-                      {}
                       {activeSection === 'partido' ? (
                         <>
                           <div className="flex flex-col gap-1.5">
@@ -326,9 +534,12 @@ export default function Admin() {
                               Nome Completo
                             </label>
                             <Textbox
-                              value={formData.nome}
+                              value={partidoForm.nome_completo}
                               onChange={(e) =>
-                                updateField('nome', e.target.value)
+                                updatePartidoField(
+                                  'nome_completo',
+                                  e.target.value,
+                                )
                               }
                             />
                           </div>
@@ -337,64 +548,158 @@ export default function Admin() {
                               Sigla
                             </label>
                             <Textbox
-                              value={formData.sigla}
+                              value={partidoForm.sigla}
                               onChange={(e) =>
-                                updateField('sigla', e.target.value)
+                                updatePartidoField('sigla', e.target.value)
                               }
                             />
                           </div>
                           <div className="flex flex-col gap-1.5">
                             <label className="text-xs font-semibold text-[#3f5ca7] uppercase tracking-wider ml-1">
-                              Número
+                              Apelido/Gentílico (Opcional)
                             </label>
                             <Textbox
-                              value={formData.numero}
+                              value={partidoForm.apelido_gentilico}
+                              onChange={(e) =>
+                                updatePartidoField(
+                                  'apelido_gentilico',
+                                  e.target.value,
+                                )
+                              }
+                            />
+                          </div>
+                          <div className="flex flex-col gap-1.5">
+                            <label className="text-xs font-semibold text-[#3f5ca7] uppercase tracking-wider ml-1">
+                              Número da Legenda (10-99)
+                            </label>
+                            <Textbox
+                              value={partidoForm.numero_legenda}
                               type="number"
-                              onChange={handleNumeroChange}
+                              onChange={handleNumeroLegendaChange}
                             />
                           </div>
                           <div className="flex flex-col gap-1.5">
                             <label className="text-xs font-semibold text-[#3f5ca7] uppercase tracking-wider ml-1">
                               Data de Fundação
                             </label>
+                            <DateField
+                              value={partidoForm.data_fundacao}
+                              onChange={(iso) =>
+                                updatePartidoField('data_fundacao', iso)
+                              }
+                              {...CORES_CAMPO}
+                            />
+                          </div>
+                          <div className="flex flex-col gap-1.5">
+                            <label className="text-xs font-semibold text-[#3f5ca7] uppercase tracking-wider ml-1">
+                              Data de Deferimento (TSE)
+                            </label>
+                            <DateField
+                              value={partidoForm.data_deferimento}
+                              onChange={(iso) =>
+                                updatePartidoField('data_deferimento', iso)
+                              }
+                              {...CORES_CAMPO}
+                            />
+                          </div>
+                          <div className="flex flex-col gap-1.5">
+                            <label className="text-xs font-semibold text-[#3f5ca7] uppercase tracking-wider ml-1">
+                              Presidente Nacional
+                            </label>
                             <Textbox
-                              value={formData.fundacao}
-                              type="date"
+                              value={partidoForm.presidente_nacional}
                               onChange={(e) =>
-                                updateField('fundacao', e.target.value)
+                                updatePartidoField(
+                                  'presidente_nacional',
+                                  e.target.value,
+                                )
                               }
                             />
                           </div>
                           <div className="flex flex-col gap-1.5">
                             <label className="text-xs font-semibold text-[#3f5ca7] uppercase tracking-wider ml-1">
-                              Presidente
+                              UF da Sede (Opcional)
                             </label>
-                            <Textbox
-                              value={formData.presidente}
-                              onChange={(e) =>
-                                updateField('presidente', e.target.value)
-                              }
+                            <ModalSelectField
+                              opcoes={estadosBrasil}
+                              value={partidoForm.uf_sede}
+                              onChange={(v) => updatePartidoField('uf_sede', v)}
+                              permiteVazio
+                              {...CORES_CAMPO}
                             />
                           </div>
                           <div className="flex flex-col gap-1.5">
                             <label className="text-xs font-semibold text-[#3f5ca7] uppercase tracking-wider ml-1">
-                              Foto (URL)
+                              Bandeira (Opcional)
                             </label>
                             <Textbox
-                              value={formData.foto}
+                              value={partidoForm.bandeira_url}
                               onChange={(e) =>
-                                updateField('foto', e.target.value)
+                                updatePartidoField(
+                                  'bandeira_url',
+                                  e.target.value,
+                                )
                               }
                             />
                           </div>
                           <div className="flex flex-col gap-1.5 sm:col-span-2">
                             <label className="text-xs font-semibold text-[#3f5ca7] uppercase tracking-wider ml-1">
-                              Ideologia (Opcional)
+                              Fundadores (um nome por linha)
                             </label>
                             <Textarea
-                              value={formData.ideologia}
+                              value={partidoForm.fundadores}
                               onChange={(e) =>
-                                updateField('ideologia', e.target.value)
+                                updatePartidoField('fundadores', e.target.value)
+                              }
+                            />
+                          </div>
+                          <div className="flex flex-col gap-1.5 sm:col-span-2">
+                            <label className="text-xs font-semibold text-[#3f5ca7] uppercase tracking-wider ml-1">
+                              Ideologia (uma por linha) (Opcional)
+                            </label>
+                            <Textarea
+                              value={partidoForm.ideologia}
+                              onChange={(e) =>
+                                updatePartidoField('ideologia', e.target.value)
+                              }
+                            />
+                          </div>
+                          <div className="flex flex-col gap-1.5 sm:col-span-2">
+                            <label className="text-xs font-semibold text-[#3f5ca7] uppercase tracking-wider ml-1">
+                              URLs das Propostas (uma por linha) (Opcional)
+                            </label>
+                            <Textarea
+                              value={partidoForm.propostas_url}
+                              onChange={(e) =>
+                                updatePartidoField(
+                                  'propostas_url',
+                                  e.target.value,
+                                )
+                              }
+                            />
+                          </div>
+                          <div className="flex flex-col gap-1.5 sm:col-span-2">
+                            <label className="text-xs font-semibold text-[#3f5ca7] uppercase tracking-wider ml-1">
+                              Resumo das Propostas (uma por linha) (Opcional)
+                            </label>
+                            <Textarea
+                              value={partidoForm.propostas_resumo}
+                              onChange={(e) =>
+                                updatePartidoField(
+                                  'propostas_resumo',
+                                  e.target.value,
+                                )
+                              }
+                            />
+                          </div>
+                          <div className="flex flex-col gap-1.5 sm:col-span-2">
+                            <label className="text-xs font-semibold text-[#3f5ca7] uppercase tracking-wider ml-1">
+                              Tags (uma por linha) (Opcional)
+                            </label>
+                            <Textarea
+                              value={partidoForm.tag}
+                              onChange={(e) =>
+                                updatePartidoField('tag', e.target.value)
                               }
                             />
                           </div>
@@ -403,12 +708,28 @@ export default function Admin() {
                         <>
                           <div className="flex flex-col gap-1.5">
                             <label className="text-xs font-semibold text-[#3f5ca7] uppercase tracking-wider ml-1">
+                              Candidatura
+                            </label>
+                            <ModalSelectField
+                              opcoes={OPCOES_CANDIDATURA}
+                              value={candidatoForm.candidatura}
+                              onChange={(v) =>
+                                updateCandidatoField('candidatura', v)
+                              }
+                              {...CORES_CAMPO}
+                            />
+                          </div>
+                          <div className="flex flex-col gap-1.5">
+                            <label className="text-xs font-semibold text-[#3f5ca7] uppercase tracking-wider ml-1">
                               Nome Completo
                             </label>
                             <Textbox
-                              value={formData.nome}
+                              value={candidatoForm.nome_completo}
                               onChange={(e) =>
-                                updateField('nome', e.target.value)
+                                updateCandidatoField(
+                                  'nome_completo',
+                                  e.target.value,
+                                )
                               }
                             />
                           </div>
@@ -417,9 +738,12 @@ export default function Admin() {
                               Nome Político
                             </label>
                             <Textbox
-                              value={formData.nome_politico}
+                              value={candidatoForm.nome_politico}
                               onChange={(e) =>
-                                updateField('nome_politico', e.target.value)
+                                updateCandidatoField(
+                                  'nome_politico',
+                                  e.target.value,
+                                )
                               }
                             />
                           </div>
@@ -427,93 +751,181 @@ export default function Admin() {
                             <label className="text-xs font-semibold text-[#3f5ca7] uppercase tracking-wider ml-1">
                               Data de Nascimento
                             </label>
+                            <DateField
+                              value={candidatoForm.data_nascimento}
+                              onChange={(iso) =>
+                                updateCandidatoField('data_nascimento', iso)
+                              }
+                              {...CORES_CAMPO}
+                            />
+                          </div>
+                          <div className="flex flex-col gap-1.5">
+                            <label className="text-xs font-semibold text-[#3f5ca7] uppercase tracking-wider ml-1">
+                              Naturalidade (Cidade)
+                            </label>
                             <Textbox
-                              type="date"
-                              value={formData.data_nascimento}
+                              value={candidatoForm.naturalidade}
                               onChange={(e) =>
-                                updateField('data_nascimento', e.target.value)
+                                updateCandidatoField(
+                                  'naturalidade',
+                                  e.target.value,
+                                )
                               }
                             />
                           </div>
                           <div className="flex flex-col gap-1.5">
                             <label className="text-xs font-semibold text-[#3f5ca7] uppercase tracking-wider ml-1">
-                              Estado
+                              UF de Naturalidade
                             </label>
-                            <Select
-                              placeholder=" "
-                              options={estadosBrasil}
-                              value={formData.uf_naturalidade}
-                              onChange={(e) =>
-                                updateField('uf_naturalidade', e.target.value)
+                            <ModalSelectField
+                              opcoes={estadosBrasil}
+                              value={candidatoForm.uf_naturalidade}
+                              onChange={(v) =>
+                                updateCandidatoField('uf_naturalidade', v)
                               }
-                            />
-                          </div>
-                          <div className="flex flex-col gap-1.5">
-                            <label className="text-xs font-semibold text-[#3f5ca7] uppercase tracking-wider ml-1">
-                              Cidade
-                            </label>
-                            <Textbox
-                              value={formData.naturalidade}
-                              onChange={(e) =>
-                                updateField('naturalidade', e.target.value)
-                              }
+                              {...CORES_CAMPO}
                             />
                           </div>
                           <div className="flex flex-col gap-1.5">
                             <label className="text-xs font-semibold text-[#3f5ca7] uppercase tracking-wider ml-1">
                               Cargo Atual
                             </label>
-                            <Select
-                              placeholder=" "
-                              options={cargos_atuais}
-                              value={formData.cargo_atual}
-                              onChange={(e) =>
-                                updateField('cargo_atual', e.target.value)
+                            <ModalSelectField
+                              opcoes={cargos_atuais}
+                              value={candidatoForm.cargo_atual}
+                              onChange={(v) =>
+                                updateCandidatoField('cargo_atual', v)
                               }
+                              {...CORES_CAMPO}
                             />
                           </div>
                           <div className="flex flex-col gap-1.5">
                             <label className="text-xs font-semibold text-[#3f5ca7] uppercase tracking-wider ml-1">
-                              Cargo de Candidatura
+                              UF de Candidatura
+                              {candidatoForm.candidatura === 'Governador'
+                                ? ''
+                                : ' (P/ Governador)'}
                             </label>
-                            <Select
-                              placeholder=" "
-                              options={cargos}
-                              value={formData.cargo}
-                              onChange={(e) =>
-                                updateField('cargo', e.target.value)
+                            <ModalSelectField
+                              opcoes={estadosBrasil}
+                              value={candidatoForm.uf_candidatura}
+                              onChange={(v) =>
+                                updateCandidatoField('uf_candidatura', v)
                               }
+                              permiteVazio
+                              {...CORES_CAMPO}
                             />
                           </div>
                           <div className="flex flex-col gap-1.5">
                             <label className="text-xs font-semibold text-[#3f5ca7] uppercase tracking-wider ml-1">
-                              Número da Urna
+                              Número da Urna (Opcional)
                             </label>
                             <Textbox
-                              value={formData.numero}
+                              value={candidatoForm.numero_urna}
                               type="number"
-                              onChange={handleNumeroChange}
+                              onChange={handleNumeroUrnaChange}
                             />
                           </div>
                           <div className="flex flex-col gap-1.5">
                             <label className="text-xs font-semibold text-[#3f5ca7] uppercase tracking-wider ml-1">
-                              Foto (URL)
+                              Número de Candidatura - TSE (Opcional)
                             </label>
                             <Textbox
-                              value={formData.foto}
+                              value={candidatoForm.numero_candidatura}
                               onChange={(e) =>
-                                updateField('foto', e.target.value)
+                                updateCandidatoField(
+                                  'numero_candidatura',
+                                  e.target.value,
+                                )
+                              }
+                            />
+                          </div>
+                          <div className="flex flex-col gap-1.5">
+                            <label className="text-xs font-semibold text-[#3f5ca7] uppercase tracking-wider ml-1">
+                              Vice (Opcional)
+                            </label>
+                            <Textbox
+                              value={candidatoForm.vice}
+                              onChange={(e) =>
+                                updateCandidatoField('vice', e.target.value)
+                              }
+                            />
+                          </div>
+                          <div className="flex flex-col gap-1.5">
+                            <label className="text-xs font-semibold text-[#3f5ca7] uppercase tracking-wider ml-1">
+                              Tempo de Atuação em anos (Opcional)
+                            </label>
+                            <Textbox
+                              value={candidatoForm.tempo_atuacao_anos}
+                              type="number"
+                              onChange={handleTempoAtuacaoChange}
+                            />
+                          </div>
+                          <div className="flex flex-col gap-1.5">
+                            <label className="text-xs font-semibold text-[#3f5ca7] uppercase tracking-wider ml-1">
+                              Profissão Anterior (Opcional)
+                            </label>
+                            <Textbox
+                              value={candidatoForm.profissao_anterior}
+                              onChange={(e) =>
+                                updateCandidatoField(
+                                  'profissao_anterior',
+                                  e.target.value,
+                                )
+                              }
+                            />
+                          </div>
+                          <div className="flex flex-col gap-1.5">
+                            <label className="text-xs font-semibold text-[#3f5ca7] uppercase tracking-wider ml-1">
+                              Foto (URL) (Opcional)
+                            </label>
+                            <Textbox
+                              value={candidatoForm.foto_url}
+                              onChange={(e) =>
+                                updateCandidatoField('foto_url', e.target.value)
                               }
                             />
                           </div>
                           <div className="flex flex-col gap-1.5 sm:col-span-2">
                             <label className="text-xs font-semibold text-[#3f5ca7] uppercase tracking-wider ml-1">
-                              Feitos (Opcional)
+                              Formação Acadêmica — "Curso - Instituição - Ano"
+                              (uma por linha) (Opcional)
                             </label>
                             <Textarea
-                              value={formData.feitos}
+                              value={candidatoForm.formacao_academica}
                               onChange={(e) =>
-                                updateField('feitos', e.target.value)
+                                updateCandidatoField(
+                                  'formacao_academica',
+                                  e.target.value,
+                                )
+                              }
+                            />
+                          </div>
+                          <div className="flex flex-col gap-1.5 sm:col-span-2">
+                            <label className="text-xs font-semibold text-[#3f5ca7] uppercase tracking-wider ml-1">
+                              URLs dos Feitos (uma por linha) (Opcional)
+                            </label>
+                            <Textarea
+                              value={candidatoForm.feitos_url}
+                              onChange={(e) =>
+                                updateCandidatoField(
+                                  'feitos_url',
+                                  e.target.value,
+                                )
+                              }
+                            />
+                          </div>
+                          <div className="flex flex-col gap-1.5 sm:col-span-2">
+                            <label className="text-xs font-semibold text-[#3f5ca7] uppercase tracking-wider ml-1">
+                              Resumo dos Feitos (um por linha) (Opcional)
+                            </label>
+                            <Textarea
+                              value={candidatoForm.feitos_resumo}
+                              onChange={(e) =>
+                                updateCandidatoField(
+                                  'feitos_resumo',
+                                  e.target.value,
+                                )
                               }
                             />
                           </div>
@@ -528,45 +940,50 @@ export default function Admin() {
                       </Botao>
                       <button
                         type="button"
-                        onClick={() => {
-                          setFormData(initialFormState);
-                          setStatus({ text: 'Campos limpos.', isError: false });
-                        }}
-                        className="rounded-full border border-[#3f5ca7] bg-white px-5 py-4 text-sm font-semibold text-[#3f5ca7] transition hover:bg-[#eef2ff] text-nowrap"
+                        onClick={handleLimparCampos}
+                        className="rounded-full border border-[#3f5ca7] bg-white px-5 py-4 text-xs font-semibold text-[#3f5ca7] transition hover:bg-[#eef2ff] text-nowrap"
                       >
                         Limpar campos
                       </button>
                     </div>
-
-                    {}
-                    {status.text && (
-                      <div
-                        className={`mt-4 rounded-[20px] px-4 py-3 text-sm border ${
-                          status.isError
-                            ? 'bg-[#fee2e2] text-[#dc2626] border-[#fca5a5]'
-                            : 'bg-[#eef2ff] text-[#3f5ca7] border-[#d7e0ff]'
-                        }`}
-                      >
-                        {status.text}
-                      </div>
-                    )}
                   </div>
                 </div>
               </div>
 
-              {}
-              <aside className="space-y-6">
+              <aside className="space-y-6 lg:sticky lg:top-[140px] lg:self-start">
                 <div className="rounded-[32px] border border-[#d9e2ff] bg-white p-6 shadow-[0_18px_40px_-20px_rgba(15,23,42,0.2)]">
-                  <p className="text-sm uppercase tracking-[0.28em] text-[#3f5ca7]">
+                  <p className="text-xs uppercase tracking-[0.28em] text-[#3f5ca7]">
                     Observações
                   </p>
-                  <div className="mt-4 space-y-4 text-sm leading-6 text-[#4c557a]">
+                  <div className="mt-4 space-y-4 text-xs leading-6 text-[#4c557a]">
                     <div>
-                      <p className="font-semibold text-[#1f2332]">CAMPO FOTO</p>
+                      <p className="font-semibold text-[#1f2332]">
+                        CAMPOS DE URL
+                      </p>
                       <p>
-                        Sempre que quiser adicionar uma foto para o partido ou
-                        candidato, utilize um URL válido ao invés de um arquivo
-                        local.
+                        Sempre que for adicionar uma imagem (bandeira do partido
+                        ou foto do candidato), utilize um link (URL) válido ao
+                        invés de um arquivo local.
+                      </p>
+                    </div>
+                    <div>
+                      <p className="font-semibold text-[#1f2332]">
+                        CAMPOS COM VÁRIOS VALORES
+                      </p>
+                      <p>
+                        Campos como Fundadores, Ideologia, Tags e Feitos aceitam
+                        múltiplos valores: digite um item por linha (aperte
+                        Enter pra separar).
+                      </p>
+                    </div>
+                    <div>
+                      <p className="font-semibold text-[#1f2332]">
+                        CAMPO BANDEIRA (PARTIDO)
+                      </p>
+                      <p>
+                        Siga esse padrão ao preencher esse campo:
+                        /logos/partidos/*sigla-partido*.svg
+                        (Ex:/logos/partidos/avante.svg)
                       </p>
                     </div>
                   </div>
@@ -581,7 +998,7 @@ export default function Admin() {
       {isModalOpen && (
         <div className="fixed inset-0 z-[2000] flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
           <div className="w-full max-w-sm rounded-[32px] bg-white p-8 shadow-2xl animate-in fade-in zoom-in duration-200">
-            <h3 className="text-xl font-bold text-[#1f2332] mb-2">
+            <h3 className="text-lg font-bold text-[#1f2332] mb-2">
               Confirmar ação
             </h3>
             <p className="text-sm text-[#4c557a] mb-8">
