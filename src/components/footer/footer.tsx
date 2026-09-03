@@ -58,6 +58,12 @@ export default function Footer() {
         >
           Título de Eleitor
         </button>
+        <button
+          onClick={() => navigate('/quem-somos')}
+          className="text-lg md:text-2xl text-gray-300 text-left hover:text-white transition-colors"
+        >
+          Quem Somos
+        </button>
       </div>
     </footer>
   );
