@@ -375,13 +375,13 @@ function SearchPol() {
               {results.map((party) => (
                 <article
                   key={party.keyword}
-                  className="flex min-h-[290px] w-full flex-col items-center gap-3 rounded-2xl border-2 p-4 text-center"
+                  className="flex min-h-[200px] w-full flex-col items-center gap-2 rounded-2xl border-2 p-3 text-center"
                   style={{
                     borderColor: party.borda,
                     backgroundColor: party.cor,
                   }}
                 >
-                  <div className="flex h-32 w-full shrink-0 items-center justify-center rounded-xl bg-white/40 p-3">
+                  <div className="flex h-28 w-full shrink-0 items-center justify-center rounded-xl bg-white/40 p-3">
                     <img
                       src={party.foto}
                       alt={`Logo de ${party.nome}`}
@@ -389,16 +389,16 @@ function SearchPol() {
                     />
                   </div>
 
-                  <div className="flex min-w-0 flex-1 flex-col items-center">
-                    <div className="flex max-w-full flex-col items-center">
+                  <div className="flex w-full min-w-0 items-end justify-between gap-3 text-left">
+                    <div className="flex min-w-0 max-w-[75%] flex-col items-start">
                       <h2 className="max-w-full text-[12px] font-bold uppercase tracking-[0.12em]">
                         PARTIDO
                       </h2>
-                      <p className="max-w-full break-words text-[25px] font-bold leading-tight tracking-[0.06em]">
+                      <p className="max-w-full break-words text-[20px] font-bold leading-tight tracking-[0.06em]">
                         {party.nome}
                       </p>
                     </div>
-                    <p className="mt-auto pt-3 text-[25px] font-black leading-tight">
+                    <p className="shrink-0 text-[20px] font-black leading-tight opacity-50 tracking-[0.06em]">
                       {party.numero}
                     </p>
                   </div>
