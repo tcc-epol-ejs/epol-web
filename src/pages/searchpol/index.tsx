@@ -104,167 +104,187 @@ function SearchPol() {
   return (
     <>
       <div className="w-full">
-        <Header />
+        <Header isBgWhite />
       </div>
-      <section className="mx-auto flex min-h-[calc(100vh-64px)] w-full max-w-[1200px] flex-col px-6 pt-8 sm:px-10 sm:pt-10 lg:flex-row lg:px-0">
-        <aside className="w-full pb-8 lg:w-1/4 lg:border-r-2 lg:border-[#2A2A72]/30 lg:pb-0 lg:pl-8 lg:pr-8">
-          <h2 className="flex items-center gap-3 text-[18px] font-bold uppercase tracking-[0.12em] text-[#2A2A72]">
-            <FiFilter aria-hidden="true" className="text-[22px]" />
-            Filtrar
-          </h2>
 
-          <div className="mt-6 flex flex-col gap-5">
-            <label className="flex items-center gap-2 text-[13px] text-[#333]">
-              <input
-                type="checkbox"
-                checked={onlyPokemon}
-                onChange={(event) => setOnlyPokemon(event.target.checked)}
-                className="h-4 w-4 accent-[#2A2A72]"
-              />
-              Pokémon
-            </label>
+      <section className="relative isolate overflow-hidden bg-transparent">
+        <div className="pointer-events-none absolute inset-0 -z-10">
+          <div className="absolute -left-10 top-8 h-28 w-28 rounded-full bg-[#FFA400]/25" />
+          <div className="absolute left-8 top-24 h-20 w-20 rounded-full bg-[#FFA400]/35" />
+          <div className="absolute left-[18%] top-[28%] h-24 w-24 rounded-full bg-[#FFA400]/20" />
+          <div className="absolute right-16 top-10 h-32 w-32 rounded-full bg-[#FFA400]/25" />
+          <div className="absolute right-8 top-32 h-24 w-24 rounded-full bg-[#FFA400]/35" />
+          <div className="absolute right-[-10px] top-[48%] h-20 w-20 rounded-full bg-[#FFA400]/25" />
+          <div className="absolute bottom-10 left-1/3 h-28 w-28 rounded-full bg-[#FFA400]/30" />
+          <div className="absolute bottom-0 left-[58%] h-40 w-40 rounded-full bg-[#FFA400]/25" />
+          <div className="absolute bottom-[-18px] right-12 h-52 w-52 rounded-full bg-[#FFA400]/25" />
+          <div className="absolute bottom-24 right-[28%] h-20 w-20 rounded-full bg-[#FFA400]/35" />
+          <div className="absolute bottom-24 left-[-14px] h-24 w-24 rounded-full bg-[#FFA400]/25" />
+          <div className="absolute left-[44%] top-[-10px] h-16 w-16 rounded-full bg-[#FFA400]/25" />
+        </div>
 
-            <label className="flex flex-col gap-2 text-[12px] font-bold uppercase tracking-[0.08em] text-[#2A2A72]">
-              Tipo de candidatura
-              <select
-                value={selectedCandidatura}
-                onChange={(event) => setSelectedCandidatura(event.target.value)}
-                className="h-10 rounded-lg border border-[#2A2A72]/30 bg-white px-3 text-[12px] font-medium normal-case tracking-normal text-[#333] outline-none"
-              >
-                <option value="">Todos os tipos</option>
-                <option value="Deputado Federal">Deputado Federal</option>
-                <option value="Governador">Governador</option>
-                <option value="Presidente">Presidente</option>
-                <option value="Vereador">Vereador</option>
-              </select>
-            </label>
+        <div className="mx-auto flex min-h-[calc(100vh-64px)] w-full max-w-[1200px] flex-col px-6 pt-8 sm:px-10 sm:pt-10 lg:flex-row lg:px-0">
+          <aside className="w-full pb-8 lg:w-1/4 lg:border-r-2 lg:border-[#2A2A72]/30 lg:pb-0 lg:pl-8 lg:pr-8">
+            <h2 className="flex items-center gap-3 text-[18px] font-bold uppercase tracking-[0.12em] text-[#2A2A72]">
+              <FiFilter aria-hidden="true" className="text-[22px]" />
+              Filtrar
+            </h2>
 
-            <label className="flex flex-col gap-2 text-[12px] font-bold uppercase tracking-[0.08em] text-[#2A2A72]">
-              Estado
-              <select
-                value={selectedEstado}
-                onChange={(event) => setSelectedEstado(event.target.value)}
-                className="h-10 rounded-lg border border-[#2A2A72]/30 bg-white px-3 text-[12px] font-medium normal-case tracking-normal text-[#333] outline-none"
-              >
-                <option value="">Todos os estados</option>
-                <option value="Acre">Acre</option>
-                <option value="Rio de Janeiro">Rio de Janeiro</option>
-                <option value="São Paulo">São Paulo</option>
-              </select>
-            </label>
+            <div className="mt-6 flex flex-col gap-5">
+              <label className="flex items-center gap-2 text-[13px] text-[#333]">
+                <input
+                  type="checkbox"
+                  checked={onlyPokemon}
+                  onChange={(event) => setOnlyPokemon(event.target.checked)}
+                  className="h-4 w-4 accent-[#2A2A72]"
+                />
+                Pokémon
+              </label>
 
-            <label className="flex flex-col gap-2 text-[12px] font-bold uppercase tracking-[0.08em] text-[#2A2A72]">
-              Partido
-              <select
-                value={selectedPartido}
-                onChange={(event) => setSelectedPartido(event.target.value)}
-                className="h-10 rounded-lg border border-[#2A2A72]/30 bg-white px-3 text-[12px] font-medium normal-case tracking-normal text-[#333] outline-none"
-              >
-                <option value="">Todos os partidos</option>
-                <option value="PARTIDO DOS IRMÃOZINHOS">
-                  Partido dos Irmãozinhos
-                </option>
-                <option value="PARTIDO DRAGÕES DA SILVA">
-                  Partido Dragões da Silva
-                </option>
-                <option value="PARTIDO EPOL">Partido EPOL</option>
-                <option value="PARTIDO DOS LIXOCOCOS">
-                  Partido dos Lixococos
-                </option>
-              </select>
-            </label>
-          </div>
-        </aside>
+              <label className="flex flex-col gap-2 text-[12px] font-bold uppercase tracking-[0.08em] text-[#2A2A72]">
+                Tipo de candidatura
+                <select
+                  value={selectedCandidatura}
+                  onChange={(event) =>
+                    setSelectedCandidatura(event.target.value)
+                  }
+                  className="h-10 rounded-lg border border-[#2A2A72]/30 bg-white px-3 text-[12px] font-medium normal-case tracking-normal text-[#333] outline-none"
+                >
+                  <option value="">Todos os tipos</option>
+                  <option value="Deputado Federal">Deputado Federal</option>
+                  <option value="Governador">Governador</option>
+                  <option value="Presidente">Presidente</option>
+                  <option value="Vereador">Vereador</option>
+                </select>
+              </label>
 
-        <div className="flex w-full flex-1 flex-col items-stretch gap-4 lg:pl-10">
-          <form
-            onSubmit={handleSearch}
-            className="flex w-full max-w-[760px] items-center gap-3"
-          >
-            <div className="flex h-14 min-w-0 flex-1 items-center gap-3 rounded-full border-2 border-[#2A2A72] bg-white px-5">
-              <input
-                id="searchpol-search"
-                type="search"
-                value={search}
-                onChange={(event) => setSearch(event.target.value)}
-                placeholder="Digite o nome de um partido ou candidato"
-                className="min-w-0 flex-1 bg-transparent text-[13px] text-[#333] outline-none placeholder:text-[#7b7b91] sm:text-[14px]"
-              />
+              <label className="flex flex-col gap-2 text-[12px] font-bold uppercase tracking-[0.08em] text-[#2A2A72]">
+                Estado
+                <select
+                  value={selectedEstado}
+                  onChange={(event) => setSelectedEstado(event.target.value)}
+                  className="h-10 rounded-lg border border-[#2A2A72]/30 bg-white px-3 text-[12px] font-medium normal-case tracking-normal text-[#333] outline-none"
+                >
+                  <option value="">Todos os estados</option>
+                  <option value="Acre">Acre</option>
+                  <option value="Rio de Janeiro">Rio de Janeiro</option>
+                  <option value="São Paulo">São Paulo</option>
+                </select>
+              </label>
+
+              <label className="flex flex-col gap-2 text-[12px] font-bold uppercase tracking-[0.08em] text-[#2A2A72]">
+                Partido
+                <select
+                  value={selectedPartido}
+                  onChange={(event) => setSelectedPartido(event.target.value)}
+                  className="h-10 rounded-lg border border-[#2A2A72]/30 bg-white px-3 text-[12px] font-medium normal-case tracking-normal text-[#333] outline-none"
+                >
+                  <option value="">Todos os partidos</option>
+                  <option value="PARTIDO DOS IRMÃOZINHOS">
+                    Partido dos Irmãozinhos
+                  </option>
+                  <option value="PARTIDO DRAGÕES DA SILVA">
+                    Partido Dragões da Silva
+                  </option>
+                  <option value="PARTIDO EPOL">Partido EPOL</option>
+                  <option value="PARTIDO DOS LIXOCOCOS">
+                    Partido dos Lixococos
+                  </option>
+                </select>
+              </label>
             </div>
+          </aside>
 
-            <button
-              type="submit"
-              aria-label="Pesquisar"
-              title="Pesquisar"
-              className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-[#FFA400] text-white transition-transform hover:opacity-85"
+          <div className="flex w-full flex-1 flex-col items-stretch gap-4 lg:pl-10">
+            <form
+              onSubmit={handleSearch}
+              className="flex w-full max-w-[760px] items-center gap-3"
             >
-              <FiSearch aria-hidden="true" className="text-[22px]" />
-            </button>
-          </form>
-
-          <div className="flex w-full max-w-[760px] flex-col gap-3">
-            {results.map((candidate) => (
-              <article
-                key={candidate.keyword}
-                className="flex w-full items-center gap-4 rounded-2xl border-2 border-[#2A2A72]/30 bg-white p-3"
-              >
-                <img
-                  src={candidate.foto}
-                  alt={`Foto de ${candidate.nome}`}
-                  className="h-32 w-32 shrink-0 rounded-xl object-cover"
+              <div className="flex h-14 min-w-0 flex-1 items-center gap-3 rounded-full border-2 border-[#2A2A72] bg-white px-5">
+                <input
+                  id="searchpol-search"
+                  type="search"
+                  value={search}
+                  onChange={(event) => setSearch(event.target.value)}
+                  placeholder="Digite o nome de um partido ou candidato"
+                  className="min-w-0 flex-1 bg-transparent text-[13px] text-[#333] outline-none placeholder:text-[#7b7b91] sm:text-[14px]"
                 />
+              </div>
 
-                <div className="flex flex-col gap-0 text-[#2A2A72]">
-                  <div className="flex items-center gap-2">
-                    <h2 className="truncate text-[22px] font-bold uppercase tracking-[0.06em]">
-                      {candidate.nome} -
-                    </h2>
-                    <span className="shrink-0 text-[22px] font-black text-[#FFA400]">
-                      {candidate.numero}
-                    </span>
-                  </div>
-                  <p className="text-[17px] font-semibold leading-tight text-[#333]">
-                    {candidate.partido}
-                  </p>
-                  <p className="mt-6 text-[15px] font-semibold text-[#333]">
-                    {candidate.estado}
-                  </p>
-                  <p className="text-[15px] font-semibold text-[#333]">
-                    Candidato a: {candidate.candidatura}
-                  </p>
-                </div>
-              </article>
-            ))}
-
-            {results2.map((party) => (
-              <article
-                key={party.keyword}
-                className="flex w-full items-center gap-4 rounded-2xl border-2 border-[#2A2A72]/30 bg-white p-3"
+              <button
+                type="submit"
+                aria-label="Pesquisar"
+                title="Pesquisar"
+                className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-[#FFA400] text-white transition-transform hover:opacity-85"
               >
-                <img
-                  src={party.foto}
-                  alt={`Logo de ${party.nome}`}
-                  className="h-32 w-32 shrink-0 rounded-xl object-cover"
-                />
+                <FiSearch aria-hidden="true" className="text-[22px]" />
+              </button>
+            </form>
 
-                <div className="flex flex-col gap-0 text-[#2A2A72]">
-                  <div className="flex items-center gap-2">
-                    <h2 className="truncate text-[22px] font-bold uppercase tracking-[0.06em]">
-                      {party.nome} -
-                    </h2>
-                    <span className="shrink-0 text-[22px] font-black text-[#FFA400]">
-                      {party.numero}
-                    </span>
+            <div className="flex w-full max-w-[760px] flex-col gap-3">
+              {results.map((candidate) => (
+                <article
+                  key={candidate.keyword}
+                  className="flex w-full items-center gap-4 rounded-2xl border-2 border-[#2A2A72]/30 bg-white p-3"
+                >
+                  <img
+                    src={candidate.foto}
+                    alt={`Foto de ${candidate.nome}`}
+                    className="h-32 w-32 shrink-0 rounded-xl object-cover"
+                  />
+
+                  <div className="flex flex-col gap-0 text-[#2A2A72]">
+                    <div className="flex items-center gap-2">
+                      <h2 className="truncate text-[22px] font-bold uppercase tracking-[0.06em]">
+                        {candidate.nome} -
+                      </h2>
+                      <span className="shrink-0 text-[22px] font-black text-[#FFA400]">
+                        {candidate.numero}
+                      </span>
+                    </div>
+                    <p className="text-[17px] font-semibold leading-tight text-[#333]">
+                      {candidate.partido}
+                    </p>
+                    <p className="mt-6 text-[15px] font-semibold text-[#333]">
+                      {candidate.estado}
+                    </p>
+                    <p className="text-[15px] font-semibold text-[#333]">
+                      Candidato a: {candidate.candidatura}
+                    </p>
                   </div>
-                  <p className="text-[17px] font-semibold leading-tight text-[#333]">
-                    Presidente: {party.presidente}
-                  </p>
-                  <p className="mt-6 text-[15px] font-semibold text-[#333]">
-                    {party.estado}
-                  </p>
-                </div>
-              </article>
-            ))}
+                </article>
+              ))}
+
+              {results2.map((party) => (
+                <article
+                  key={party.keyword}
+                  className="flex w-full items-center gap-4 rounded-2xl border-2 border-[#2A2A72]/30 bg-white p-3"
+                >
+                  <img
+                    src={party.foto}
+                    alt={`Logo de ${party.nome}`}
+                    className="h-32 w-32 shrink-0 rounded-xl object-cover"
+                  />
+
+                  <div className="flex flex-col gap-0 text-[#2A2A72]">
+                    <div className="flex items-center gap-2">
+                      <h2 className="truncate text-[22px] font-bold uppercase tracking-[0.06em]">
+                        {party.nome} -
+                      </h2>
+                      <span className="shrink-0 text-[22px] font-black text-[#FFA400]">
+                        {party.numero}
+                      </span>
+                    </div>
+                    <p className="text-[17px] font-semibold leading-tight text-[#333]">
+                      Presidente: {party.presidente}
+                    </p>
+                    <p className="mt-6 text-[15px] font-semibold text-[#333]">
+                      {party.estado}
+                    </p>
+                  </div>
+                </article>
+              ))}
+            </div>
           </div>
         </div>
       </section>
