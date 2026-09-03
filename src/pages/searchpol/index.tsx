@@ -371,7 +371,7 @@ function SearchPol() {
               </button>
             </form>
 
-            <div className="grid w-full max-w-[960px] grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            <div className="grid w-full max-w-[960px] grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {results.map((party) => (
                 <article
                   key={party.keyword}
@@ -389,13 +389,16 @@ function SearchPol() {
                     />
                   </div>
 
-                  <div className="flex min-w-0 flex-1 flex-col items-center text-[#2A2A72]">
-                    <div className="flex items-center gap-2">
-                      <h2 className="line-clamp-2 text-[17px] font-bold uppercase tracking-[0.06em]">
-                        PARTIDO {party.nome}
+                  <div className="flex min-w-0 flex-1 flex-col items-center">
+                    <div className="flex max-w-full flex-col items-center">
+                      <h2 className="max-w-full text-[12px] font-bold uppercase tracking-[0.12em]">
+                        PARTIDO
                       </h2>
+                      <p className="max-w-full break-words text-[25px] font-bold leading-tight tracking-[0.06em]">
+                        {party.nome}
+                      </p>
                     </div>
-                    <p className="mt-2 text-[24px] font-black leading-tight text-[#FFA400]">
+                    <p className="mt-auto pt-3 text-[25px] font-black leading-tight">
                       {party.numero}
                     </p>
                   </div>
