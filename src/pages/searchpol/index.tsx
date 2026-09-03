@@ -1,4 +1,4 @@
-import { FiFilter, FiSearch } from 'react-icons/fi';
+import { FiChevronDown, FiChevronUp, FiFilter, FiSearch } from 'react-icons/fi';
 import { FormEvent, useState } from 'react';
 import Header from '../../components/header';
 
@@ -41,7 +41,7 @@ const partidos = [
   },
   {
     keyword: 'democrata',
-    nome: 'DEMOCRATA',
+    nome: 'DEMOCRATAS',
     sigla: 'DEMOCRATA',
     numero: '20',
     foto: '/logos/partidos/democrata.svg',
@@ -50,7 +50,7 @@ const partidos = [
   },
   {
     keyword: 'mdb',
-    nome: 'MDB',
+    nome: 'MOVIMENTO DEMOCRÁTICO BRASILEIRO',
     sigla: 'MDB',
     numero: '15',
     foto: '/logos/partidos/mdb.svg',
@@ -61,7 +61,7 @@ const partidos = [
     keyword: 'missao',
     nome: 'MISSÃO',
     sigla: 'MISSÃO',
-    numero: '10',
+    numero: '14',
     foto: '/logos/partidos/missao.svg',
     cor: '#fbc84b',
     borda: '#ae8b34',
@@ -86,7 +86,7 @@ const partidos = [
   },
   {
     keyword: 'pcb',
-    nome: 'PCB',
+    nome: 'PARTIDO COMUNISTA BRASILEIRO',
     sigla: 'PCB',
     numero: '21',
     foto: '/logos/partidos/pcb.svg',
@@ -95,7 +95,7 @@ const partidos = [
   },
   {
     keyword: 'pcdob',
-    nome: 'PCdoB',
+    nome: 'PARTIDO COMUNISTA DO BRASIL',
     sigla: 'PCdoB',
     numero: '65',
     foto: '/logos/partidos/pcdob.svg',
@@ -104,7 +104,7 @@ const partidos = [
   },
   {
     keyword: 'pco',
-    nome: 'PCO',
+    nome: 'PARTIDO DA CAUSA OPERÁRIA',
     sigla: 'PCO',
     numero: '29',
     foto: '/logos/partidos/pco.svg',
@@ -113,7 +113,7 @@ const partidos = [
   },
   {
     keyword: 'pdt',
-    nome: 'PDT',
+    nome: 'PARTIDO DEMOCRÁTICO TRABALHISTA',
     sigla: 'PDT',
     numero: '12',
     foto: '/logos/partidos/pdt.svg',
@@ -122,7 +122,7 @@ const partidos = [
   },
   {
     keyword: 'pl',
-    nome: 'PL',
+    nome: 'PARTIDO LIBERAL',
     sigla: 'PL',
     numero: '22',
     foto: '/logos/partidos/pl.svg',
@@ -131,7 +131,7 @@ const partidos = [
   },
   {
     keyword: 'pode',
-    nome: 'PODE',
+    nome: 'PODEMOS',
     sigla: 'PODE',
     numero: '20',
     foto: '/logos/partidos/pode.svg',
@@ -140,7 +140,7 @@ const partidos = [
   },
   {
     keyword: 'pp',
-    nome: 'PP',
+    nome: 'PROGRESSISTAS',
     sigla: 'PP',
     numero: '11',
     foto: '/logos/partidos/pp.svg',
@@ -149,7 +149,7 @@ const partidos = [
   },
   {
     keyword: 'prd',
-    nome: 'PRD',
+    nome: 'PARTIDO RENOVAÇÃO DEMOCRÁTICA',
     sigla: 'PRD',
     numero: '25',
     foto: '/logos/partidos/prd.svg',
@@ -158,7 +158,7 @@ const partidos = [
   },
   {
     keyword: 'prtb',
-    nome: 'PRTB',
+    nome: 'PARTIDO RENOVADOR TRABALHISTA BRASILEIRO',
     sigla: 'PRTB',
     numero: '28',
     foto: '/logos/partidos/prtb.svg',
@@ -167,7 +167,7 @@ const partidos = [
   },
   {
     keyword: 'psb',
-    nome: 'PSB',
+    nome: 'PARTIDO SOCIALISTA BRASILEIRO',
     sigla: 'PSB',
     numero: '40',
     foto: '/logos/partidos/psb.svg',
@@ -176,7 +176,7 @@ const partidos = [
   },
   {
     keyword: 'psd',
-    nome: 'PSD',
+    nome: 'PARTIDO SOCIAL DEMOCRÁTICO',
     sigla: 'PSD',
     numero: '55',
     foto: '/logos/partidos/psd.svg',
@@ -185,7 +185,7 @@ const partidos = [
   },
   {
     keyword: 'psdb',
-    nome: 'PSDB',
+    nome: 'PARTIDO DA SOCIAL DEMOCRACIA BRASILEIRA',
     sigla: 'PSDB',
     numero: '45',
     foto: '/logos/partidos/psdb.svg',
@@ -194,7 +194,7 @@ const partidos = [
   },
   {
     keyword: 'psol',
-    nome: 'PSOL',
+    nome: 'PARTIDO SOCIALISMO E LIBERDADE',
     sigla: 'PSOL',
     numero: '50',
     foto: '/logos/partidos/psol.svg',
@@ -203,16 +203,16 @@ const partidos = [
   },
   {
     keyword: 'pstu',
-    nome: 'PSTU',
+    nome: 'PARTIDO SOCIALISTA DOS TRABALHADORES UNIFICADO',
     sigla: 'PSTU',
     numero: '16',
     foto: '/logos/partidos/pstu.svg',
-    cor: '#ff2d2d',
-    borda: '#b21f1f',
+    cor: '#ff7979',
+    borda: '#b25454',
   },
   {
     keyword: 'pt',
-    nome: 'PT',
+    nome: 'PARTIDO DOS TRABALHADORES',
     sigla: 'PT',
     numero: '13',
     foto: '/logos/partidos/pt.svg',
@@ -221,7 +221,7 @@ const partidos = [
   },
   {
     keyword: 'pv',
-    nome: 'PV',
+    nome: 'PARTIDO VERDE',
     sigla: 'PV',
     numero: '43',
     foto: '/logos/partidos/pv.svg',
@@ -230,7 +230,7 @@ const partidos = [
   },
   {
     keyword: 'rede',
-    nome: 'REDE',
+    nome: 'REDE SUSTENTABILIDADE',
     sigla: 'REDE',
     numero: '18',
     foto: '/logos/partidos/rede.svg',
@@ -279,6 +279,8 @@ function SearchPol() {
   const [search, setSearch] = useState('');
   const [searchedTerm, setSearchedTerm] = useState('');
   const [selectedPartido, setSelectedPartido] = useState('');
+  const [sortBy, setSortBy] = useState<'nome' | 'numero'>('nome');
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
 
   const handleSearch = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -286,16 +288,41 @@ function SearchPol() {
   };
 
   const results = [...partidos]
-    .sort((firstParty, secondParty) =>
-      firstParty.nome.localeCompare(secondParty.nome, 'pt-BR'),
-    )
     .filter(
       (party) =>
         (searchedTerm === '' ||
           party.keyword.includes(searchedTerm) ||
           party.nome.toLowerCase().includes(searchedTerm)) &&
         (!selectedPartido || party.nome === selectedPartido),
-    );
+    )
+    .sort((firstParty, secondParty) => {
+      const comparison =
+        sortBy === 'nome'
+          ? firstParty.nome.localeCompare(secondParty.nome, 'pt-BR')
+          : Number(firstParty.numero) - Number(secondParty.numero);
+
+      return sortDirection === 'asc' ? comparison : -comparison;
+    });
+
+  const toggleSort = (nextSortBy: 'nome' | 'numero') => {
+    if (sortBy === nextSortBy) {
+      setSortDirection((currentDirection) =>
+        currentDirection === 'asc' ? 'desc' : 'asc',
+      );
+      return;
+    }
+
+    setSortBy(nextSortBy);
+    setSortDirection('asc');
+  };
+
+  const sortIcon = (option: 'nome' | 'numero') => {
+    if (sortBy !== option || sortDirection === 'asc') {
+      return <FiChevronUp aria-hidden="true" />;
+    }
+
+    return <FiChevronDown aria-hidden="true" />;
+  };
 
   return (
     <>
@@ -342,6 +369,30 @@ function SearchPol() {
                   ))}
                 </select>
               </label>
+
+              <div className="flex flex-col gap-2 text-[12px] font-bold uppercase tracking-[0.08em] text-[#2A2A72]">
+                Ordenar por lista
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => toggleSort('nome')}
+                    className={`flex h-10 flex-1 items-center justify-between rounded-lg border px-3 text-left text-[11px] transition-colors ${sortBy === 'nome' ? 'border-[#2A2A72] bg-[#2A2A72] text-white' : 'border-[#2A2A72]/30 bg-white text-[#333]'}`}
+                    aria-label={`Ordenar alfabeticamente em ordem ${sortBy === 'nome' && sortDirection === 'desc' ? 'decrescente' : 'crescente'}`}
+                  >
+                    Alfabética
+                    <span className="text-[16px]">{sortIcon('nome')}</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => toggleSort('numero')}
+                    className={`flex h-10 flex-1 items-center justify-between rounded-lg border px-3 text-left text-[11px] transition-colors ${sortBy === 'numero' ? 'border-[#2A2A72] bg-[#2A2A72] text-white' : 'border-[#2A2A72]/30 bg-white text-[#333]'}`}
+                    aria-label={`Ordenar numericamente em ordem ${sortBy === 'numero' && sortDirection === 'desc' ? 'decrescente' : 'crescente'}`}
+                  >
+                    Numérica
+                    <span className="text-[16px]">{sortIcon('numero')}</span>
+                  </button>
+                </div>
+              </div>
             </div>
           </aside>
 
@@ -391,14 +442,14 @@ function SearchPol() {
 
                   <div className="flex w-full min-w-0 items-end justify-between gap-3 text-left">
                     <div className="flex min-w-0 max-w-[75%] flex-col items-start">
-                      <h2 className="max-w-full text-[12px] font-bold uppercase tracking-[0.12em]">
+                      <h2 className="max-w-full text-[10px] font-bold uppercase opacity-60 tracking-[0.12em]">
                         PARTIDO
                       </h2>
-                      <p className="max-w-full break-words text-[20px] font-bold leading-tight tracking-[0.06em]">
+                      <p className="max-w-full break-words text-[15px] font-bold leading-tight tracking-[0.06em]">
                         {party.nome}
                       </p>
                     </div>
-                    <p className="shrink-0 text-[20px] font-black leading-tight opacity-50 tracking-[0.06em]">
+                    <p className="shrink-0 text-[20px] font-black leading-tight opacity-60 tracking-[0.06em]">
                       {party.numero}
                     </p>
                   </div>
