@@ -1,72 +1,283 @@
 import { FiFilter, FiSearch } from 'react-icons/fi';
 import { FormEvent, useState } from 'react';
 import Header from '../../components/header';
-import Pipo1 from '../../assets/GIFs/pipo1.gif';
-import Drago from '../../assets/Imagens/dragonite.png';
-import Nico from '../../assets/Imagens/nico.png';
-import Irmao from '../../assets/Imagens/irmao.png';
-import Bacana from '../../assets/Imagens/bacanas.png';
-
-const candidatos = [
-  {
-    keyword: 'pipo',
-    nome: 'Pipo',
-    partido: 'PARTIDO EPOL',
-    numero: '6767',
-    estado: 'São Paulo',
-    candidatura: 'Deputado Federal',
-    isPokemon: false,
-    foto: Pipo1,
-  },
-  {
-    keyword: 'dragonite',
-    nome: 'Dragonite da Silva',
-    partido: 'PARTIDO DRAGÕES DA SILVA',
-    numero: '25',
-    estado: 'Rio de Janeiro',
-    candidatura: 'Governador',
-    isPokemon: true,
-    foto: Drago,
-  },
-  {
-    keyword: 'lixococo',
-    nome: 'Nicolas Rodrigues',
-    partido: 'PARTIDO DOS LIXOCOCOS',
-    numero: '17',
-    estado: 'São Paulo',
-    candidatura: 'Presidente',
-    isPokemon: false,
-    foto: Nico,
-  },
-  {
-    keyword: 'irmao',
-    nome: 'Irmãozinho',
-    partido: 'PARTIDO DOS IRMÃOZINHOS',
-    numero: '67123',
-    estado: 'Acre',
-    candidatura: 'Vereador',
-    isPokemon: true,
-    foto: Irmao,
-  },
-];
 
 const partidos = [
   {
-    keyword: 'bacana',
-    nome: 'PARTIDO BACANA',
-    presidente: 'Bacana da Silva',
+    keyword: 'agir',
+    nome: 'AGIR',
+    sigla: 'AGIR',
+    numero: '36',
+    foto: '/logos/partidos/agir.svg',
+    cor: '#6a9dde',
+    borda: '#456691',
+  },
+  {
+    keyword: 'avante',
+    nome: 'AVANTE',
+    sigla: 'AVANTE',
+    numero: '70',
+    foto: '/logos/partidos/avante.svg',
+    cor: '#f3854c',
+    borda: '#a65b34',
+  },
+  {
+    keyword: 'cidadania',
+    nome: 'CIDADANIA',
+    sigla: 'CIDADANIA',
+    numero: '23',
+    foto: '/logos/partidos/cidadania.svg',
+    cor: '#ed0277',
+    borda: '#a00150',
+  },
+  {
+    keyword: 'democracia crista',
+    nome: 'DEMOCRACIA CRISTÃ',
+    sigla: 'DC',
+    numero: '27',
+    foto: '/logos/partidos/dc.svg',
+    cor: '#6161c0',
+    borda: '#3a3a73',
+  },
+  {
+    keyword: 'democrata',
+    nome: 'DEMOCRATA',
+    sigla: 'DEMOCRATA',
+    numero: '20',
+    foto: '/logos/partidos/democrata.svg',
+    cor: '#ddffad',
+    borda: '#9ab279',
+  },
+  {
+    keyword: 'mdb',
+    nome: 'MDB',
+    sigla: 'MDB',
+    numero: '15',
+    foto: '/logos/partidos/mdb.svg',
+    cor: '#6bcf9b',
+    borda: '#438261',
+  },
+  {
+    keyword: 'missao',
+    nome: 'MISSÃO',
+    sigla: 'MISSÃO',
     numero: '10',
-    estado: 'São Paulo',
-    foto: Bacana,
+    foto: '/logos/partidos/missao.svg',
+    cor: '#fbc84b',
+    borda: '#ae8b34',
+  },
+  {
+    keyword: 'mobiliza',
+    nome: 'MOBILIZA',
+    sigla: 'MOBILIZA',
+    numero: '33',
+    foto: '/logos/partidos/mobiliza.svg',
+    cor: '#ffffff',
+    borda: '#b2b2b2',
+  },
+  {
+    keyword: 'novo',
+    nome: 'NOVO',
+    sigla: 'NOVO',
+    numero: '30',
+    foto: '/logos/partidos/novo.svg',
+    cor: '#f1f1f1',
+    borda: '#a5a5a5',
+  },
+  {
+    keyword: 'pcb',
+    nome: 'PCB',
+    sigla: 'PCB',
+    numero: '21',
+    foto: '/logos/partidos/pcb.svg',
+    cor: '#ff3434',
+    borda: '#b22424',
+  },
+  {
+    keyword: 'pcdob',
+    nome: 'PCdoB',
+    sigla: 'PCdoB',
+    numero: '65',
+    foto: '/logos/partidos/pcdob.svg',
+    cor: '#da251c',
+    borda: '#8d1812',
+  },
+  {
+    keyword: 'pco',
+    nome: 'PCO',
+    sigla: 'PCO',
+    numero: '29',
+    foto: '/logos/partidos/pco.svg',
+    cor: '#c90b1c',
+    borda: '#7c0611',
+  },
+  {
+    keyword: 'pdt',
+    nome: 'PDT',
+    sigla: 'PDT',
+    numero: '12',
+    foto: '/logos/partidos/pdt.svg',
+    cor: '#27AE60',
+    borda: '#156135',
+  },
+  {
+    keyword: 'pl',
+    nome: 'PL',
+    sigla: 'PL',
+    numero: '22',
+    foto: '/logos/partidos/pl.svg',
+    cor: '#0075eb',
+    borda: '#004e9e',
+  },
+  {
+    keyword: 'pode',
+    nome: 'PODE',
+    sigla: 'PODE',
+    numero: '20',
+    foto: '/logos/partidos/pode.svg',
+    cor: '#6fd571',
+    borda: '#478848',
+  },
+  {
+    keyword: 'pp',
+    nome: 'PP',
+    sigla: 'PP',
+    numero: '11',
+    foto: '/logos/partidos/pp.svg',
+    cor: '#a8d6ee',
+    borda: '#7191a1',
+  },
+  {
+    keyword: 'prd',
+    nome: 'PRD',
+    sigla: 'PRD',
+    numero: '25',
+    foto: '/logos/partidos/prd.svg',
+    cor: '#d8c35a',
+    borda: '#8b7d3a',
+  },
+  {
+    keyword: 'prtb',
+    nome: 'PRTB',
+    sigla: 'PRTB',
+    numero: '28',
+    foto: '/logos/partidos/prtb.svg',
+    cor: '#7ebe6c',
+    borda: '#4b7140',
+  },
+  {
+    keyword: 'psb',
+    nome: 'PSB',
+    sigla: 'PSB',
+    numero: '40',
+    foto: '/logos/partidos/psb.svg',
+    cor: '#e34450',
+    borda: '#962d35',
+  },
+  {
+    keyword: 'psd',
+    nome: 'PSD',
+    sigla: 'PSD',
+    numero: '55',
+    foto: '/logos/partidos/psd.svg',
+    cor: '#386edc',
+    borda: '#24478f',
+  },
+  {
+    keyword: 'psdb',
+    nome: 'PSDB',
+    sigla: 'PSDB',
+    numero: '45',
+    foto: '/logos/partidos/psdb.svg',
+    cor: '#f3bb34',
+    borda: '#a68023',
+  },
+  {
+    keyword: 'psol',
+    nome: 'PSOL',
+    sigla: 'PSOL',
+    numero: '50',
+    foto: '/logos/partidos/psol.svg',
+    cor: '#953fb5',
+    borda: '#562468',
+  },
+  {
+    keyword: 'pstu',
+    nome: 'PSTU',
+    sigla: 'PSTU',
+    numero: '16',
+    foto: '/logos/partidos/pstu.svg',
+    cor: '#ff2d2d',
+    borda: '#b21f1f',
+  },
+  {
+    keyword: 'pt',
+    nome: 'PT',
+    sigla: 'PT',
+    numero: '13',
+    foto: '/logos/partidos/pt.svg',
+    cor: '#e4142c',
+    borda: '#970d1d',
+  },
+  {
+    keyword: 'pv',
+    nome: 'PV',
+    sigla: 'PV',
+    numero: '43',
+    foto: '/logos/partidos/pv.svg',
+    cor: '#299329',
+    borda: '#134613',
+  },
+  {
+    keyword: 'rede',
+    nome: 'REDE',
+    sigla: 'REDE',
+    numero: '18',
+    foto: '/logos/partidos/rede.svg',
+    cor: '#63b9c2',
+    borda: '#3b7075',
+  },
+  {
+    keyword: 'republicanos',
+    nome: 'REPUBLICANOS',
+    sigla: 'REPUBLICANOS',
+    numero: '10',
+    foto: '/logos/partidos/republicanos.svg',
+    cor: '#2D9CDB',
+    borda: '#17628D',
+  },
+  {
+    keyword: 'solidariedade',
+    nome: 'SOLIDARIEDADE',
+    sigla: 'SOLIDARIEDADE',
+    numero: '77',
+    foto: '/logos/partidos/solidariedade.svg',
+    cor: '#f39963',
+    borda: '#a66843',
+  },
+  {
+    keyword: 'uniao',
+    nome: 'UNIÃO BRASIL',
+    sigla: 'UNIÃO',
+    numero: '44',
+    foto: '/logos/partidos/uniao.svg',
+    cor: '#fbd64f',
+    borda: '#ae9436',
+  },
+  {
+    keyword: 'up',
+    nome: 'UNIDADE POPULAR',
+    sigla: 'UP',
+    numero: '80',
+    foto: '/logos/partidos/up.svg',
+    cor: '#8a8a8a',
+    borda: '#494949',
   },
 ];
 
 function SearchPol() {
   const [search, setSearch] = useState('');
   const [searchedTerm, setSearchedTerm] = useState('');
-  const [onlyPokemon, setOnlyPokemon] = useState(false);
-  const [selectedCandidatura, setSelectedCandidatura] = useState('');
-  const [selectedEstado, setSelectedEstado] = useState('');
   const [selectedPartido, setSelectedPartido] = useState('');
 
   const handleSearch = (event: FormEvent<HTMLFormElement>) => {
@@ -74,30 +285,15 @@ function SearchPol() {
     setSearchedTerm(search.trim().toLowerCase());
   };
 
-  const results = [...candidatos]
-    .sort((firstCandidate, secondCandidate) =>
-      firstCandidate.nome.localeCompare(secondCandidate.nome, 'pt-BR'),
-    )
-    .filter(
-      (candidate) =>
-        (searchedTerm === '' || candidate.keyword === searchedTerm) &&
-        (!onlyPokemon || candidate.isPokemon) &&
-        (!selectedCandidatura ||
-          candidate.candidatura === selectedCandidatura) &&
-        (!selectedEstado || candidate.estado === selectedEstado) &&
-        (!selectedPartido || candidate.partido === selectedPartido),
-    );
-
-  const results2 = [...partidos]
+  const results = [...partidos]
     .sort((firstParty, secondParty) =>
       firstParty.nome.localeCompare(secondParty.nome, 'pt-BR'),
     )
     .filter(
       (party) =>
-        (searchedTerm === '' || party.keyword === searchedTerm) &&
-        !onlyPokemon &&
-        !selectedCandidatura &&
-        (!selectedEstado || party.estado === selectedEstado) &&
+        (searchedTerm === '' ||
+          party.keyword.includes(searchedTerm) ||
+          party.nome.toLowerCase().includes(searchedTerm)) &&
         (!selectedPartido || party.nome === selectedPartido),
     );
 
@@ -131,47 +327,6 @@ function SearchPol() {
             </h2>
 
             <div className="mt-6 flex flex-col gap-5">
-              <label className="flex items-center gap-2 text-[13px] text-[#333]">
-                <input
-                  type="checkbox"
-                  checked={onlyPokemon}
-                  onChange={(event) => setOnlyPokemon(event.target.checked)}
-                  className="h-4 w-4 accent-[#2A2A72]"
-                />
-                Pokémon
-              </label>
-
-              <label className="flex flex-col gap-2 text-[12px] font-bold uppercase tracking-[0.08em] text-[#2A2A72]">
-                Tipo de candidatura
-                <select
-                  value={selectedCandidatura}
-                  onChange={(event) =>
-                    setSelectedCandidatura(event.target.value)
-                  }
-                  className="h-10 rounded-lg border border-[#2A2A72]/30 bg-white px-3 text-[12px] font-medium normal-case tracking-normal text-[#333] outline-none"
-                >
-                  <option value="">Todos os tipos</option>
-                  <option value="Deputado Federal">Deputado Federal</option>
-                  <option value="Governador">Governador</option>
-                  <option value="Presidente">Presidente</option>
-                  <option value="Vereador">Vereador</option>
-                </select>
-              </label>
-
-              <label className="flex flex-col gap-2 text-[12px] font-bold uppercase tracking-[0.08em] text-[#2A2A72]">
-                Estado
-                <select
-                  value={selectedEstado}
-                  onChange={(event) => setSelectedEstado(event.target.value)}
-                  className="h-10 rounded-lg border border-[#2A2A72]/30 bg-white px-3 text-[12px] font-medium normal-case tracking-normal text-[#333] outline-none"
-                >
-                  <option value="">Todos os estados</option>
-                  <option value="Acre">Acre</option>
-                  <option value="Rio de Janeiro">Rio de Janeiro</option>
-                  <option value="São Paulo">São Paulo</option>
-                </select>
-              </label>
-
               <label className="flex flex-col gap-2 text-[12px] font-bold uppercase tracking-[0.08em] text-[#2A2A72]">
                 Partido
                 <select
@@ -180,16 +335,11 @@ function SearchPol() {
                   className="h-10 rounded-lg border border-[#2A2A72]/30 bg-white px-3 text-[12px] font-medium normal-case tracking-normal text-[#333] outline-none"
                 >
                   <option value="">Todos os partidos</option>
-                  <option value="PARTIDO DOS IRMÃOZINHOS">
-                    Partido dos Irmãozinhos
-                  </option>
-                  <option value="PARTIDO DRAGÕES DA SILVA">
-                    Partido Dragões da Silva
-                  </option>
-                  <option value="PARTIDO EPOL">Partido EPOL</option>
-                  <option value="PARTIDO DOS LIXOCOCOS">
-                    Partido dos Lixococos
-                  </option>
+                  {partidos.map((party) => (
+                    <option key={party.keyword} value={party.nome}>
+                      {party.nome}
+                    </option>
+                  ))}
                 </select>
               </label>
             </div>
@@ -222,64 +372,31 @@ function SearchPol() {
             </form>
 
             <div className="flex w-full max-w-[760px] flex-col gap-3">
-              {results.map((candidate) => (
-                <article
-                  key={candidate.keyword}
-                  className="flex w-full items-center gap-4 rounded-2xl border-2 border-[#2A2A72]/30 bg-white p-3"
-                >
-                  <img
-                    src={candidate.foto}
-                    alt={`Foto de ${candidate.nome}`}
-                    className="h-32 w-32 shrink-0 rounded-xl object-cover"
-                  />
-
-                  <div className="flex flex-col gap-0 text-[#2A2A72]">
-                    <div className="flex items-center gap-2">
-                      <h2 className="truncate text-[22px] font-bold uppercase tracking-[0.06em]">
-                        {candidate.nome} -
-                      </h2>
-                      <span className="shrink-0 text-[22px] font-black text-[#FFA400]">
-                        {candidate.numero}
-                      </span>
-                    </div>
-                    <p className="text-[17px] font-semibold leading-tight text-[#333]">
-                      {candidate.partido}
-                    </p>
-                    <p className="mt-6 text-[15px] font-semibold text-[#333]">
-                      {candidate.estado}
-                    </p>
-                    <p className="text-[15px] font-semibold text-[#333]">
-                      Candidato a: {candidate.candidatura}
-                    </p>
-                  </div>
-                </article>
-              ))}
-
-              {results2.map((party) => (
+              {results.map((party) => (
                 <article
                   key={party.keyword}
-                  className="flex w-full items-center gap-4 rounded-2xl border-2 border-[#2A2A72]/30 bg-white p-3"
+                  className="flex w-full items-center gap-4 rounded-2xl border-2 p-3"
+                  style={{
+                    borderColor: party.borda,
+                    backgroundColor: party.cor,
+                  }}
                 >
-                  <img
-                    src={party.foto}
-                    alt={`Logo de ${party.nome}`}
-                    className="h-32 w-32 shrink-0 rounded-xl object-cover"
-                  />
+                  <div className="flex h-24 w-24 shrink-0 items-center justify-center rounded-xl bg-white/40 p-2">
+                    <img
+                      src={party.foto}
+                      alt={`Logo de ${party.nome}`}
+                      className="h-full w-full object-contain"
+                    />
+                  </div>
 
-                  <div className="flex flex-col gap-0 text-[#2A2A72]">
+                  <div className="min-w-0 flex-1 text-[#2A2A72]">
                     <div className="flex items-center gap-2">
                       <h2 className="truncate text-[22px] font-bold uppercase tracking-[0.06em]">
-                        {party.nome} -
+                        PARTIDO {party.nome}
                       </h2>
-                      <span className="shrink-0 text-[22px] font-black text-[#FFA400]">
-                        {party.numero}
-                      </span>
                     </div>
-                    <p className="text-[17px] font-semibold leading-tight text-[#333]">
-                      Presidente: {party.presidente}
-                    </p>
-                    <p className="mt-6 text-[15px] font-semibold text-[#333]">
-                      {party.estado}
+                    <p className="text-[17px] font-semibold leading-tight text-[#2A2A72]">
+                      {party.numero}
                     </p>
                   </div>
                 </article>
