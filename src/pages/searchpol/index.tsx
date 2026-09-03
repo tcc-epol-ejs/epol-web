@@ -371,17 +371,17 @@ function SearchPol() {
               </button>
             </form>
 
-            <div className="flex w-full max-w-[760px] flex-col gap-3">
+            <div className="grid w-full max-w-[960px] grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {results.map((party) => (
                 <article
                   key={party.keyword}
-                  className="flex w-full items-center gap-4 rounded-2xl border-2 p-3"
+                  className="flex min-h-[290px] w-full flex-col items-center gap-3 rounded-2xl border-2 p-4 text-center"
                   style={{
                     borderColor: party.borda,
                     backgroundColor: party.cor,
                   }}
                 >
-                  <div className="flex h-24 w-24 shrink-0 items-center justify-center rounded-xl bg-white/40 p-2">
+                  <div className="flex h-32 w-full shrink-0 items-center justify-center rounded-xl bg-white/40 p-3">
                     <img
                       src={party.foto}
                       alt={`Logo de ${party.nome}`}
@@ -389,13 +389,13 @@ function SearchPol() {
                     />
                   </div>
 
-                  <div className="min-w-0 flex-1 text-[#2A2A72]">
+                  <div className="flex min-w-0 flex-1 flex-col items-center text-[#2A2A72]">
                     <div className="flex items-center gap-2">
-                      <h2 className="truncate text-[22px] font-bold uppercase tracking-[0.06em]">
+                      <h2 className="line-clamp-2 text-[17px] font-bold uppercase tracking-[0.06em]">
                         PARTIDO {party.nome}
                       </h2>
                     </div>
-                    <p className="text-[17px] font-semibold leading-tight text-[#2A2A72]">
+                    <p className="mt-2 text-[24px] font-black leading-tight text-[#FFA400]">
                       {party.numero}
                     </p>
                   </div>
