@@ -282,6 +282,8 @@ function SearchPol() {
   const [selectedPartido, setSelectedPartido] = useState('');
   const [sortBy, setSortBy] = useState<'nome' | 'numero'>('nome');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
+  const [partidosOpen, setPartidosOpen] = useState(true);
+  const [candidatosOpen, setCandidatosOpen] = useState(true);
   const [candidatos, setCandidatos] = useState<Candidato[]>([]);
   const [candidatosLoading, setCandidatosLoading] = useState(true);
   const [candidatosError, setCandidatosError] = useState('');
@@ -470,42 +472,59 @@ function SearchPol() {
                 Partidos
               </h2>
               <div className="h-px flex-1 bg-[#2A2A72]/30" />
+              <button
+                type="button"
+                onClick={() => setPartidosOpen((current) => !current)}
+                className="flex h-8 w-8 items-center justify-center rounded-full border border-[#2A2A72]/30 bg-white text-[#2A2A72] transition-colors hover:bg-[#2A2A72] hover:text-white"
+                aria-expanded={partidosOpen}
+                aria-label={
+                  partidosOpen ? 'Ocultar partidos' : 'Mostrar partidos'
+                }
+              >
+                {partidosOpen ? (
+                  <FiChevronUp aria-hidden="true" className="text-[18px]" />
+                ) : (
+                  <FiChevronDown aria-hidden="true" className="text-[18px]" />
+                )}
+              </button>
             </div>
 
-            <div className="grid w-full max-w-[960px] grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {results.map((party) => (
-                <article
-                  key={party.keyword}
-                  className="flex min-h-[200px] w-full flex-col items-center gap-2 rounded-2xl border-2 p-3 text-center"
-                  style={{
-                    borderColor: party.borda,
-                    backgroundColor: party.cor,
-                  }}
-                >
-                  <div className="flex h-28 w-full shrink-0 items-center justify-center rounded-xl bg-white/40 p-3">
-                    <img
-                      src={party.foto}
-                      alt={`Logo de ${party.nome}`}
-                      className="h-full w-full object-contain"
-                    />
-                  </div>
+            {partidosOpen && (
+              <div className="grid w-full max-w-[960px] grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {results.map((party) => (
+                  <article
+                    key={party.keyword}
+                    className="flex min-h-[200px] w-full flex-col items-center gap-2 rounded-2xl border-2 p-3 text-center"
+                    style={{
+                      borderColor: party.borda,
+                      backgroundColor: party.cor,
+                    }}
+                  >
+                    <div className="flex h-28 w-full shrink-0 items-center justify-center rounded-xl bg-white/40 p-3">
+                      <img
+                        src={party.foto}
+                        alt={`Logo de ${party.nome}`}
+                        className="h-full w-full object-contain"
+                      />
+                    </div>
 
-                  <div className="flex w-full min-w-0 items-end justify-between gap-3 text-left">
-                    <div className="flex min-w-0 max-w-[75%] flex-col items-start">
-                      <h2 className="max-w-full text-[10px] font-bold uppercase opacity-60 tracking-[0.12em]">
-                        PARTIDO
-                      </h2>
-                      <p className="max-w-full break-words text-[15px] font-bold leading-tight tracking-[0.06em]">
-                        {party.nome}
+                    <div className="flex w-full min-w-0 items-end justify-between gap-3 text-left">
+                      <div className="flex min-w-0 max-w-[75%] flex-col items-start">
+                        <h2 className="max-w-full text-[10px] font-bold uppercase opacity-60 tracking-[0.12em]">
+                          PARTIDO
+                        </h2>
+                        <p className="max-w-full break-words text-[15px] font-bold leading-tight tracking-[0.06em]">
+                          {party.nome}
+                        </p>
+                      </div>
+                      <p className="shrink-0 text-[20px] font-black leading-tight opacity-60 tracking-[0.06em]">
+                        {party.numero}
                       </p>
                     </div>
-                    <p className="shrink-0 text-[20px] font-black leading-tight opacity-60 tracking-[0.06em]">
-                      {party.numero}
-                    </p>
-                  </div>
-                </article>
-              ))}
-            </div>
+                  </article>
+                ))}
+              </div>
+            )}
 
             <div className="my-8 flex items-center gap-4 text-[#2A2A72]">
               <div className="h-px flex-1 bg-[#2A2A72]/30" />
@@ -513,70 +532,91 @@ function SearchPol() {
                 Candidatos
               </h2>
               <div className="h-px flex-1 bg-[#2A2A72]/30" />
+              <button
+                type="button"
+                onClick={() => setCandidatosOpen((current) => !current)}
+                className="flex h-8 w-8 items-center justify-center rounded-full border border-[#2A2A72]/30 bg-white text-[#2A2A72] transition-colors hover:bg-[#2A2A72] hover:text-white"
+                aria-expanded={candidatosOpen}
+                aria-label={
+                  candidatosOpen ? 'Ocultar candidatos' : 'Mostrar candidatos'
+                }
+              >
+                {candidatosOpen ? (
+                  <FiChevronUp aria-hidden="true" className="text-[18px]" />
+                ) : (
+                  <FiChevronDown aria-hidden="true" className="text-[18px]" />
+                )}
+              </button>
             </div>
 
-            {candidatosLoading && (
-              <p className="text-[14px] text-[#2A2A72]">
-                Carregando candidatos...
-              </p>
-            )}
+            {candidatosOpen && (
+              <>
+                {candidatosLoading && (
+                  <p className="text-[14px] text-[#2A2A72]">
+                    Carregando candidatos...
+                  </p>
+                )}
 
-            {!candidatosLoading && candidatosError && (
-              <p className="text-[14px] text-[#A72B2B]">{candidatosError}</p>
-            )}
+                {!candidatosLoading && candidatosError && (
+                  <p className="text-[14px] text-[#A72B2B]">
+                    {candidatosError}
+                  </p>
+                )}
 
-            {!candidatosLoading && !candidatosError && (
-              <div className="grid w-full max-w-[960px] grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                {candidatosResults.map((candidate) => (
-                  <article
-                    key={candidate.id}
-                    className="flex min-h-[300px] w-full flex-col overflow-hidden rounded-2xl border-2 border-[#2A2A72] bg-white text-[#2A2A72]"
-                  >
-                    <div className="flex h-44 w-full shrink-0 items-center justify-center overflow-hidden bg-[#2A2A72]">
-                      {candidate.foto_url ? (
-                        <img
-                          src={candidate.foto_url}
-                          alt={`Foto de ${candidate.nome_politico || candidate.nome_completo}`}
-                          loading="lazy"
-                          decoding="async"
-                          className="h-full w-full object-cover object-[center_20%]"
-                        />
-                      ) : (
-                        <span className="text-[12px] font-bold uppercase tracking-[0.1em] text-white/70">
-                          Sem foto
-                        </span>
-                      )}
-                    </div>
+                {!candidatosLoading && !candidatosError && (
+                  <div className="grid w-full max-w-[960px] grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                    {candidatosResults.map((candidate) => (
+                      <article
+                        key={candidate.id}
+                        className="flex min-h-[300px] w-full flex-col overflow-hidden rounded-2xl border-2 border-[#2A2A72] bg-white text-[#2A2A72]"
+                      >
+                        <div className="flex h-44 w-full shrink-0 items-center justify-center overflow-hidden bg-[#2A2A72]">
+                          {candidate.foto_url ? (
+                            <img
+                              src={candidate.foto_url}
+                              alt={`Foto de ${candidate.nome_politico || candidate.nome_completo}`}
+                              loading="lazy"
+                              decoding="async"
+                              className="h-full w-full object-cover object-[center_20%]"
+                            />
+                          ) : (
+                            <span className="text-[12px] font-bold uppercase tracking-[0.1em] text-white/70">
+                              Sem foto
+                            </span>
+                          )}
+                        </div>
 
-                    <div className="flex flex-1 flex-col p-4">
-                      <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#2A2A72]/70">
-                        Candidato a{' '}
-                        {candidate.candidatura?.toLowerCase() ||
-                          'cargo não informado'}
-                      </p>
-                      <h3 className="mt-1 break-words text-[20px] font-bold uppercase leading-tight">
-                        {candidate.nome_politico || candidate.nome_completo}
-                      </h3>
-                      <p className="mt-2 text-[14px] font-semibold text-[#333]">
-                        {candidate.partidos?.nome_completo ||
-                          'Partido não informado'}
-                      </p>
-                      <div className="mt-auto flex items-end justify-between gap-3 pt-4">
-                        <p className="text-[13px] font-semibold uppercase tracking-[0.08em] text-[#333]">
-                          {candidate.uf_candidatura ||
-                            candidate.uf_naturalidade ||
-                            'UF não informada'}
-                        </p>
-                        <p className="text-[24px] font-black leading-none text-[#FFA400]">
-                          {candidate.numero_candidatura ||
-                            candidate.numero_urna ||
-                            'N/A'}
-                        </p>
-                      </div>
-                    </div>
-                  </article>
-                ))}
-              </div>
+                        <div className="flex flex-1 flex-col p-4">
+                          <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#2A2A72]/70">
+                            Candidato a{' '}
+                            {candidate.candidatura?.toLowerCase() ||
+                              'cargo não informado'}
+                          </p>
+                          <h3 className="mt-1 break-words text-[20px] font-bold uppercase leading-tight">
+                            {candidate.nome_politico || candidate.nome_completo}
+                          </h3>
+                          <p className="mt-2 text-[14px] font-semibold text-[#333]">
+                            {candidate.partidos?.nome_completo ||
+                              'Partido não informado'}
+                          </p>
+                          <div className="mt-auto flex items-end justify-between gap-3 pt-4">
+                            <p className="text-[13px] font-semibold uppercase tracking-[0.08em] text-[#333]">
+                              {candidate.uf_candidatura ||
+                                candidate.uf_naturalidade ||
+                                'UF não informada'}
+                            </p>
+                            <p className="text-[24px] font-black leading-none text-[#FFA400]">
+                              {candidate.numero_candidatura ||
+                                candidate.numero_urna ||
+                                'N/A'}
+                            </p>
+                          </div>
+                        </div>
+                      </article>
+                    ))}
+                  </div>
+                )}
+              </>
             )}
           </div>
         </div>
