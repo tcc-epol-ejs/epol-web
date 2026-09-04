@@ -532,12 +532,14 @@ function SearchPol() {
                     key={candidate.id}
                     className="flex min-h-[300px] w-full flex-col overflow-hidden rounded-2xl border-2 border-[#2A2A72] bg-white text-[#2A2A72]"
                   >
-                    <div className="flex h-44 w-full shrink-0 items-center justify-center bg-[#2A2A72]">
+                    <div className="flex h-44 w-full shrink-0 items-center justify-center overflow-hidden bg-[#2A2A72]">
                       {candidate.foto_url ? (
                         <img
                           src={candidate.foto_url}
                           alt={`Foto de ${candidate.nome_politico || candidate.nome_completo}`}
-                          className="h-full w-full object-cover"
+                          loading="lazy"
+                          decoding="async"
+                          className="h-full w-full object-cover object-[center_20%]"
                         />
                       ) : (
                         <span className="text-[12px] font-bold uppercase tracking-[0.1em] text-white/70">
@@ -548,13 +550,16 @@ function SearchPol() {
 
                     <div className="flex flex-1 flex-col p-4">
                       <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#2A2A72]/70">
-                        Candidato
+                        Candidato a{' '}
+                        {candidate.candidatura?.toLowerCase() ||
+                          'cargo não informado'}
                       </p>
                       <h3 className="mt-1 break-words text-[20px] font-bold uppercase leading-tight">
                         {candidate.nome_politico || candidate.nome_completo}
                       </h3>
                       <p className="mt-2 text-[14px] font-semibold text-[#333]">
-                        {candidate.partidos?.sigla || 'Partido não informado'}
+                        {candidate.partidos?.nome_completo ||
+                          'Partido não informado'}
                       </p>
                       <div className="mt-auto flex items-end justify-between gap-3 pt-4">
                         <p className="text-[13px] font-semibold uppercase tracking-[0.08em] text-[#333]">
@@ -563,7 +568,9 @@ function SearchPol() {
                             'UF não informada'}
                         </p>
                         <p className="text-[24px] font-black leading-none text-[#FFA400]">
-                          {candidate.numero_urna}
+                          {candidate.numero_candidatura ||
+                            candidate.numero_urna ||
+                            'N/A'}
                         </p>
                       </div>
                     </div>
