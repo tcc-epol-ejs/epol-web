@@ -1,6 +1,7 @@
 import { FiChevronDown, FiChevronUp, FiFilter, FiSearch } from 'react-icons/fi';
-import { FormEvent, useState } from 'react';
+import { FormEvent, useEffect, useState } from 'react';
 import Header from '../../components/header';
+import { Candidato, listarCandidatos } from '../../services/api';
 
 const partidos = [
   {
@@ -281,6 +282,23 @@ function SearchPol() {
   const [selectedPartido, setSelectedPartido] = useState('');
   const [sortBy, setSortBy] = useState<'nome' | 'numero'>('nome');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
+  const [candidatos, setCandidatos] = useState<Candidato[]>([]);
+  const [candidatosLoading, setCandidatosLoading] = useState(true);
+  const [candidatosError, setCandidatosError] = useState('');
+
+  useEffect(() => {
+    const carregarCandidatos = async () => {
+      try {
+        setCandidatos(await listarCandidatos());
+      } catch {
+        setCandidatosError('Não foi possível carregar os candidatos.');
+      } finally {
+        setCandidatosLoading(false);
+      }
+    };
+
+    carregarCandidatos();
+  }, []);
 
   const handleSearch = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -323,6 +341,30 @@ function SearchPol() {
 
     return <FiChevronDown aria-hidden="true" />;
   };
+
+  const candidatosResults = [...candidatos]
+    .filter((candidate) => {
+      const termo = searchedTerm;
+      const nome = (
+        candidate.nome_politico || candidate.nome_completo
+      ).toLowerCase();
+      const partido = candidate.partidos?.nome_completo.toLowerCase() || '';
+
+      return (
+        termo === '' ||
+        nome.includes(termo) ||
+        candidate.nome_completo.toLowerCase().includes(termo) ||
+        partido.includes(termo)
+      );
+    })
+    .sort((firstCandidate, secondCandidate) =>
+      (
+        firstCandidate.nome_politico || firstCandidate.nome_completo
+      ).localeCompare(
+        secondCandidate.nome_politico || secondCandidate.nome_completo,
+        'pt-BR',
+      ),
+    );
 
   return (
     <>
@@ -422,6 +464,14 @@ function SearchPol() {
               </button>
             </form>
 
+            <div className="my-8 flex items-center gap-4 text-[#2A2A72]">
+              <div className="h-px flex-1 bg-[#2A2A72]/30" />
+              <h2 className="text-[18px] font-bold uppercase tracking-[0.12em]">
+                Partidos
+              </h2>
+              <div className="h-px flex-1 bg-[#2A2A72]/30" />
+            </div>
+
             <div className="grid w-full max-w-[960px] grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {results.map((party) => (
                 <article
@@ -456,6 +506,71 @@ function SearchPol() {
                 </article>
               ))}
             </div>
+
+            <div className="my-8 flex items-center gap-4 text-[#2A2A72]">
+              <div className="h-px flex-1 bg-[#2A2A72]/30" />
+              <h2 className="text-[18px] font-bold uppercase tracking-[0.12em]">
+                Candidatos
+              </h2>
+              <div className="h-px flex-1 bg-[#2A2A72]/30" />
+            </div>
+
+            {candidatosLoading && (
+              <p className="text-[14px] text-[#2A2A72]">
+                Carregando candidatos...
+              </p>
+            )}
+
+            {!candidatosLoading && candidatosError && (
+              <p className="text-[14px] text-[#A72B2B]">{candidatosError}</p>
+            )}
+
+            {!candidatosLoading && !candidatosError && (
+              <div className="grid w-full max-w-[960px] grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {candidatosResults.map((candidate) => (
+                  <article
+                    key={candidate.id}
+                    className="flex min-h-[300px] w-full flex-col overflow-hidden rounded-2xl border-2 border-[#2A2A72] bg-white text-[#2A2A72]"
+                  >
+                    <div className="flex h-44 w-full shrink-0 items-center justify-center bg-[#2A2A72]">
+                      {candidate.foto_url ? (
+                        <img
+                          src={candidate.foto_url}
+                          alt={`Foto de ${candidate.nome_politico || candidate.nome_completo}`}
+                          className="h-full w-full object-cover"
+                        />
+                      ) : (
+                        <span className="text-[12px] font-bold uppercase tracking-[0.1em] text-white/70">
+                          Sem foto
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="flex flex-1 flex-col p-4">
+                      <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#2A2A72]/70">
+                        Candidato
+                      </p>
+                      <h3 className="mt-1 break-words text-[20px] font-bold uppercase leading-tight">
+                        {candidate.nome_politico || candidate.nome_completo}
+                      </h3>
+                      <p className="mt-2 text-[14px] font-semibold text-[#333]">
+                        {candidate.partidos?.sigla || 'Partido não informado'}
+                      </p>
+                      <div className="mt-auto flex items-end justify-between gap-3 pt-4">
+                        <p className="text-[13px] font-semibold uppercase tracking-[0.08em] text-[#333]">
+                          {candidate.uf_candidatura ||
+                            candidate.uf_naturalidade ||
+                            'UF não informada'}
+                        </p>
+                        <p className="text-[24px] font-black leading-none text-[#FFA400]">
+                          {candidate.numero_urna}
+                        </p>
+                      </div>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </section>
