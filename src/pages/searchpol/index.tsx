@@ -368,6 +368,20 @@ function SearchPol() {
       ),
     );
 
+  useEffect(() => {
+    if (searchedTerm.trim() === '') {
+      return;
+    }
+
+    if (results.length > 0) {
+      setPartidosOpen(true);
+    }
+
+    if (candidatosResults.length > 0) {
+      setCandidatosOpen(true);
+    }
+  }, [searchedTerm, results.length, candidatosResults.length]);
+
   return (
     <>
       <div className="w-full">
