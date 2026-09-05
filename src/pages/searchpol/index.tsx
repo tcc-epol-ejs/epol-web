@@ -1,4 +1,11 @@
-import { FiChevronDown, FiChevronUp, FiFilter, FiSearch } from 'react-icons/fi';
+import {
+  FiArrowDown,
+  FiArrowUp,
+  FiChevronDown,
+  FiChevronUp,
+  FiFilter,
+  FiSearch,
+} from 'react-icons/fi';
 import { FormEvent, useEffect, useState } from 'react';
 import Header from '../../components/header';
 import { Candidato, listarCandidatos } from '../../services/api';
@@ -346,10 +353,10 @@ function SearchPol() {
 
   const sortIcon = (option: 'nome' | 'numero') => {
     if (sortBy !== option || sortDirection === 'asc') {
-      return <FiChevronUp aria-hidden="true" />;
+      return <FiArrowUp aria-hidden="true" />;
     }
 
-    return <FiChevronDown aria-hidden="true" />;
+    return <FiArrowDown aria-hidden="true" />;
   };
 
   const toggleCandidatosSort = () => {
@@ -364,6 +371,9 @@ function SearchPol() {
     setSelectedEstadoCandidato('');
     setSelectedPartidoCandidato('');
     setFiltroSelecionado(null);
+    setSortBy('nome');
+    setSortDirection('asc');
+    setCandidatosSortDirection('asc');
   };
 
   const candidatosResults = [...candidatos]
@@ -495,7 +505,7 @@ function SearchPol() {
         <Header isBgWhite />
       </div>
 
-      <section className="relative isolate overflow-hidden bg-transparent">
+      <section className="relative isolate overflow-clip bg-transparent">
         <div className="pointer-events-none absolute inset-0 -z-10">
           <div className="absolute -left-10 top-8 h-28 w-28 rounded-full bg-[#FFA400]/25" />
           <div className="absolute left-8 top-24 h-20 w-20 rounded-full bg-[#FFA400]/35" />
@@ -512,7 +522,7 @@ function SearchPol() {
         </div>
 
         <div className="mx-auto flex min-h-[calc(100vh-64px)] w-full max-w-[1200px] flex-col px-6 pt-8 sm:px-10 sm:pt-10 lg:flex-row lg:px-0">
-          <aside className="w-full pb-8 lg:w-1/4 lg:border-r-2 lg:border-[#2A2A72]/30 lg:pb-0 lg:pl-8 lg:pr-8">
+          <aside className="w-full self-start pb-8 lg:sticky lg:top-6 lg:h-fit lg:w-1/4 lg:border-r-2 lg:border-[#2A2A72]/30 lg:pb-0 lg:pl-8 lg:pr-8">
             <h2 className="flex items-center gap-3 text-[18px] font-bold uppercase tracking-[0.12em] text-[#2A2A72]">
               <FiFilter aria-hidden="true" className="text-[22px]" />
               Filtrar
@@ -526,21 +536,27 @@ function SearchPol() {
 
                 <label className="flex flex-col gap-2 text-[12px] font-bold uppercase tracking-[0.08em] text-[#2A2A72]">
                   Filtrar partido
-                  <select
-                    value={selectedPartido}
-                    onChange={(event) => {
-                      setFiltroSelecionado('partidos');
-                      setSelectedPartido(event.target.value);
-                    }}
-                    className="h-10 rounded-lg border border-[#2A2A72]/30 bg-white px-3 text-[12px] font-medium normal-case tracking-normal text-[#333] outline-none"
-                  >
-                    <option value="">Todos os partidos</option>
-                    {partidos.map((party) => (
-                      <option key={party.keyword} value={party.nome}>
-                        {party.nome}
-                      </option>
-                    ))}
-                  </select>
+                  <div className="relative">
+                    <select
+                      value={selectedPartido}
+                      onChange={(event) => {
+                        setFiltroSelecionado('partidos');
+                        setSelectedPartido(event.target.value);
+                      }}
+                      className="h-10 w-full appearance-none rounded-lg border border-[#2A2A72]/30 bg-white px-3 pr-10 text-[12px] font-medium normal-case tracking-normal text-[#333] outline-none"
+                    >
+                      <option value="">Todos os partidos</option>
+                      {partidos.map((party) => (
+                        <option key={party.keyword} value={party.nome}>
+                          {party.nome}
+                        </option>
+                      ))}
+                    </select>
+                    <FiChevronDown
+                      aria-hidden="true"
+                      className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[18px] text-[#2A2A72]"
+                    />
+                  </div>
                 </label>
 
                 <div className="flex flex-col gap-2 text-[12px] font-bold uppercase tracking-[0.08em] text-[#2A2A72]">
@@ -581,40 +597,52 @@ function SearchPol() {
 
                 <label className="flex flex-col gap-2 text-[12px] font-bold uppercase tracking-[0.08em] text-[#2A2A72]">
                   Filtrar estado
-                  <select
-                    value={selectedEstadoCandidato}
-                    onChange={(event) => {
-                      setFiltroSelecionado('candidatos');
-                      setSelectedEstadoCandidato(event.target.value);
-                    }}
-                    className="h-10 rounded-lg border border-[#2A2A72]/30 bg-white px-3 text-[12px] font-medium normal-case tracking-normal text-[#333] outline-none"
-                  >
-                    <option value="">Todos os estados</option>
-                    {estadosCandidatos.map((estado) => (
-                      <option key={estado} value={estado}>
-                        {estado}
-                      </option>
-                    ))}
-                  </select>
+                  <div className="relative">
+                    <select
+                      value={selectedEstadoCandidato}
+                      onChange={(event) => {
+                        setFiltroSelecionado('candidatos');
+                        setSelectedEstadoCandidato(event.target.value);
+                      }}
+                      className="h-10 w-full appearance-none rounded-lg border border-[#2A2A72]/30 bg-white px-3 pr-10 text-[12px] font-medium normal-case tracking-normal text-[#333] outline-none"
+                    >
+                      <option value="">Todos os estados</option>
+                      {estadosCandidatos.map((estado) => (
+                        <option key={estado} value={estado}>
+                          {estado}
+                        </option>
+                      ))}
+                    </select>
+                    <FiChevronDown
+                      aria-hidden="true"
+                      className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[18px] text-[#2A2A72]"
+                    />
+                  </div>
                 </label>
 
                 <label className="flex flex-col gap-2 text-[12px] font-bold uppercase tracking-[0.08em] text-[#2A2A72]">
                   Filtrar partido do candidato
-                  <select
-                    value={selectedPartidoCandidato}
-                    onChange={(event) => {
-                      setFiltroSelecionado('candidatos');
-                      setSelectedPartidoCandidato(event.target.value);
-                    }}
-                    className="h-10 rounded-lg border border-[#2A2A72]/30 bg-white px-3 text-[12px] font-medium normal-case tracking-normal text-[#333] outline-none"
-                  >
-                    <option value="">Todos os partidos</option>
-                    {partidosCandidatos.map((party) => (
-                      <option key={party.id} value={party.id}>
-                        {party.nome_completo}
-                      </option>
-                    ))}
-                  </select>
+                  <div className="relative">
+                    <select
+                      value={selectedPartidoCandidato}
+                      onChange={(event) => {
+                        setFiltroSelecionado('candidatos');
+                        setSelectedPartidoCandidato(event.target.value);
+                      }}
+                      className="h-10 w-full appearance-none rounded-lg border border-[#2A2A72]/30 bg-white px-3 pr-10 text-[12px] font-medium normal-case tracking-normal text-[#333] outline-none"
+                    >
+                      <option value="">Todos os partidos</option>
+                      {partidosCandidatos.map((party) => (
+                        <option key={party.id} value={party.id}>
+                          {party.nome_completo}
+                        </option>
+                      ))}
+                    </select>
+                    <FiChevronDown
+                      aria-hidden="true"
+                      className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[18px] text-[#2A2A72]"
+                    />
+                  </div>
                 </label>
 
                 <div className="flex flex-col gap-2 text-[12px] font-bold uppercase tracking-[0.08em] text-[#2A2A72]">
@@ -628,9 +656,9 @@ function SearchPol() {
                     Alfabética
                     <span className="text-[16px]">
                       {candidatosSortDirection === 'asc' ? (
-                        <FiChevronUp aria-hidden="true" />
+                        <FiArrowUp aria-hidden="true" />
                       ) : (
-                        <FiChevronDown aria-hidden="true" />
+                        <FiArrowDown aria-hidden="true" />
                       )}
                     </span>
                   </button>
