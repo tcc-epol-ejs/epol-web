@@ -280,8 +280,16 @@ function SearchPol() {
   const [search, setSearch] = useState('');
   const [searchedTerm, setSearchedTerm] = useState('');
   const [selectedPartido, setSelectedPartido] = useState('');
+  const [selectedEstadoCandidato, setSelectedEstadoCandidato] = useState('');
+  const [selectedPartidoCandidato, setSelectedPartidoCandidato] = useState('');
+  const [filtroSelecionado, setFiltroSelecionado] = useState<
+    'partidos' | 'candidatos' | null
+  >(null);
   const [sortBy, setSortBy] = useState<'nome' | 'numero'>('nome');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
+  const [candidatosSortDirection, setCandidatosSortDirection] = useState<
+    'asc' | 'desc'
+  >('asc');
   const [partidosOpen, setPartidosOpen] = useState(true);
   const [candidatosOpen, setCandidatosOpen] = useState(true);
   const [candidatos, setCandidatos] = useState<Candidato[]>([]);
@@ -344,6 +352,20 @@ function SearchPol() {
     return <FiChevronDown aria-hidden="true" />;
   };
 
+  const toggleCandidatosSort = () => {
+    setFiltroSelecionado('candidatos');
+    setCandidatosSortDirection((currentDirection) =>
+      currentDirection === 'asc' ? 'desc' : 'asc',
+    );
+  };
+
+  const limparFiltros = () => {
+    setSelectedPartido('');
+    setSelectedEstadoCandidato('');
+    setSelectedPartidoCandidato('');
+    setFiltroSelecionado(null);
+  };
+
   const candidatosResults = [...candidatos]
     .filter((candidate) => {
       const termo = searchedTerm;
@@ -353,22 +375,82 @@ function SearchPol() {
       const partido = candidate.partidos?.nome_completo.toLowerCase() || '';
 
       return (
-        termo === '' ||
-        nome.includes(termo) ||
-        candidate.nome_completo.toLowerCase().includes(termo) ||
-        partido.includes(termo)
+        (termo === '' ||
+          nome.includes(termo) ||
+          candidate.nome_completo.toLowerCase().includes(termo) ||
+          partido.includes(termo)) &&
+        (!selectedEstadoCandidato ||
+          candidate.uf_candidatura === selectedEstadoCandidato) &&
+        (!selectedPartidoCandidato ||
+          candidate.partidos?.id === selectedPartidoCandidato)
       );
     })
-    .sort((firstCandidate, secondCandidate) =>
-      (
+    .sort((firstCandidate, secondCandidate) => {
+      const comparison = (
         firstCandidate.nome_politico || firstCandidate.nome_completo
       ).localeCompare(
         secondCandidate.nome_politico || secondCandidate.nome_completo,
         'pt-BR',
+      );
+
+      return candidatosSortDirection === 'asc' ? comparison : -comparison;
+    });
+
+  const estadosCandidatos = [
+    ...new Set(
+      candidatos
+        .map((candidate) => candidate.uf_candidatura)
+        .filter((estado): estado is string => Boolean(estado)),
+    ),
+  ].sort((firstState, secondState) =>
+    firstState.localeCompare(secondState, 'pt-BR'),
+  );
+
+  const partidosCandidatos = candidatos
+    .filter((candidate) => candidate.partidos)
+    .map(
+      (candidate) => candidate.partidos as NonNullable<Candidato['partidos']>,
+    )
+    .filter(
+      (party, index, parties) =>
+        parties.findIndex((item) => item.id === party.id) === index,
+    )
+    .sort((firstParty, secondParty) =>
+      firstParty.nome_completo.localeCompare(
+        secondParty.nome_completo,
+        'pt-BR',
       ),
     );
 
+  const filtroPartidoAtivo = selectedPartido !== '';
+  const filtroCandidatoAtivo =
+    selectedEstadoCandidato !== '' || selectedPartidoCandidato !== '';
+
   useEffect(() => {
+    if (filtroSelecionado === 'partidos') {
+      setPartidosOpen(true);
+      setCandidatosOpen(false);
+      return;
+    }
+
+    if (filtroSelecionado === 'candidatos') {
+      setPartidosOpen(false);
+      setCandidatosOpen(true);
+      return;
+    }
+
+    if (filtroPartidoAtivo && !filtroCandidatoAtivo) {
+      setPartidosOpen(true);
+      setCandidatosOpen(false);
+      return;
+    }
+
+    if (filtroCandidatoAtivo && !filtroPartidoAtivo) {
+      setPartidosOpen(false);
+      setCandidatosOpen(true);
+      return;
+    }
+
     if (searchedTerm.trim() === '') {
       setPartidosOpen(true);
       setCandidatosOpen(true);
@@ -398,7 +480,14 @@ function SearchPol() {
 
     setPartidosOpen(false);
     setCandidatosOpen(false);
-  }, [searchedTerm, results.length, candidatosResults.length]);
+  }, [
+    searchedTerm,
+    results.length,
+    candidatosResults.length,
+    filtroPartidoAtivo,
+    filtroCandidatoAtivo,
+    filtroSelecionado,
+  ]);
 
   return (
     <>
@@ -429,45 +518,131 @@ function SearchPol() {
               Filtrar
             </h2>
 
-            <div className="mt-6 flex flex-col gap-5">
-              <label className="flex flex-col gap-2 text-[12px] font-bold uppercase tracking-[0.08em] text-[#2A2A72]">
-                Partido
-                <select
-                  value={selectedPartido}
-                  onChange={(event) => setSelectedPartido(event.target.value)}
-                  className="h-10 rounded-lg border border-[#2A2A72]/30 bg-white px-3 text-[12px] font-medium normal-case tracking-normal text-[#333] outline-none"
-                >
-                  <option value="">Todos os partidos</option>
-                  {partidos.map((party) => (
-                    <option key={party.keyword} value={party.nome}>
-                      {party.nome}
-                    </option>
-                  ))}
-                </select>
-              </label>
+            <div className="mt-6 flex flex-col gap-6">
+              <div className="flex flex-col gap-4 border-b border-[#2A2A72]/20 pb-6">
+                <h3 className="text-[14px] font-black uppercase tracking-[0.12em] text-[#2A2A72]">
+                  Partidos
+                </h3>
 
-              <div className="flex flex-col gap-2 text-[12px] font-bold uppercase tracking-[0.08em] text-[#2A2A72]">
-                Ordenar por lista
-                <div className="flex gap-2">
+                <label className="flex flex-col gap-2 text-[12px] font-bold uppercase tracking-[0.08em] text-[#2A2A72]">
+                  Filtrar partido
+                  <select
+                    value={selectedPartido}
+                    onChange={(event) => {
+                      setFiltroSelecionado('partidos');
+                      setSelectedPartido(event.target.value);
+                    }}
+                    className="h-10 rounded-lg border border-[#2A2A72]/30 bg-white px-3 text-[12px] font-medium normal-case tracking-normal text-[#333] outline-none"
+                  >
+                    <option value="">Todos os partidos</option>
+                    {partidos.map((party) => (
+                      <option key={party.keyword} value={party.nome}>
+                        {party.nome}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+
+                <div className="flex flex-col gap-2 text-[12px] font-bold uppercase tracking-[0.08em] text-[#2A2A72]">
+                  Ordenar partidos
+                  <div className="flex gap-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setFiltroSelecionado('partidos');
+                        toggleSort('nome');
+                      }}
+                      className={`flex h-10 flex-1 items-center justify-between rounded-lg border px-3 text-left text-[11px] transition-colors ${sortBy === 'nome' ? 'border-[#2A2A72] bg-[#2A2A72] text-white' : 'border-[#2A2A72]/30 bg-white text-[#333]'}`}
+                      aria-label={`Ordenar partidos alfabeticamente em ordem ${sortBy === 'nome' && sortDirection === 'desc' ? 'decrescente' : 'crescente'}`}
+                    >
+                      Alfabética
+                      <span className="text-[16px]">{sortIcon('nome')}</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setFiltroSelecionado('partidos');
+                        toggleSort('numero');
+                      }}
+                      className={`flex h-10 flex-1 items-center justify-between rounded-lg border px-3 text-left text-[11px] transition-colors ${sortBy === 'numero' ? 'border-[#2A2A72] bg-[#2A2A72] text-white' : 'border-[#2A2A72]/30 bg-white text-[#333]'}`}
+                      aria-label={`Ordenar partidos numericamente em ordem ${sortBy === 'numero' && sortDirection === 'desc' ? 'decrescente' : 'crescente'}`}
+                    >
+                      Numérica
+                      <span className="text-[16px]">{sortIcon('numero')}</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-4">
+                <h3 className="text-[14px] font-black uppercase tracking-[0.12em] text-[#2A2A72]">
+                  Candidatos
+                </h3>
+
+                <label className="flex flex-col gap-2 text-[12px] font-bold uppercase tracking-[0.08em] text-[#2A2A72]">
+                  Filtrar estado
+                  <select
+                    value={selectedEstadoCandidato}
+                    onChange={(event) => {
+                      setFiltroSelecionado('candidatos');
+                      setSelectedEstadoCandidato(event.target.value);
+                    }}
+                    className="h-10 rounded-lg border border-[#2A2A72]/30 bg-white px-3 text-[12px] font-medium normal-case tracking-normal text-[#333] outline-none"
+                  >
+                    <option value="">Todos os estados</option>
+                    {estadosCandidatos.map((estado) => (
+                      <option key={estado} value={estado}>
+                        {estado}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+
+                <label className="flex flex-col gap-2 text-[12px] font-bold uppercase tracking-[0.08em] text-[#2A2A72]">
+                  Filtrar partido do candidato
+                  <select
+                    value={selectedPartidoCandidato}
+                    onChange={(event) => {
+                      setFiltroSelecionado('candidatos');
+                      setSelectedPartidoCandidato(event.target.value);
+                    }}
+                    className="h-10 rounded-lg border border-[#2A2A72]/30 bg-white px-3 text-[12px] font-medium normal-case tracking-normal text-[#333] outline-none"
+                  >
+                    <option value="">Todos os partidos</option>
+                    {partidosCandidatos.map((party) => (
+                      <option key={party.id} value={party.id}>
+                        {party.nome_completo}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+
+                <div className="flex flex-col gap-2 text-[12px] font-bold uppercase tracking-[0.08em] text-[#2A2A72]">
+                  Ordenar candidatos
                   <button
                     type="button"
-                    onClick={() => toggleSort('nome')}
-                    className={`flex h-10 flex-1 items-center justify-between rounded-lg border px-3 text-left text-[11px] transition-colors ${sortBy === 'nome' ? 'border-[#2A2A72] bg-[#2A2A72] text-white' : 'border-[#2A2A72]/30 bg-white text-[#333]'}`}
-                    aria-label={`Ordenar alfabeticamente em ordem ${sortBy === 'nome' && sortDirection === 'desc' ? 'decrescente' : 'crescente'}`}
+                    onClick={toggleCandidatosSort}
+                    className="flex h-10 w-full items-center justify-between rounded-lg border border-[#2A2A72] bg-[#2A2A72] px-3 text-left text-[11px] text-white transition-colors"
+                    aria-label={`Ordenar candidatos alfabeticamente em ordem ${candidatosSortDirection === 'desc' ? 'decrescente' : 'crescente'}`}
                   >
                     Alfabética
-                    <span className="text-[16px]">{sortIcon('nome')}</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => toggleSort('numero')}
-                    className={`flex h-10 flex-1 items-center justify-between rounded-lg border px-3 text-left text-[11px] transition-colors ${sortBy === 'numero' ? 'border-[#2A2A72] bg-[#2A2A72] text-white' : 'border-[#2A2A72]/30 bg-white text-[#333]'}`}
-                    aria-label={`Ordenar numericamente em ordem ${sortBy === 'numero' && sortDirection === 'desc' ? 'decrescente' : 'crescente'}`}
-                  >
-                    Numérica
-                    <span className="text-[16px]">{sortIcon('numero')}</span>
+                    <span className="text-[16px]">
+                      {candidatosSortDirection === 'asc' ? (
+                        <FiChevronUp aria-hidden="true" />
+                      ) : (
+                        <FiChevronDown aria-hidden="true" />
+                      )}
+                    </span>
                   </button>
                 </div>
+
+                <button
+                  type="button"
+                  onClick={limparFiltros}
+                  className="mt-2 flex h-10 w-full items-center justify-center rounded-lg border border-[#A72B2B] bg-white px-3 text-[11px] font-bold uppercase tracking-[0.08em] text-[#A72B2B] transition-colors hover:bg-[#A72B2B] hover:text-white"
+                >
+                  Limpar filtros
+                </button>
               </div>
             </div>
           </aside>
@@ -498,35 +673,40 @@ function SearchPol() {
               </button>
             </form>
 
-            {(searchedTerm.trim() === '' || results.length > 0) && (
-              <div className="relative -ml-4 mr-[-2.5rem] mt-5 w-[calc(100%+5rem)]">
-                <div className="flex w-full items-center gap-4 text-[#2A2A72]">
-                  <div className="h-px min-w-0 flex-1 bg-[#2A2A72]/30" />
-                  <h2 className="shrink-0 text-[18px] font-bold uppercase tracking-[0.12em]">
-                    Partidos
-                  </h2>
-                  <div className="h-px min-w-0 flex-1 bg-[#2A2A72]/30" />
-                  <button
-                    type="button"
-                    onClick={() => setPartidosOpen((current) => !current)}
-                    className="ml-auto flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-[#2A2A72]/30 bg-white text-[#2A2A72] transition-colors hover:bg-[#2A2A72] hover:text-white"
-                    aria-expanded={partidosOpen}
-                    aria-label={
-                      partidosOpen ? 'Ocultar partidos' : 'Mostrar partidos'
-                    }
-                  >
-                    {partidosOpen ? (
-                      <FiChevronUp aria-hidden="true" className="text-[18px]" />
-                    ) : (
-                      <FiChevronDown
-                        aria-hidden="true"
-                        className="text-[18px]"
-                      />
-                    )}
-                  </button>
+            {filtroSelecionado !== 'candidatos' &&
+              !filtroCandidatoAtivo &&
+              (searchedTerm.trim() === '' || results.length > 0) && (
+                <div className="relative -ml-4 mr-[-2.5rem] mt-5 w-[calc(100%+5rem)]">
+                  <div className="flex w-full items-center gap-4 text-[#2A2A72]">
+                    <div className="h-px min-w-0 flex-1 bg-[#2A2A72]/30" />
+                    <h2 className="shrink-0 text-[18px] font-bold uppercase tracking-[0.12em]">
+                      Partidos
+                    </h2>
+                    <div className="h-px min-w-0 flex-1 bg-[#2A2A72]/30" />
+                    <button
+                      type="button"
+                      onClick={() => setPartidosOpen((current) => !current)}
+                      className="ml-auto flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-[#2A2A72]/30 bg-white text-[#2A2A72] transition-colors hover:bg-[#2A2A72] hover:text-white"
+                      aria-expanded={partidosOpen}
+                      aria-label={
+                        partidosOpen ? 'Ocultar partidos' : 'Mostrar partidos'
+                      }
+                    >
+                      {partidosOpen ? (
+                        <FiChevronUp
+                          aria-hidden="true"
+                          className="text-[18px]"
+                        />
+                      ) : (
+                        <FiChevronDown
+                          aria-hidden="true"
+                          className="text-[18px]"
+                        />
+                      )}
+                    </button>
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
 
             {partidosOpen && (
               <div className="grid w-full max-w-[960px] grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -565,37 +745,42 @@ function SearchPol() {
               </div>
             )}
 
-            {(searchedTerm.trim() === '' || candidatosResults.length > 0) && (
-              <div className="relative -ml-4 mr-[-2.5rem] my-2 w-[calc(100%+5rem)]">
-                <div className="flex w-full items-center gap-4 text-[#2A2A72]">
-                  <div className="h-px min-w-0 flex-1 bg-[#2A2A72]/30" />
-                  <h2 className="shrink-0 text-[18px] font-bold uppercase tracking-[0.12em]">
-                    Candidatos
-                  </h2>
-                  <div className="h-px min-w-0 flex-1 bg-[#2A2A72]/30" />
-                  <button
-                    type="button"
-                    onClick={() => setCandidatosOpen((current) => !current)}
-                    className="ml-auto flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-[#2A2A72]/30 bg-white text-[#2A2A72] transition-colors hover:bg-[#2A2A72] hover:text-white"
-                    aria-expanded={candidatosOpen}
-                    aria-label={
-                      candidatosOpen
-                        ? 'Ocultar candidatos'
-                        : 'Mostrar candidatos'
-                    }
-                  >
-                    {candidatosOpen ? (
-                      <FiChevronUp aria-hidden="true" className="text-[18px]" />
-                    ) : (
-                      <FiChevronDown
-                        aria-hidden="true"
-                        className="text-[18px]"
-                      />
-                    )}
-                  </button>
+            {filtroSelecionado !== 'partidos' &&
+              !filtroPartidoAtivo &&
+              (searchedTerm.trim() === '' || candidatosResults.length > 0) && (
+                <div className="relative -ml-4 mr-[-2.5rem] my-2 w-[calc(100%+5rem)]">
+                  <div className="flex w-full items-center gap-4 text-[#2A2A72]">
+                    <div className="h-px min-w-0 flex-1 bg-[#2A2A72]/30" />
+                    <h2 className="shrink-0 text-[18px] font-bold uppercase tracking-[0.12em]">
+                      Candidatos
+                    </h2>
+                    <div className="h-px min-w-0 flex-1 bg-[#2A2A72]/30" />
+                    <button
+                      type="button"
+                      onClick={() => setCandidatosOpen((current) => !current)}
+                      className="ml-auto flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-[#2A2A72]/30 bg-white text-[#2A2A72] transition-colors hover:bg-[#2A2A72] hover:text-white"
+                      aria-expanded={candidatosOpen}
+                      aria-label={
+                        candidatosOpen
+                          ? 'Ocultar candidatos'
+                          : 'Mostrar candidatos'
+                      }
+                    >
+                      {candidatosOpen ? (
+                        <FiChevronUp
+                          aria-hidden="true"
+                          className="text-[18px]"
+                        />
+                      ) : (
+                        <FiChevronDown
+                          aria-hidden="true"
+                          className="text-[18px]"
+                        />
+                      )}
+                    </button>
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
 
             {candidatosOpen && (
               <>
