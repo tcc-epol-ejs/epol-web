@@ -568,7 +568,7 @@ function SearchPol() {
                         setFiltroSelecionado('partidos');
                         toggleSort('nome');
                       }}
-                      className={`flex h-10 flex-1 items-center justify-between rounded-lg border px-3 text-left text-[11px] transition-colors ${sortBy === 'nome' ? 'border-[#2A2A72] bg-[#2A2A72] text-white' : 'border-[#2A2A72]/30 bg-white text-[#333]'}`}
+                      className={`flex h-10 flex-1 items-center justify-center gap-1 rounded-lg border px-3 text-left text-[11px] transition-colors ${sortBy === 'nome' ? 'border-[#2A2A72] bg-[#2A2A72] text-white' : 'border-[#2A2A72]/30 bg-white text-[#333]'}`}
                       aria-label={`Ordenar partidos alfabeticamente em ordem ${sortBy === 'nome' && sortDirection === 'desc' ? 'decrescente' : 'crescente'}`}
                     >
                       Alfabética
@@ -580,7 +580,7 @@ function SearchPol() {
                         setFiltroSelecionado('partidos');
                         toggleSort('numero');
                       }}
-                      className={`flex h-10 flex-1 items-center justify-between rounded-lg border px-3 text-left text-[11px] transition-colors ${sortBy === 'numero' ? 'border-[#2A2A72] bg-[#2A2A72] text-white' : 'border-[#2A2A72]/30 bg-white text-[#333]'}`}
+                      className={`flex h-10 flex-1 items-center justify-center gap-1 rounded-lg border px-3 text-left text-[11px] transition-colors ${sortBy === 'numero' ? 'border-[#2A2A72] bg-[#2A2A72] text-white' : 'border-[#2A2A72]/30 bg-white text-[#333]'}`}
                       aria-label={`Ordenar partidos numericamente em ordem ${sortBy === 'numero' && sortDirection === 'desc' ? 'decrescente' : 'crescente'}`}
                     >
                       Numérica
@@ -685,7 +685,12 @@ function SearchPol() {
                   id="searchpol-search"
                   type="search"
                   value={search}
-                  onChange={(event) => setSearch(event.target.value)}
+                  onChange={(event) => {
+                    const nextSearch = event.target.value;
+
+                    setSearch(nextSearch);
+                    setSearchedTerm(nextSearch.trim().toLowerCase());
+                  }}
                   placeholder="Digite o nome de um partido ou candidato"
                   className="min-w-0 flex-1 bg-transparent text-[13px] text-[#333] outline-none placeholder:text-[#7b7b91] sm:text-[14px]"
                 />
