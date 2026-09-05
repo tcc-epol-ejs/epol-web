@@ -6,7 +6,7 @@ import {
   FiFilter,
   FiSearch,
 } from 'react-icons/fi';
-import { FormEvent, useEffect, useState } from 'react';
+import { FormEvent, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import Header from '../../components/header';
 import { Candidato, listarCandidatos } from '../../services/api';
 
@@ -284,6 +284,7 @@ const partidos = [
 ];
 
 function SearchPol() {
+  const resultadosRef = useRef<HTMLDivElement>(null);
   const [search, setSearch] = useState('');
   const [searchedTerm, setSearchedTerm] = useState('');
   const [selectedPartido, setSelectedPartido] = useState('');
@@ -302,6 +303,10 @@ function SearchPol() {
   const [candidatos, setCandidatos] = useState<Candidato[]>([]);
   const [candidatosLoading, setCandidatosLoading] = useState(true);
   const [candidatosError, setCandidatosError] = useState('');
+
+  useLayoutEffect(() => {
+    resultadosRef.current?.scrollTo({ top: 0, behavior: 'auto' });
+  }, []);
 
   useEffect(() => {
     const carregarCandidatos = async () => {
@@ -534,33 +539,8 @@ function SearchPol() {
                   Partidos
                 </h3>
 
-                <label className="flex flex-col gap-2 text-[12px] font-bold uppercase tracking-[0.08em] text-[#2A2A72]">
-                  Filtrar partido
-                  <div className="relative">
-                    <select
-                      value={selectedPartido}
-                      onChange={(event) => {
-                        setFiltroSelecionado('partidos');
-                        setSelectedPartido(event.target.value);
-                      }}
-                      className="h-10 w-full appearance-none rounded-lg border border-[#2A2A72]/30 bg-white px-3 pr-10 text-[12px] font-medium normal-case tracking-normal text-[#333] outline-none"
-                    >
-                      <option value="">Todos os partidos</option>
-                      {partidos.map((party) => (
-                        <option key={party.keyword} value={party.nome}>
-                          {party.nome}
-                        </option>
-                      ))}
-                    </select>
-                    <FiChevronDown
-                      aria-hidden="true"
-                      className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[18px] text-[#2A2A72]"
-                    />
-                  </div>
-                </label>
-
                 <div className="flex flex-col gap-2 text-[12px] font-bold uppercase tracking-[0.08em] text-[#2A2A72]">
-                  Ordenar partidos
+                  Por ordem:
                   <div className="flex gap-2">
                     <button
                       type="button"
@@ -596,7 +576,7 @@ function SearchPol() {
                 </h3>
 
                 <label className="flex flex-col gap-2 text-[12px] font-bold uppercase tracking-[0.08em] text-[#2A2A72]">
-                  Filtrar estado
+                  Por estado
                   <div className="relative">
                     <select
                       value={selectedEstadoCandidato}
@@ -621,7 +601,7 @@ function SearchPol() {
                 </label>
 
                 <label className="flex flex-col gap-2 text-[12px] font-bold uppercase tracking-[0.08em] text-[#2A2A72]">
-                  Filtrar partido do candidato
+                  Por partido do candidato
                   <div className="relative">
                     <select
                       value={selectedPartidoCandidato}
@@ -646,7 +626,7 @@ function SearchPol() {
                 </label>
 
                 <div className="flex flex-col gap-2 text-[12px] font-bold uppercase tracking-[0.08em] text-[#2A2A72]">
-                  Ordenar candidatos
+                  Por ordem:
                   <button
                     type="button"
                     onClick={toggleCandidatosSort}
@@ -706,7 +686,10 @@ function SearchPol() {
               </button>
             </form>
 
-            <div className="flex min-h-0 flex-1 flex-col gap-4 lg:overflow-y-auto lg:[scrollbar-width:none] lg:[&::-webkit-scrollbar]:hidden">
+            <div
+              ref={resultadosRef}
+              className="flex min-h-0 flex-1 flex-col gap-4 lg:overflow-y-auto lg:[scrollbar-width:none] lg:[&::-webkit-scrollbar]:hidden"
+            >
               {filtroSelecionado !== 'candidatos' &&
                 !filtroCandidatoAtivo &&
                 (searchedTerm.trim() === '' || results.length > 0) && (
