@@ -370,16 +370,34 @@ function SearchPol() {
 
   useEffect(() => {
     if (searchedTerm.trim() === '') {
+      setPartidosOpen(true);
+      setCandidatosOpen(true);
       return;
     }
 
-    if (results.length > 0) {
+    const temPartidos = results.length > 0;
+    const temCandidatos = candidatosResults.length > 0;
+
+    if (temPartidos && !temCandidatos) {
       setPartidosOpen(true);
+      setCandidatosOpen(false);
+      return;
     }
 
-    if (candidatosResults.length > 0) {
+    if (!temPartidos && temCandidatos) {
+      setPartidosOpen(false);
       setCandidatosOpen(true);
+      return;
     }
+
+    if (temPartidos && temCandidatos) {
+      setPartidosOpen(true);
+      setCandidatosOpen(true);
+      return;
+    }
+
+    setPartidosOpen(false);
+    setCandidatosOpen(false);
   }, [searchedTerm, results.length, candidatosResults.length]);
 
   return (
@@ -480,30 +498,35 @@ function SearchPol() {
               </button>
             </form>
 
-            <div className="relative -ml-4 mr-[-2.5rem] mt-5 w-[calc(100%+5rem)]">
-              <div className="flex w-full items-center gap-4 text-[#2A2A72]">
-                <div className="h-px min-w-0 flex-1 bg-[#2A2A72]/30" />
-                <h2 className="shrink-0 text-[18px] font-bold uppercase tracking-[0.12em]">
-                  Partidos
-                </h2>
-                <div className="h-px min-w-0 flex-1 bg-[#2A2A72]/30" />
-                <button
-                  type="button"
-                  onClick={() => setPartidosOpen((current) => !current)}
-                  className="ml-auto flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-[#2A2A72]/30 bg-white text-[#2A2A72] transition-colors hover:bg-[#2A2A72] hover:text-white"
-                  aria-expanded={partidosOpen}
-                  aria-label={
-                    partidosOpen ? 'Ocultar partidos' : 'Mostrar partidos'
-                  }
-                >
-                  {partidosOpen ? (
-                    <FiChevronUp aria-hidden="true" className="text-[18px]" />
-                  ) : (
-                    <FiChevronDown aria-hidden="true" className="text-[18px]" />
-                  )}
-                </button>
+            {(searchedTerm.trim() === '' || results.length > 0) && (
+              <div className="relative -ml-4 mr-[-2.5rem] mt-5 w-[calc(100%+5rem)]">
+                <div className="flex w-full items-center gap-4 text-[#2A2A72]">
+                  <div className="h-px min-w-0 flex-1 bg-[#2A2A72]/30" />
+                  <h2 className="shrink-0 text-[18px] font-bold uppercase tracking-[0.12em]">
+                    Partidos
+                  </h2>
+                  <div className="h-px min-w-0 flex-1 bg-[#2A2A72]/30" />
+                  <button
+                    type="button"
+                    onClick={() => setPartidosOpen((current) => !current)}
+                    className="ml-auto flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-[#2A2A72]/30 bg-white text-[#2A2A72] transition-colors hover:bg-[#2A2A72] hover:text-white"
+                    aria-expanded={partidosOpen}
+                    aria-label={
+                      partidosOpen ? 'Ocultar partidos' : 'Mostrar partidos'
+                    }
+                  >
+                    {partidosOpen ? (
+                      <FiChevronUp aria-hidden="true" className="text-[18px]" />
+                    ) : (
+                      <FiChevronDown
+                        aria-hidden="true"
+                        className="text-[18px]"
+                      />
+                    )}
+                  </button>
+                </div>
               </div>
-            </div>
+            )}
 
             {partidosOpen && (
               <div className="grid w-full max-w-[960px] grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -542,30 +565,37 @@ function SearchPol() {
               </div>
             )}
 
-            <div className="relative -ml-4 mr-[-2.5rem] my-2 w-[calc(100%+5rem)]">
-              <div className="flex w-full items-center gap-4 text-[#2A2A72]">
-                <div className="h-px min-w-0 flex-1 bg-[#2A2A72]/30" />
-                <h2 className="shrink-0 text-[18px] font-bold uppercase tracking-[0.12em]">
-                  Candidatos
-                </h2>
-                <div className="h-px min-w-0 flex-1 bg-[#2A2A72]/30" />
-                <button
-                  type="button"
-                  onClick={() => setCandidatosOpen((current) => !current)}
-                  className="ml-auto flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-[#2A2A72]/30 bg-white text-[#2A2A72] transition-colors hover:bg-[#2A2A72] hover:text-white"
-                  aria-expanded={candidatosOpen}
-                  aria-label={
-                    candidatosOpen ? 'Ocultar candidatos' : 'Mostrar candidatos'
-                  }
-                >
-                  {candidatosOpen ? (
-                    <FiChevronUp aria-hidden="true" className="text-[18px]" />
-                  ) : (
-                    <FiChevronDown aria-hidden="true" className="text-[18px]" />
-                  )}
-                </button>
+            {(searchedTerm.trim() === '' || candidatosResults.length > 0) && (
+              <div className="relative -ml-4 mr-[-2.5rem] my-2 w-[calc(100%+5rem)]">
+                <div className="flex w-full items-center gap-4 text-[#2A2A72]">
+                  <div className="h-px min-w-0 flex-1 bg-[#2A2A72]/30" />
+                  <h2 className="shrink-0 text-[18px] font-bold uppercase tracking-[0.12em]">
+                    Candidatos
+                  </h2>
+                  <div className="h-px min-w-0 flex-1 bg-[#2A2A72]/30" />
+                  <button
+                    type="button"
+                    onClick={() => setCandidatosOpen((current) => !current)}
+                    className="ml-auto flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-[#2A2A72]/30 bg-white text-[#2A2A72] transition-colors hover:bg-[#2A2A72] hover:text-white"
+                    aria-expanded={candidatosOpen}
+                    aria-label={
+                      candidatosOpen
+                        ? 'Ocultar candidatos'
+                        : 'Mostrar candidatos'
+                    }
+                  >
+                    {candidatosOpen ? (
+                      <FiChevronUp aria-hidden="true" className="text-[18px]" />
+                    ) : (
+                      <FiChevronDown
+                        aria-hidden="true"
+                        className="text-[18px]"
+                      />
+                    )}
+                  </button>
+                </div>
               </div>
-            </div>
+            )}
 
             {candidatosOpen && (
               <>
