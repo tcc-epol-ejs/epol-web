@@ -1,18 +1,23 @@
 import { useState, useRef, useMemo, useEffect } from 'react';
 import type { PointerEvent as ReactPointerEvent } from 'react';
-import {
-  FiX,
-  FiMinus,
-  FiHeart,
-  FiChevronLeft,
-  FiFlag,
-  FiTarget,
-} from 'react-icons/fi';
+import { useNavigate } from 'react-router-dom';
+import { FiX, FiMinus, FiHeart, FiChevronLeft, FiFlag } from 'react-icons/fi';
 import Header from '../../components/header';
 import RoundButton from '../../components/botoes/roundButton';
 import PipoCoracao from '../../assets/Imagens/pipoCoracao.png';
 import PipoDefault from '../../assets/Imagens/pipoDefault.png';
 import PipoTriste from '../../assets/Imagens/pipoTriste.png';
+import { useAuth } from '../../contexts/AuthContext';
+import {
+  listarPerguntas,
+  listarPartidos,
+  salvarResposta,
+  limparRespostas,
+  buscarCompatibilidade,
+  type Pergunta as PerguntaAPI,
+  type Partido as PartidoAPI,
+  type CompatibilidadePartido,
+} from '../../services/api';
 
 // -----------------------------------------------------------------------------
 // TIPOS
@@ -21,20 +26,22 @@ type Mood = 'neutral' | 'happy' | 'sad';
 type Valor = -1 | 0 | 1;
 
 interface Pergunta {
-  id: number;
+  id: string;
   categoria: string;
   texto: string;
   tags: string[];
 }
 
 interface Partido {
+  id: string;
   sigla: string;
   nome: string;
   cor: string;
+  logoSrc: string;
   tags: string[];
 }
 
-interface PartidoComScore extends Partido {
+interface PartidoResultado extends Partido {
   pct: number;
 }
 
@@ -43,10 +50,107 @@ interface Resposta {
   valor: Valor;
 }
 
+interface AcaoErro {
+  titulo: string;
+  mensagem: string;
+  acao?: { label: string; onClick: () => void };
+}
+
 // -----------------------------------------------------------------------------
-// MASCOTE — Pipo (imagens, no lugar do SVG antigo do componente Mascote)
+// MAPEAMENTO API -> TIPOS DO FRONT
 // -----------------------------------------------------------------------------
-// happy = concordou (coração), neutral = parado/abstenção, sad = discordou
+
+// A tabela partidos não tem coluna de cor — gera uma cor estável a partir da
+// sigla (o mesmo partido sempre cai na mesma cor). Se um dia adicionar uma
+// coluna `cor` na tabela, troque isso por `partido.cor` vindo da API direto.
+const PALETA_CORES = [
+  '#FF9F1C',
+  '#4C9AFF',
+  '#2E2A47',
+  '#8B84D6',
+  '#22C55E',
+  '#EF4444',
+  '#F472B6',
+  '#0EA5E9',
+];
+
+function corPorSigla(sigla: string): string {
+  let hash = 0;
+  for (let i = 0; i < sigla.length; i++) {
+    hash = (hash * 31 + sigla.charCodeAt(i)) >>> 0;
+  }
+  return PALETA_CORES[hash % PALETA_CORES.length];
+}
+
+function mapearPergunta(p: PerguntaAPI): Pergunta {
+  return {
+    id: p.id,
+    categoria: p.categoria,
+    texto: p.texto,
+    tags: p.tag ?? [],
+  };
+}
+
+function mapearPartido(p: PartidoAPI): Partido {
+  return {
+    id: p.id,
+    sigla: p.sigla,
+    nome: p.nome_completo,
+    cor: corPorSigla(p.sigla),
+    logoSrc: p.bandeira_url ?? p.sigla,
+    tags: p.tag ?? [],
+  };
+}
+
+// Junta o ranking que veio do backend (calcular_compatibilidade, com o
+// percentual já certo) com os dados visuais que só existem no front
+// (cor, logo, tags) — combinando pelo id do partido.
+function montarRanking(
+  ranking: CompatibilidadePartido[],
+  partidos: Partido[],
+): PartidoResultado[] {
+  return ranking.map((r) => {
+    const partido = partidos.find((p) => p.id === r.partido_id);
+    return {
+      id: r.partido_id,
+      sigla: r.sigla,
+      nome: r.nome_completo,
+      cor: partido?.cor ?? corPorSigla(r.sigla),
+      logoSrc: partido?.logoSrc ?? r.sigla,
+      tags: partido?.tags ?? [],
+      pct: r.compatibilidade_pct,
+    };
+  });
+}
+
+// Tags vêm do banco (livres, cadastradas por quem administra as perguntas/
+// partidos), então não dá pra confiar só num dicionário fixo. Usa um rótulo
+// bonito se existir aqui, senão formata o próprio valor da tag.
+const LABELS: Record<string, string> = {
+  intervencionismo: 'Intervenção estatal',
+  estado_forte: 'Estado forte',
+  educacao_tecnica: 'Educação técnica',
+  reforma_educacional: 'Reforma educacional',
+  saude_publica: 'Saúde pública',
+  seguranca_dura: 'Segurança',
+  ordem: 'Ordem pública',
+  pauta_ambiental: 'Meio ambiente',
+  tributacao_progressiva: 'Tributação',
+};
+
+function formatarTag(tag: string): string {
+  if (LABELS[tag]) return LABELS[tag];
+  return tag
+    .replace(/_/g, ' ')
+    .split(' ')
+    .filter(Boolean)
+    .map((palavra) => palavra.charAt(0).toUpperCase() + palavra.slice(1))
+    .join(' ');
+}
+
+// -----------------------------------------------------------------------------
+// MASCOTE — Pipo (usado só na tela de quiz, pra refletir a reação do usuário)
+// -----------------------------------------------------------------------------
 const PIPO_IMAGES: Record<Mood, string> = {
   happy: PipoCoracao,
   neutral: PipoDefault,
@@ -56,13 +160,12 @@ const PIPO_IMAGES: Record<Mood, string> = {
 interface PipoProps {
   mood?: Mood;
   size?: number;
-  /** Desliga o flutuar suave — útil pros mascotes pequenos dos cards de resultado. */
   animated?: boolean;
 }
 
 function Pipo({ mood = 'neutral', size = 120, animated = true }: PipoProps) {
   const wrapperRef = useRef<HTMLDivElement>(null);
-  const phaseRef = useRef(Math.random() * Math.PI * 2); // fase aleatória: vários Pipos na tela não boiam em sincronia
+  const phaseRef = useRef(Math.random() * Math.PI * 2);
 
   useEffect(() => {
     if (!animated) return;
@@ -102,125 +205,91 @@ function Pipo({ mood = 'neutral', size = 120, animated = true }: PipoProps) {
 }
 
 // -----------------------------------------------------------------------------
-// DADOS DE DEMONSTRAÇÃO (trocar pela chamada real da API depois)
+// LOGO DO PARTIDO — com fallback pra sigla caso a imagem não exista/carregue
 // -----------------------------------------------------------------------------
-const QUESTIONS: Pergunta[] = [
-  {
-    id: 1,
-    categoria: 'Economia',
-    texto: 'O Estado deve ter participação ativa em empresas estratégicas?',
-    tags: ['intervencionismo', 'estado_forte'],
-  },
-  {
-    id: 2,
-    categoria: 'Educação',
-    texto:
-      'O ensino técnico deveria ter prioridade sobre o ensino superior tradicional?',
-    tags: ['educacao_tecnica', 'reforma_educacional'],
-  },
-  {
-    id: 3,
-    categoria: 'Saúde',
-    texto:
-      'A saúde pública deveria receber mais investimento do que incentivos à saúde privada?',
-    tags: ['saude_publica', 'intervencionismo'],
-  },
-  {
-    id: 4,
-    categoria: 'Segurança',
-    texto:
-      'As polícias deveriam ter mais autonomia para atuar em operações de risco?',
-    tags: ['seguranca_dura', 'ordem'],
-  },
-  {
-    id: 5,
-    categoria: 'Meio Ambiente',
-    texto:
-      'Empresas poluentes deveriam pagar taxas mais altas por seus impactos?',
-    tags: ['pauta_ambiental', 'intervencionismo'],
-  },
-  {
-    id: 6,
-    categoria: 'Economia',
-    texto: 'Os impostos sobre grandes fortunas deveriam aumentar?',
-    tags: ['tributacao_progressiva', 'intervencionismo'],
-  },
-];
-
-const PARTIDOS: Partido[] = [
-  {
-    sigla: 'PF',
-    nome: 'Partido Fuleco',
-    cor: '#FF9F1C',
-    tags: [
-      'intervencionismo',
-      'estado_forte',
-      'saude_publica',
-      'pauta_ambiental',
-      'tributacao_progressiva',
-    ],
-  },
-  {
-    sigla: 'PA',
-    nome: 'Partido Avante',
-    cor: '#4C9AFF',
-    tags: [
-      'educacao_tecnica',
-      'reforma_educacional',
-      'seguranca_dura',
-      'ordem',
-    ],
-  },
-  {
-    sigla: 'PC',
-    nome: 'Partido Central',
-    cor: '#2E2A47',
-    tags: ['saude_publica', 'educacao_tecnica', 'ordem'],
-  },
-];
-
-const LABELS: Record<string, string> = {
-  intervencionismo: 'Intervenção estatal',
-  estado_forte: 'Estado forte',
-  educacao_tecnica: 'Educação técnica',
-  reforma_educacional: 'Reforma educacional',
-  saude_publica: 'Saúde pública',
-  seguranca_dura: 'Segurança',
-  ordem: 'Ordem pública',
-  pauta_ambiental: 'Meio ambiente',
-  tributacao_progressiva: 'Tributação',
-};
-
-// -----------------------------------------------------------------------------
-// LÓGICA DE COMPATIBILIDADE
-// -----------------------------------------------------------------------------
-function intersection(a: string[], b: string[]): number {
-  return a.filter((t) => b.includes(t)).length;
+interface PartidoLogoProps {
+  partido: Partido;
+  size: number;
 }
 
-function calcularCompatibilidade(respostas: Resposta[]): PartidoComScore[] {
-  return PARTIDOS.map((p) => {
-    let score = 0;
-    let max = 0;
-    respostas.forEach(({ tags, valor }) => {
-      const m = intersection(tags, p.tags);
-      max += m;
-      if (valor !== 0) score += valor * m;
-    });
-    const pct = max === 0 ? 50 : Math.round(((score + max) / (2 * max)) * 100);
-    return { ...p, pct };
-  }).sort((a, b) => b.pct - a.pct);
+function PartidoLogo({ partido, size }: PartidoLogoProps) {
+  const [erro, setErro] = useState(false);
+
+  if (erro) {
+    return (
+      <div
+        className="rounded-full flex items-center justify-center text-white [font-family:'Sora',sans-serif] font-extrabold"
+        style={{
+          width: size,
+          height: size,
+          fontSize: size * 0.32,
+          background: partido.cor,
+        }}
+      >
+        {partido.sigla}
+      </div>
+    );
+  }
+
+  return (
+    <img
+      src={partido.logoSrc}
+      alt={`Logo do ${partido.nome}`}
+      width={size}
+      height={size}
+      style={{ width: size, height: size, objectFit: 'contain' }}
+      onError={() => setErro(true)}
+    />
+  );
+}
+
+// -----------------------------------------------------------------------------
+// SORTEIO DE PERGUNTAS — 15 por vez
+// -----------------------------------------------------------------------------
+function embaralhar<T>(lista: T[]): T[] {
+  const arr = [...lista];
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+function selecionarPerguntas(todas: Pergunta[], quantidade = 15): Pergunta[] {
+  const porCategoria = new Map<string, Pergunta[]>();
+  todas.forEach((p) => {
+    const lista = porCategoria.get(p.categoria) ?? [];
+    lista.push(p);
+    porCategoria.set(p.categoria, lista);
+  });
+  const grupos = [...porCategoria.values()].map(embaralhar);
+
+  const selecionadas: Pergunta[] = [];
+  let indice = 0;
+  while (selecionadas.length < quantidade) {
+    let adicionouAlguma = false;
+    for (const grupo of grupos) {
+      if (selecionadas.length >= quantidade) break;
+      if (grupo[indice]) {
+        selecionadas.push(grupo[indice]);
+        adicionouAlguma = true;
+      }
+    }
+    if (!adicionouAlguma) break;
+    indice++;
+  }
+
+  return embaralhar(selecionadas);
 }
 
 // -----------------------------------------------------------------------------
 // BLOBS DE FUNDO
 // -----------------------------------------------------------------------------
-
 interface BlobMotion {
-  ampX: number; // amplitude horizontal em px
-  ampY: number; // amplitude vertical em px
-  speed: number; // velocidade angular (rad/s) — baixo = bem sutil
-  phase: number; // deslocamento de fase, pra não ficarem todos sincronizados
+  ampX: number;
+  ampY: number;
+  speed: number;
+  phase: number;
 }
 
 const BLOB_MOTION: BlobMotion[] = [
@@ -343,6 +412,43 @@ function Blobs({ tint }: { tint?: string | null }) {
     </>
   );
 }
+
+// -----------------------------------------------------------------------------
+// TELA DE STATUS — carregando / erro / login necessário
+// -----------------------------------------------------------------------------
+function StatusScreen({
+  titulo,
+  mensagem,
+  acao,
+}: {
+  titulo: string;
+  mensagem: string;
+  acao?: { label: string; onClick: () => void };
+}) {
+  return (
+    <div className="relative w-full h-full min-h-[640px] bg-[#2E2A6B] overflow-hidden flex items-center justify-center px-4 py-8">
+      <Blobs />
+      <div className="relative z-10 bg-white rounded-[28px] p-9 w-full max-w-[420px] shadow-[0_30px_60px_rgba(15,12,60,0.35)] text-center">
+        <Pipo mood={acao ? 'sad' : 'neutral'} size={90} />
+        <h2 className="[font-family:'Sora',sans-serif] font-bold text-[18px] text-[#1B1B3A] mt-3 mb-1">
+          {titulo}
+        </h2>
+        <p className="text-[13px] text-[#5b5776] leading-[1.5] mb-4">
+          {mensagem}
+        </p>
+        {acao && (
+          <button
+            onClick={acao.onClick}
+            className="bg-[#2E2A47] text-white [font-family:'Sora',sans-serif] font-bold text-[13px] px-5 py-2.5 rounded-full"
+          >
+            {acao.label}
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
+
 // -----------------------------------------------------------------------------
 // TELA 0 — INTRODUÇÃO
 // -----------------------------------------------------------------------------
@@ -400,10 +506,12 @@ function IntroScreen({ onStart }: IntroScreenProps) {
 // TELA 1 — QUIZ
 // -----------------------------------------------------------------------------
 interface QuizScreenProps {
+  perguntas: Pergunta[];
+  onAnswer: (perguntaId: string, valor: Valor) => void;
   onFinish: (respostas: Resposta[]) => void;
 }
 
-function QuizScreen({ onFinish }: QuizScreenProps) {
+function QuizScreen({ perguntas, onAnswer, onFinish }: QuizScreenProps) {
   const [index, setIndex] = useState(0);
   const [respostas, setRespostas] = useState<Resposta[]>([]);
   const [dragX, setDragX] = useState(0);
@@ -412,16 +520,17 @@ function QuizScreen({ onFinish }: QuizScreenProps) {
   const [mood, setMood] = useState<Mood>('neutral');
   const startX = useRef(0);
 
-  const total = QUESTIONS.length;
-  const question = QUESTIONS[index];
-  const next1 = QUESTIONS[index + 1];
-  const next2 = QUESTIONS[index + 2];
-  const progress = Math.round((index / total) * 100);
+  const total = perguntas.length;
+  const question = perguntas[index];
+  const next1 = perguntas[index + 1];
+  const next2 = perguntas[index + 2];
+  const progress = total > 0 ? Math.round((index / total) * 100) : 0;
 
   function commit(valor: Valor, mood: Mood) {
-    if (exit) return;
+    if (exit || !question) return;
     setMood(mood);
     setExit(valor === 1 ? 'like' : valor === -1 ? 'dislike' : 'neutral');
+    onAnswer(question.id, valor); // salva no backend, sem travar a navegação local
     setTimeout(() => {
       const novas: Resposta[] = [...respostas, { tags: question.tags, valor }];
       setRespostas(novas);
@@ -472,6 +581,15 @@ function QuizScreen({ onFinish }: QuizScreenProps) {
         : exit === 'neutral'
           ? 'translateY(-360px) scale(0.9)'
           : null;
+
+  if (!question) {
+    return (
+      <StatusScreen
+        titulo="Nenhuma pergunta disponível"
+        mensagem="Não encontramos perguntas ativas cadastradas no momento. Volte mais tarde."
+      />
+    );
+  }
 
   return (
     <div className="relative w-full h-full min-h-[640px] bg-[#2E2A6B] overflow-hidden flex items-center justify-center px-4 py-8">
@@ -580,20 +698,18 @@ function QuizScreen({ onFinish }: QuizScreenProps) {
 // TELA 2 — RESULTADO
 // -----------------------------------------------------------------------------
 interface ResultScreenProps {
+  ranking: PartidoResultado[];
   respostas: Resposta[];
   onRestart: () => void;
 }
 
-function ResultScreen({ respostas, onRestart }: ResultScreenProps) {
-  const ranking = useMemo(
-    () => calcularCompatibilidade(respostas),
-    [respostas],
-  );
+function ResultScreen({ ranking, respostas, onRestart }: ResultScreenProps) {
   const [top, second, third] = ranking;
   const [reveal, setReveal] = useState(false);
   const [count, setCount] = useState(0);
 
   const interesses = useMemo(() => {
+    if (!top) return [];
     const likedTags = respostas
       .filter((r) => r.valor === 1)
       .flatMap((r) => r.tags);
@@ -607,7 +723,7 @@ function ResultScreen({ respostas, onRestart }: ResultScreenProps) {
   }, []);
 
   useEffect(() => {
-    if (!reveal) return;
+    if (!reveal || !top) return;
     const duration = 900;
     const start = performance.now();
     let frameId: number;
@@ -619,7 +735,17 @@ function ResultScreen({ respostas, onRestart }: ResultScreenProps) {
     }
     frameId = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(frameId);
-  }, [reveal, top.pct]);
+  }, [reveal, top]);
+
+  if (!top) {
+    return (
+      <StatusScreen
+        titulo="Sem resultado ainda"
+        mensagem="Não encontramos compatibilidade calculada. Tente refazer o quiz."
+        acao={{ label: 'Refazer quiz', onClick: onRestart }}
+      />
+    );
+  }
 
   return (
     <div className="relative w-full h-full min-h-[640px] bg-[#2E2A6B] overflow-hidden flex items-center justify-center px-4 py-8">
@@ -660,7 +786,7 @@ function ResultScreen({ respostas, onRestart }: ResultScreenProps) {
                     key={t}
                     className="bg-[#FFE1B0] text-[#7A4A00] text-[11px] font-bold px-3 py-1.5 rounded-full"
                   >
-                    {LABELS[t] || t}
+                    {formatarTag(t)}
                   </span>
                 ))
               ) : (
@@ -676,21 +802,24 @@ function ResultScreen({ respostas, onRestart }: ResultScreenProps) {
 
           <div className="min-w-[180px] flex flex-col gap-[14px] items-center">
             <div
-              className="w-[180px] h-[180px] rounded-[22px] flex items-center justify-center"
-              style={{ background: top.cor }}
+              className="w-[180px] h-[180px] rounded-[22px] flex items-center justify-center p-6 bg-[#F4F3FA] border-[4px]"
+              style={{ borderColor: top.cor }}
             >
-              <Pipo mood="happy" size={110} />
+              <PartidoLogo partido={top} size={110} />
             </div>
             <div className="flex gap-[10px]">
-              {[second, third].map((p) => (
+              {[second, third].filter(Boolean).map((p) => (
                 <div
-                  key={p.sigla}
-                  className="w-[83px] h-[83px] rounded-2xl flex flex-col items-center justify-center gap-0.5"
-                  style={{ background: p.cor }}
+                  key={p!.sigla}
+                  className="w-[83px] h-[83px] rounded-2xl flex flex-col items-center justify-center gap-0.5 p-3 pb-1 bg-[#F4F3FA] border-[3px]"
+                  style={{ borderColor: p!.cor }}
                 >
-                  <Pipo mood="neutral" size={40} />
-                  <span className="text-white font-extrabold text-[15px] [font-family:'Sora',sans-serif]">
-                    {p.pct}%
+                  <PartidoLogo partido={p!} size={55} />
+                  <span
+                    className="font-extrabold text-[15px] [font-family:'Sora',sans-serif]"
+                    style={{ color: p!.cor }}
+                  >
+                    {p!.pct}%
                   </span>
                 </div>
               ))}
@@ -708,19 +837,163 @@ function ResultScreen({ respostas, onRestart }: ResultScreenProps) {
 type View = 'intro' | 'quiz' | 'result';
 
 export default function MatchPolitico() {
+  const navigate = useNavigate();
+  const { usuario, token, carregando: carregandoAuth } = useAuth();
+
   const [view, setView] = useState<View>('intro');
   const [respostas, setRespostas] = useState<Resposta[]>([]);
+  const [perguntas, setPerguntas] = useState<Pergunta[]>([]);
+  const [perguntasQuiz, setPerguntasQuiz] = useState<Pergunta[]>([]);
+  const [partidos, setPartidos] = useState<Partido[]>([]);
+  const [rankingServidor, setRankingServidor] = useState<
+    CompatibilidadePartido[]
+  >([]);
 
-  function handleStart() {
-    setView('quiz');
+  const [carregandoDados, setCarregandoDados] = useState(true);
+  const [erroDados, setErroDados] = useState<string | null>(null);
+  const [carregandoResultado, setCarregandoResultado] = useState(false);
+  const [erroAcao, setErroAcao] = useState<AcaoErro | null>(null);
+
+  async function carregarDados() {
+    setCarregandoDados(true);
+    setErroDados(null);
+    try {
+      const [perguntasApi, partidosApi] = await Promise.all([
+        listarPerguntas(),
+        listarPartidos(),
+      ]);
+      setPerguntas(perguntasApi.map(mapearPergunta));
+      setPartidos(partidosApi.map(mapearPartido));
+    } catch (err) {
+      setErroDados(
+        err instanceof Error ? err.message : 'Erro ao carregar dados.',
+      );
+    } finally {
+      setCarregandoDados(false);
+    }
   }
-  function handleFinish(novas: Resposta[]) {
+
+  useEffect(() => {
+    if (usuario) carregarDados();
+  }, [usuario]);
+
+  async function handleStart() {
+    if (!token) return;
+    setErroAcao(null);
+    try {
+      await limparRespostas(token);
+      setRespostas([]);
+      setPerguntasQuiz(selecionarPerguntas(perguntas, 15));
+      setView('quiz');
+    } catch (err) {
+      setErroAcao({
+        titulo: 'Não deu pra começar',
+        mensagem:
+          err instanceof Error
+            ? err.message
+            : 'Erro ao preparar uma nova tentativa.',
+        acao: { label: 'Tentar de novo', onClick: handleStart },
+      });
+    }
+  }
+
+  function handleAnswer(perguntaId: string, valor: Valor) {
+    if (!token) return;
+    // dispara e esquece: uma falha isolada de rede numa pergunta não deve
+    // travar o quiz. O que realmente importa é o resultado final, tratado
+    // com retry explícito em handleFinish.
+    salvarResposta(token, perguntaId, valor).catch((err) => {
+      console.error('Falha ao salvar resposta:', err);
+    });
+  }
+
+  async function handleFinish(novas: Resposta[]) {
     setRespostas(novas);
-    setTimeout(() => setView('result'), 150);
+    if (!token) return;
+    setErroAcao(null);
+    setCarregandoResultado(true);
+    try {
+      const ranking = await buscarCompatibilidade(token);
+      setRankingServidor(ranking);
+      setView('result');
+    } catch (err) {
+      setErroAcao({
+        titulo: 'Não foi possível calcular seu resultado',
+        mensagem: err instanceof Error ? err.message : 'Tente novamente.',
+        acao: { label: 'Tentar de novo', onClick: () => handleFinish(novas) },
+      });
+    } finally {
+      setCarregandoResultado(false);
+    }
   }
-  function handleRestart() {
-    setRespostas([]);
-    setView('quiz');
+
+  const rankingFinal = useMemo(
+    () => montarRanking(rankingServidor, partidos),
+    [rankingServidor, partidos],
+  );
+
+  let conteudo: React.ReactNode;
+
+  if (carregandoAuth) {
+    conteudo = (
+      <StatusScreen titulo="Carregando..." mensagem="Verificando sua sessão." />
+    );
+  } else if (!usuario) {
+    conteudo = (
+      <StatusScreen
+        titulo="Faça login para continuar"
+        mensagem="O Match Político salva suas respostas na sua conta, então é preciso estar logado antes de começar."
+        acao={{ label: 'Fazer login', onClick: () => navigate('/login') }}
+      />
+    );
+  } else if (carregandoDados) {
+    conteudo = (
+      <StatusScreen
+        titulo="Carregando..."
+        mensagem="Buscando as perguntas e os partidos cadastrados."
+      />
+    );
+  } else if (erroDados) {
+    conteudo = (
+      <StatusScreen
+        titulo="Algo deu errado"
+        mensagem={erroDados}
+        acao={{ label: 'Tentar de novo', onClick: carregarDados }}
+      />
+    );
+  } else if (erroAcao) {
+    conteudo = (
+      <StatusScreen
+        titulo={erroAcao.titulo}
+        mensagem={erroAcao.mensagem}
+        acao={erroAcao.acao}
+      />
+    );
+  } else if (carregandoResultado) {
+    conteudo = (
+      <StatusScreen
+        titulo="Calculando..."
+        mensagem="Comparando suas respostas com os partidos cadastrados."
+      />
+    );
+  } else if (view === 'intro') {
+    conteudo = <IntroScreen onStart={handleStart} />;
+  } else if (view === 'quiz') {
+    conteudo = (
+      <QuizScreen
+        perguntas={perguntasQuiz}
+        onAnswer={handleAnswer}
+        onFinish={handleFinish}
+      />
+    );
+  } else {
+    conteudo = (
+      <ResultScreen
+        ranking={rankingFinal}
+        respostas={respostas}
+        onRestart={handleStart}
+      />
+    );
   }
 
   return (
@@ -728,13 +1001,7 @@ export default function MatchPolitico() {
       <div className="w-full fixed top-0 z-[1000]">
         <Header />
       </div>
-      <div className="w-full h-full">
-        {view === 'intro' && <IntroScreen onStart={handleStart} />}
-        {view === 'quiz' && <QuizScreen onFinish={handleFinish} />}
-        {view === 'result' && (
-          <ResultScreen respostas={respostas} onRestart={handleRestart} />
-        )}
-      </div>
+      <div className="w-full h-full">{conteudo}</div>
     </section>
   );
 }

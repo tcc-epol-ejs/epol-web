@@ -89,6 +89,18 @@ export interface Pergunta {
 
 export type PerguntaInput = Omit<Pergunta, 'id' | 'created_at' | 'updated_at'>;
 
+// ---------- RESPOSTAS / COMPATIBILIDADE ----------
+
+export interface CompatibilidadePartido {
+  partido_id: string;
+  nome_completo: string;
+  sigla: string;
+  score: number;
+  compatibilidade_pct: number;
+}
+
+// Todas exigem usuário logado (o backend valida o token e usa req.user.id).
+
 // ---------- AUTH ----------
 
 export const me = (token: string) =>
@@ -167,7 +179,8 @@ export const excluirCandidato = (id: string) =>
 
 // ---------- PERGUNTAS ----------
 
-// Por padrão o backend já filtra ativa = true. Passe { todas: true } pra trazer também as desativadas
+// Por padrão o backend já filtra ativa = true. Passe { todas: true } pra
+// trazer também as desativadas (uso administrativo).
 export const listarPerguntas = (opcoes?: { todas?: boolean }) => {
   const query = opcoes?.todas ? '?todas=true' : '';
   return request<Pergunta[]>(`/api/perguntas${query}`);
@@ -193,10 +206,36 @@ export const excluirPergunta = (id: string) =>
     method: 'DELETE',
   });
 
+// ---------- RESPOSTAS / COMPATIBILIDADE ----------
+// Seguem o mesmo padrão do `me(token)`: o token vem explícito porque essas
+// rotas exigem usuário logado.
+
+export const salvarResposta = (
+  token: string,
+  pergunta_id: string,
+  valor: -1 | 0 | 1,
+) =>
+  request<{ id: string }>('/api/respostas', {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}` },
+    body: JSON.stringify({ pergunta_id, valor }),
+  });
+
+export const limparRespostas = (token: string) =>
+  request<{ mensagem: string }>('/api/respostas', {
+    method: 'DELETE',
+    headers: { Authorization: `Bearer ${token}` },
+  });
+
+export const buscarCompatibilidade = (token: string) =>
+  request<CompatibilidadePartido[]>('/api/respostas/compatibilidade', {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+
 async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   const res = await fetch(`${API_URL}${path}`, {
-    headers: { 'Content-Type': 'application/json', ...options.headers },
     ...options,
+    headers: { 'Content-Type': 'application/json', ...options.headers },
   });
   const data = await res.json();
   if (!res.ok) throw new Error(data.erro || 'Erro na requisição');
