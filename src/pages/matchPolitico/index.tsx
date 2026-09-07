@@ -60,9 +60,6 @@ interface AcaoErro {
 // MAPEAMENTO API -> TIPOS DO FRONT
 // -----------------------------------------------------------------------------
 
-// A tabela partidos não tem coluna de cor — gera uma cor estável a partir da
-// sigla (o mesmo partido sempre cai na mesma cor). Se um dia adicionar uma
-// coluna `cor` na tabela, troque isso por `partido.cor` vindo da API direto.
 const PALETA_CORES = [
   '#FF9F1C',
   '#4C9AFF',
@@ -205,7 +202,7 @@ function Pipo({ mood = 'neutral', size = 120, animated = true }: PipoProps) {
 }
 
 // -----------------------------------------------------------------------------
-// LOGO DO PARTIDO — com fallback pra sigla caso a imagem não exista/carregue
+// LOGO DO PARTIDO
 // -----------------------------------------------------------------------------
 interface PartidoLogoProps {
   partido: Partido;
@@ -899,9 +896,6 @@ export default function MatchPolitico() {
 
   function handleAnswer(perguntaId: string, valor: Valor) {
     if (!token) return;
-    // dispara e esquece: uma falha isolada de rede numa pergunta não deve
-    // travar o quiz. O que realmente importa é o resultado final, tratado
-    // com retry explícito em handleFinish.
     salvarResposta(token, perguntaId, valor).catch((err) => {
       console.error('Falha ao salvar resposta:', err);
     });
