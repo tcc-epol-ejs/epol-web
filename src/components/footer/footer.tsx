@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 
 export default function Footer() {
   const navigate = useNavigate();
+  window.scrollTo(0, 0);
 
   return (
     <footer className="w-full min-h-128 bg-[#2d2d6b] text-white py-24 px-8 md:py-36 md:px-16 lg:px-24 flex flex-col md:flex-row gap-10 md:gap-24 lg:gap-76">

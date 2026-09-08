@@ -5,7 +5,6 @@ import type { Partido } from '../../services/api';
 import { useAuth } from '../../contexts/AuthContext';
 import Textbox from '../../components/inputs';
 import Botao from '../../components/botoes/botao';
-import Footer from '../../components/footer/footer';
 import LogoEpol from '../../assets/Imagens/Logos/logoepol.png';
 import { ToastContainer, useToasts } from '../../components/toast';
 import DateField from '../../components/inputs/data';
@@ -23,9 +22,11 @@ const bolasConfig = [
   { size: 160, bottom: '120px', right: '200px', opacity: 0.6 },
 ];
 
+// E-mail: exige usuário + domínio com pelo menos um ponto (ex: nome@dominio.com)
 const EMAIL_REGEX =
   /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)+$/;
 
+// Senha: mínimo 8 caracteres, 1 maiúscula, 1 minúscula e 1 número
 const SENHA_MIN_LENGTH = 8;
 
 interface FormData {
@@ -66,12 +67,14 @@ function validarCampo(
       if (!valor.includes(' ')) return 'Informe nome e sobrenome';
       return undefined;
     }
+
     case 'apelido': {
       const valor = dados.apelido.trim();
       if (!valor) return 'Informe um apelido';
       if (valor.length < 2) return 'O apelido deve ter pelo menos 2 caracteres';
       return undefined;
     }
+
     case 'data_nascimento': {
       const valor = dados.data_nascimento;
       if (!valor) return 'Informe sua data de nascimento';
@@ -81,6 +84,7 @@ function validarCampo(
         return 'A data de nascimento não pode ser no futuro';
       return undefined;
     }
+
     case 'email': {
       const valor = dados.email.trim();
       if (!valor) return 'Informe seu e-mail';
@@ -88,21 +92,24 @@ function validarCampo(
         return 'Insira um e-mail válido (ex: nome@dominio.com)';
       return undefined;
     }
+
     case 'confirmEmail': {
       if (!dados.confirmEmail.trim()) return 'Confirme seu e-mail';
       if (dados.confirmEmail.trim() !== dados.email.trim())
         return 'Os e-mails não coincidem';
       return undefined;
     }
+
     case 'estado': {
       if (!dados.estado.trim()) return 'Informe seu estado';
       return undefined;
     }
+
     case 'senha': {
       const valor = dados.senha;
       if (!valor) return 'Informe uma senha';
       if (valor.length < SENHA_MIN_LENGTH)
-        return `A senha deve ter pelo menos ${SENHA_MIN_LENGTH} caracteres`;
+        return A senha deve ter pelo menos ${SENHA_MIN_LENGTH} caracteres;
       if (!/[A-Z]/.test(valor))
         return 'A senha deve conter ao menos uma letra maiúscula';
       if (!/[a-z]/.test(valor))
@@ -110,22 +117,27 @@ function validarCampo(
       if (!/\d/.test(valor)) return 'A senha deve conter ao menos um número';
       return undefined;
     }
+
     case 'confirmSenha': {
       if (!dados.confirmSenha) return 'Confirme sua senha';
       if (dados.confirmSenha !== dados.senha) return 'As senhas não coincidem';
       return undefined;
     }
+
     default:
       return undefined;
   }
 }
 
+// Campos que pertencem a cada passo (partido não entra aqui: é opcional, sem validação)
 const CAMPOS_POR_PASSO: Record<Passo, (keyof FormData)[]> = {
   1: ['nome', 'apelido', 'data_nascimento'],
   2: ['email', 'confirmEmail', 'estado'],
   3: [],
   4: ['senha', 'confirmSenha'],
 };
+
+// Seletor de estado customizado (mesmo estilo visual do calendário)
 
 const ESTADOS_BR = [
   { nome: 'Acre', uf: 'AC' },
@@ -183,6 +195,11 @@ function EstadoField({
     return () => document.removeEventListener('mousedown', aoClicarFora);
   }, []);
 
+  function selecionar(nomeEstado: string) {
+    onChange(nomeEstado);
+    setAberto(false);
+  }
+
   return (
     <div className="relative w-full custom-scroll" ref={containerRef}>
       <button
@@ -192,7 +209,7 @@ function EstadoField({
       >
         <span className={value ? 'text-[#1f2a52]' : 'text-[#5A5A70]'}>
           {estadoSelecionado
-            ? `${estadoSelecionado.nome} - ${estadoSelecionado.uf}`
+            ? ${estadoSelecionado.nome} - ${estadoSelecionado.uf}
             : placeholder}
         </span>
         <svg
@@ -206,26 +223,27 @@ function EstadoField({
           <path d="M6 9l6 6 6-6" />
         </svg>
       </button>
+
       {aberto && (
         <div className="absolute z-50 top-full left-0 mt-2 w-full max-h-60 overflow-y-auto rounded-2xl bg-[#A9A9F6] border border-[#8888D3] p-2 shadow-xl custom-scroll">
           <div className="flex flex-col gap-0.5">
-            {ESTADOS_BR.map((estado) => (
-              <button
-                key={estado.uf}
-                type="button"
-                onClick={() => {
-                  onChange(estado.nome);
-                  setAberto(false);
-                }}
-                className={`text-left px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
-                  estado.nome === value
-                    ? 'bg-[#FFA400] text-white font-semibold'
-                    : 'text-[#2a2a72] hover:bg-[#6262AD]/60'
-                }`}
-              >
-                {estado.nome} - {estado.uf}
-              </button>
-            ))}
+            {ESTADOS_BR.map((estado) => {
+              const selecionado = estado.nome === value;
+              return (
+                <button
+                  key={estado.uf}
+                  type="button"
+                  onClick={() => selecionar(estado.nome)}
+                  className={`text-left px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                    selecionado
+                      ? 'bg-[#FFA400] text-white font-semibold'
+                      : 'text-[#2a2a72] hover:bg-[#6262AD]/60'
+                  }`}
+                >
+                  {estado.nome} - {estado.uf}
+                </button>
+              );
+            })}
           </div>
         </div>
       )}
@@ -233,6 +251,10 @@ function EstadoField({
   );
 }
 
+// Seletor de partido customizado (mesmo estilo visual do calendário/estado)
+
+// Círculo com as iniciais da sigla, usado quando o partido não tem bandeira_url
+// (ou quando a imagem falha ao carregar)
 function IniciaisPartido({ sigla }: { sigla: string }) {
   return (
     <span className="w-6 h-6 rounded-full flex-shrink-0 bg-white/70 flex items-center justify-center text-[9px] font-bold text-[#2a2a72]">
@@ -271,6 +293,11 @@ function PartidoField({
     return () => document.removeEventListener('mousedown', aoClicarFora);
   }, []);
 
+  function selecionar(idPartido: string) {
+    onChange(idPartido);
+    setAberto(false);
+  }
+
   return (
     <div className="relative w-full" ref={containerRef}>
       <button
@@ -281,17 +308,30 @@ function PartidoField({
         <span className="flex items-center gap-2 min-w-0">
           {partidoSelecionado &&
             (partidoSelecionado.numero_legenda ? (
-              <div className="w-5 h-5 text-[12px] text-[#2A2A72] font-semibold rounded-full flex-shrink-0 bg-[#F3C994]">
+              <div
+                className="w-5 h-5 text-[12px] text-[#2A2A72] font-semibold rounded-full object-cover flex-shrink-0 bg-[#F3C994]"
+                onError={(e) => {
+                  (e.currentTarget as HTMLImageElement).style.display = 'none';
+                }}
+              >
                 {partidoSelecionado.numero_legenda}
               </div>
             ) : (
+              // <img
+              //   src={partidoSelecionado.bandeira_url}
+              //   alt=""
+              //   className="w-5 h-5 rounded-full object-cover flex-shrink-0 bg-white"
+              //   onError={(e) => {
+              //     (e.currentTarget as HTMLImageElement).style.display = 'none';
+              //   }}
+              // />
               <IniciaisPartido sigla={partidoSelecionado.sigla} />
             ))}
           <span
-            className={`truncate ${value ? 'text-[#1f2a52]' : 'text-[#5A5A70]'}`}
+            className={truncate ${value ? 'text-[#1f2a52]' : 'text-[#5A5A70]'}}
           >
             {partidoSelecionado
-              ? `${partidoSelecionado.nome_completo} - ${partidoSelecionado.sigla}`
+              ? ${partidoSelecionado.nome_completo} - ${partidoSelecionado.sigla}
               : placeholder}
           </span>
         </span>
@@ -306,56 +346,76 @@ function PartidoField({
           <path d="M6 9l6 6 6-6" />
         </svg>
       </button>
+
       {aberto && (
         <div className="absolute z-50 top-full left-0 mt-2 w-full max-h-72 overflow-y-auto rounded-2xl bg-[#A9A9F6] border border-[#8888D3] p-2 shadow-xl custom-scroll">
           <div className="flex flex-col gap-0.5">
             <button
               type="button"
-              onClick={() => {
-                onChange('');
-                setAberto(false);
-              }}
-              className={`text-left px-3 py-2 rounded-lg text-xs font-semibold transition-colors ${value === '' ? 'bg-[#FFA400] text-white' : 'text-[#2a2a72] hover:bg-[#6262AD]/60'}`}
+              onClick={() => selecionar('')}
+              className={`text-left px-3 py-2 rounded-lg text-xs font-semibold transition-colors ${
+                value === ''
+                  ? 'bg-[#FFA400] text-white'
+                  : 'text-[#2a2a72] hover:bg-[#6262AD]/60'
+              }`}
             >
               Ainda não tenho um partido
             </button>
+
             {carregando && (
               <p className="px-3 py-2 text-xs text-[#2a2a72]">
                 Carregando partidos...
               </p>
             )}
+
             {!carregando && partidos.length === 0 && (
               <p className="px-3 py-2 text-xs text-[#2a2a72]">
                 Não foi possível carregar os partidos.
               </p>
             )}
+
             {!carregando &&
-              partidos.map((partido) => (
-                <button
-                  key={partido.id}
-                  type="button"
-                  onClick={() => {
-                    onChange(partido.id);
-                    setAberto(false);
-                  }}
-                  className={`flex items-center gap-2 text-left px-3 py-2 rounded-lg text-xs font-medium transition-colors ${
-                    partido.id === value
-                      ? 'bg-[#FFA400] text-white font-semibold'
-                      : 'text-[#2a2a72] hover:bg-[#6262AD]/60'
-                  }`}
-                >
-                  {partido.numero_legenda ? (
-                    <div className="w-5 h-5 text-[11px] rounded-full flex items-center justify-center flex-shrink-0 bg-[#F3C994]">
-                      {partido.numero_legenda}
-                    </div>
-                  ) : (
-                    <IniciaisPartido sigla={partido.sigla} />
-                  )}
-                  <span className="truncate">
-                    {partido.nome_completo} - {partido.sigla}
-                  </span>
-                </button>
-              ))}
+              partidos.map((partido) => {
+                const selecionado = partido.id === value;
+                return (
+                  <button
+                    key={partido.id}
+                    type="button"
+                    onClick={() => selecionar(partido.id)}
+                    className={`flex items-center gap-2 text-left px-3 py-2 rounded-lg text-xs font-medium transition-colors ${
+                      selecionado
+                        ? 'bg-[#FFA400] text-white font-semibold'
+                        : 'text-[#2a2a72] hover:bg-[#6262AD]/60'
+                    }`}
+                  >
+                    {partido.numero_legenda ? (
+                      <div
+                        className="w-5 h-5 text-[11px] rounded-full flex items-center justify-center flex-shrink-0 bg-[#F3C994]"
+                        onError={(e) => {
+                          (e.currentTarget as HTMLImageElement).style.display =
+                            'none';
+                        }}
+                      >
+                        {partido.numero_legenda}
+                      </div>
+                    ) : (
+                      // <img
+                      //   src={partido.bandeira_url}
+                      //   alt=""
+                      //   className="w-6 h-6 rounded-full object-cover flex-shrink-0 bg-white"
+                      //   onError={(e) => {
+                      //     (e.currentTarget as HTMLImageElement).style.display =
+                      //       'none';
+                      //   }}
+                      // />
+                      <IniciaisPartido sigla={partido.sigla} />
+                    )}
+                    <span className="truncate">
+                      {partido.nome_completo} - {partido.sigla}
+                    </span>
+                  </button>
+                );
+              })}
           </div>
         </div>
       )}
@@ -363,12 +423,15 @@ function PartidoField({
   );
 }
 
+// Indicador de força de senha
+
 function calcularForcaSenha(senha: string): {
   nivel: 0 | 1 | 2 | 3;
   label: string;
   cor: string;
 } {
   if (!senha) return { nivel: 0, label: '', cor: 'transparent' };
+
   let pontos = 0;
   if (senha.length >= 8) pontos++;
   if (senha.length >= 12) pontos++;
@@ -376,6 +439,7 @@ function calcularForcaSenha(senha: string): {
   if (/[A-Z]/.test(senha)) pontos++;
   if (/\d/.test(senha)) pontos++;
   if (/[^A-Za-z0-9]/.test(senha)) pontos++;
+
   if (pontos <= 2) return { nivel: 1, label: 'Fraca', cor: '#ef4444' };
   if (pontos <= 4) return { nivel: 2, label: 'Média', cor: '#eab308' };
   return { nivel: 3, label: 'Forte', cor: '#22c55e' };
@@ -383,6 +447,7 @@ function calcularForcaSenha(senha: string): {
 
 function BarraForcaSenha({ senha }: { senha: string }) {
   const forca = calcularForcaSenha(senha);
+
   return (
     <div className="flex flex-col gap-1 mt-1">
       <div className="flex gap-1">
@@ -413,6 +478,7 @@ function Cadastro() {
   const [formData, setFormData] = useState<FormData>(initialFormData);
   const { toasts, mostrarErro, fecharToast } = useToasts();
   const [enviando, setEnviando] = useState(false);
+
   const [partidos, setPartidos] = useState<Partido[]>([]);
   const [carregandoPartidos, setCarregandoPartidos] = useState(true);
 
@@ -420,18 +486,21 @@ function Cadastro() {
     listarPartidos()
       .then((data: Partido[]) => setPartidos(data))
       .catch((err: any) => {
+        console.error('Erro ao buscar partidos:', err);
         mostrarErro(
           err?.message
-            ? `Não foi possível carregar os partidos: ${err.message}`
+            ? Não foi possível carregar os partidos: ${err.message}
             : 'Não foi possível carregar a lista de partidos.',
         );
       })
       .finally(() => setCarregandoPartidos(false));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   function handleChange(campo: keyof FormData) {
     return (event: ChangeEvent<HTMLInputElement>) => {
-      setFormData((prev) => ({ ...prev, [campo]: event.target.value }));
+      const valor = event.target.value;
+      setFormData((prev) => ({ ...prev, [campo]: valor }));
     };
   }
 
@@ -448,13 +517,16 @@ function Cadastro() {
   }
 
   function validarPasso(passo: Passo): boolean {
-    for (const campo of CAMPOS_POR_PASSO[passo]) {
+    const camposDoPasso = CAMPOS_POR_PASSO[passo];
+
+    for (const campo of camposDoPasso) {
       const mensagem = validarCampo(campo, formData);
       if (mensagem) {
         mostrarErro(mensagem);
         return false;
       }
     }
+
     return true;
   }
 
@@ -469,7 +541,9 @@ function Cadastro() {
 
   async function handleCadastro() {
     if (!validarPasso(4)) return;
+
     setEnviando(true);
+
     try {
       await cadastrar({
         nome: formData.nome.trim(),
@@ -489,153 +563,174 @@ function Cadastro() {
   }
 
   return (
-    <>
-      <section className="w-full min-h-[100dvh] bg-[#2a2a72] flex items-center justify-center overflow-hidden relative">
-        <ToastContainer toasts={toasts} onFechar={fecharToast} />
+    <section className="w-full min-h-[100dvh] bg-[#2a2a72] flex items-center justify-center overflow-hidden relative">
+      <ToastContainer toasts={toasts} onFechar={fecharToast} />
 
-        {bolasConfig.map((b, i) => (
-          <div
-            key={i}
-            className="absolute rounded-full"
-            style={{
-              width: b.size,
-              height: b.size,
-              top: 'top' in b ? b.top : undefined,
-              bottom: 'bottom' in b ? b.bottom : undefined,
-              left: 'left' in b ? b.left : undefined,
-              right: 'right' in b ? b.right : undefined,
-              backgroundColor: '#8888D3',
-              opacity: b.opacity,
-              zIndex: 0,
-            }}
+      {bolasConfig.map((b, i) => (
+        <div
+          key={i}
+          className="absolute rounded-full"
+          style={{
+            width: b.size,
+            height: b.size,
+            top: 'top' in b ? b.top : undefined,
+            bottom: 'bottom' in b ? b.bottom : undefined,
+            left: 'left' in b ? b.left : undefined,
+            right: 'right' in b ? b.right : undefined,
+            backgroundColor: '#8888D3',
+            opacity: b.opacity,
+            zIndex: 0,
+          }}
+        />
+      ))}
+
+      <div
+        className="absolute inset-y-0 left-0 z-10"
+        style={{
+          width: '50vw',
+          backgroundColor: '#FFA400',
+          clipPath: polygon(0% 50%, 100% 0%, calc(100% - ${gap}) 50%, 100% 100%),
+        }}
+      />
+
+      <div
+        className="absolute inset-y-0 right-0 z-10"
+        style={{
+          width: '50vw',
+          backgroundColor: '#FFA400',
+          clipPath: polygon(${gap} 0%, 100% 50%, ${gap} 100%, 0% 50%),
+        }}
+      />
+
+      <div
+        className="relative z-20 bg-[#2a2a72] rounded-full flex items-center justify-center flex-shrink-0"
+        style={{ width: circleSize, height: circleSize }}
+      >
+        <div className="flex flex-col items-center gap-4 w-[70%] pt-5 relative">
+          <img
+            className="h-auto w-[100px] absolute -top-[50px]"
+            alt="Logo EPOL"
+            src={LogoEpol}
+            onClick={() => navigate('/')}
           />
-        ))}
 
-        <div
-          className="absolute inset-y-0 left-0 z-10"
-          style={{
-            width: '50vw',
-            backgroundColor: '#FFA400',
-            clipPath: `polygon(0% 50%, 100% 0%, calc(100% - ${gap}) 50%, 100% 100%)`,
-          }}
-        />
-        <div
-          className="absolute inset-y-0 right-0 z-10"
-          style={{
-            width: '50vw',
-            backgroundColor: '#FFA400',
-            clipPath: `polygon(${gap} 0%, 100% 50%, ${gap} 100%, 0% 50%)`,
-          }}
-        />
+          <h1 className="text-[#FFA400] font-bold text-center text-[22px] leading-tight">
+            Crie sua conta!
+          </h1>
 
-        <div
-          className="relative z-20 bg-[#2a2a72] rounded-full flex items-center justify-center flex-shrink-0"
-          style={{ width: circleSize, height: circleSize }}
-        >
-          <div className="flex flex-col items-center gap-4 w-[70%] pt-5 relative">
-            <img
-              className="h-auto w-[100px] absolute -top-[50px] cursor-pointer"
-              alt="Logo EPOL"
-              src={LogoEpol}
-              onClick={() => navigate('/')}
-            />
+          <p
+            className="text-[#CBCBEC] text-center font-semibold"
+            style={{ fontSize: '11px' }}
+          >
+            Passo {step} de {TOTAL_STEPS}
+          </p>
 
-            <h1 className="text-[#FFA400] font-bold text-center text-[22px] leading-tight">
-              Crie sua conta!
-            </h1>
-
-            <p
-              className="text-[#CBCBEC] text-center font-semibold"
-              style={{ fontSize: '11px' }}
+          <div className="relative w-full">
+            <div
+              aria-hidden="true"
+              className="invisible flex flex-col gap-4 w-full"
             >
-              Passo {step} de {TOTAL_STEPS}
-            </p>
-
-            <div className="relative w-full">
-              <div
-                aria-hidden="true"
-                className="invisible flex flex-col gap-4 w-full"
-              >
-                <Textbox
-                  placeholder="Nome completo"
-                  value=""
-                  onChange={() => {}}
-                />
-                <Textbox placeholder="Apelido" value="" onChange={() => {}} />
-                <DateField value="" onChange={() => {}} />
-              </div>
-
-              <div className="absolute inset-x-0 top-0 flex flex-col gap-4 w-full">
-                {step === 1 && (
-                  <>
-                    <Textbox
-                      placeholder="Nome completo"
-                      value={formData.nome}
-                      onChange={handleChange('nome')}
-                    />
-                    <Textbox
-                      placeholder="Apelido (como você quer ser chamado?)"
-                      value={formData.apelido}
-                      onChange={handleChange('apelido')}
-                    />
-                    <DateField
-                      value={formData.data_nascimento}
-                      onChange={handleDataNascimentoChange}
-                      placeholder="Data de Nascimento"
-                    />
-                  </>
-                )}
-                {step === 2 && (
-                  <>
-                    <Textbox
-                      placeholder="E-mail"
-                      type="email"
-                      value={formData.email}
-                      onChange={handleChange('email')}
-                    />
-                    <Textbox
-                      placeholder="Confirmar e-mail"
-                      type="email"
-                      value={formData.confirmEmail}
-                      onChange={handleChange('confirmEmail')}
-                    />
-                    <EstadoField
-                      value={formData.estado}
-                      onChange={handleEstadoChange}
-                    />
-                  </>
-                )}
-                {step === 3 && (
-                  <PartidoField
-                    partidos={partidos}
-                    carregando={carregandoPartidos}
-                    value={formData.partido_id}
-                    onChange={handlePartidoChange}
-                  />
-                )}
-                {step === 4 && (
-                  <>
-                    <Textbox
-                      showToggle
-                      type="password"
-                      placeholder="Senha"
-                      value={formData.senha}
-                      onChange={handleChange('senha')}
-                    />
-                    <Textbox
-                      showToggle
-                      type="password"
-                      placeholder="Confirmar senha"
-                      value={formData.confirmSenha}
-                      onChange={handleChange('confirmSenha')}
-                    />
-                    <BarraForcaSenha senha={formData.senha} />
-                  </>
-                )}
-              </div>
+              <Textbox
+                placeholder="Nome completo"
+                value=""
+                onChange={() => {}}
+              />
+              <Textbox placeholder="Apelido" value="" onChange={() => {}} />
+              <DateField value="" onChange={() => {}} />
             </div>
 
-            {step === 1 && (
+            <div className="absolute inset-x-0 top-0 flex flex-col gap-4 w-full">
+              {step === 1 && (
+                <>
+                  <Textbox
+                    placeholder="Nome completo"
+                    value={formData.nome}
+                    onChange={handleChange('nome')}
+                  />
+                  <Textbox
+                    placeholder="Apelido (como você quer ser chamado?)"
+                    value={formData.apelido}
+                    onChange={handleChange('apelido')}
+                  />
+                  <DateField
+                    value={formData.data_nascimento}
+                    onChange={handleDataNascimentoChange}
+                    placeholder="Data de Nascimento"
+                  />
+                </>
+              )}
+
+              {step === 2 && (
+                <>
+                  <Textbox
+                    placeholder="E-mail"
+                    type="email"
+                    value={formData.email}
+                    onChange={handleChange('email')}
+                  />
+                  <Textbox
+                    placeholder="Confirmar e-mail"
+                    type="email"
+                    value={formData.confirmEmail}
+                    onChange={handleChange('confirmEmail')}
+                  />
+                  <EstadoField
+                    value={formData.estado}
+                    onChange={handleEstadoChange}
+                  />
+                </>
+              )}
+
+              {step === 3 && (
+                <PartidoField
+                  partidos={partidos}
+                  carregando={carregandoPartidos}
+                  value={formData.partido_id}
+                  onChange={handlePartidoChange}
+                />
+              )}
+
+              {step === 4 && (
+                <>
+                  <Textbox
+                    showToggle
+                    type="password"
+                    placeholder="Senha"
+                    value={formData.senha}
+                    onChange={handleChange('senha')}
+                  />
+                  <Textbox
+                    showToggle
+                    type="password"
+                    placeholder="Confirmar senha"
+                    value={formData.confirmSenha}
+                    onChange={handleChange('confirmSenha')}
+                  />
+                  <BarraForcaSenha senha={formData.senha} />
+                </>
+              )}
+            </div>
+          </div>
+
+          {step === 1 && (
+            <Botao
+              bgColor="#ffa400"
+              textColor="#ffffff"
+              onClick={handleAvancar}
+            >
+              avançar
+            </Botao>
+          )}
+
+          {step > 1 && step < TOTAL_STEPS && (
+            <div className="flex gap-3 w-full justify-center">
+              <Botao
+                bgColor="#8888D3"
+                textColor="#ffffff"
+                onClick={handleVoltar}
+              >
+                voltar
+              </Botao>
               <Botao
                 bgColor="#ffa400"
                 textColor="#ffffff"
@@ -643,61 +738,43 @@ function Cadastro() {
               >
                 avançar
               </Botao>
-            )}
-            {step > 1 && step < TOTAL_STEPS && (
-              <div className="flex gap-3 w-full justify-center">
-                <Botao
-                  bgColor="#8888D3"
-                  textColor="#ffffff"
-                  onClick={handleVoltar}
-                >
-                  voltar
-                </Botao>
-                <Botao
-                  bgColor="#ffa400"
-                  textColor="#ffffff"
-                  onClick={handleAvancar}
-                >
-                  avançar
-                </Botao>
-              </div>
-            )}
-            {step === TOTAL_STEPS && (
-              <div className="flex gap-3 w-full justify-center">
-                <Botao
-                  bgColor="#8888D3"
-                  textColor="#ffffff"
-                  onClick={handleVoltar}
-                >
-                  voltar
-                </Botao>
-                <Botao
-                  bgColor="#ffa400"
-                  textColor="#ffffff"
-                  onClick={handleCadastro}
-                >
-                  {enviando ? 'cadastrando...' : 'cadastrar'}
-                </Botao>
-              </div>
-            )}
+            </div>
+          )}
 
-            <p
-              className="text-white text-center"
-              style={{ fontSize: 'clamp(11px, 2vw, 14px)' }}
-            >
-              Já tem uma conta?{' '}
-              <span
-                onClick={() => navigate('/login')}
-                className="text-[#CBCBEC] font-semibold cursor-pointer hover:underline"
+          {step === TOTAL_STEPS && (
+            <div className="flex gap-3 w-full justify-center">
+              <Botao
+                bgColor="#8888D3"
+                textColor="#ffffff"
+                onClick={handleVoltar}
               >
-                Entrar
-              </span>
-            </p>
-          </div>
+                voltar
+              </Botao>
+              <Botao
+                bgColor="#ffa400"
+                textColor="#ffffff"
+                onClick={handleCadastro}
+              >
+                {enviando ? 'cadastrando...' : 'cadastrar'}
+              </Botao>
+            </div>
+          )}
+
+          <p
+            className="text-white text-center"
+            style={{ fontSize: 'clamp(11px, 2vw, 14px)' }}
+          >
+            Já tem uma conta?{' '}
+            <span
+              onClick={() => navigate('/login')}
+              className="text-[#CBCBEC] font-semibold cursor-pointer hover:underline"
+            >
+              Entrar
+            </span>
+          </p>
         </div>
-      </section>
-      <Footer />
-    </>
+      </div>
+    </section>
   );
 }
 
