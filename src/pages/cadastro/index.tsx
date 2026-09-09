@@ -109,7 +109,7 @@ function validarCampo(
       const valor = dados.senha;
       if (!valor) return 'Informe uma senha';
       if (valor.length < SENHA_MIN_LENGTH)
-        return A senha deve ter pelo menos ${SENHA_MIN_LENGTH} caracteres;
+        return `A senha deve ter pelo menos ${SENHA_MIN_LENGTH} caracteres`;
       if (!/[A-Z]/.test(valor))
         return 'A senha deve conter ao menos uma letra maiúscula';
       if (!/[a-z]/.test(valor))
@@ -209,7 +209,7 @@ function EstadoField({
       >
         <span className={value ? 'text-[#1f2a52]' : 'text-[#5A5A70]'}>
           {estadoSelecionado
-            ? ${estadoSelecionado.nome} - ${estadoSelecionado.uf}
+            ? `${estadoSelecionado.nome} - ${estadoSelecionado.uf}`
             : placeholder}
         </span>
         <svg
@@ -328,10 +328,10 @@ function PartidoField({
               <IniciaisPartido sigla={partidoSelecionado.sigla} />
             ))}
           <span
-            className={truncate ${value ? 'text-[#1f2a52]' : 'text-[#5A5A70]'}}
+            className={`truncate ${value ? 'text-[#1f2a52]' : 'text-[#5A5A70]'}`}
           >
             {partidoSelecionado
-              ? ${partidoSelecionado.nome_completo} - ${partidoSelecionado.sigla}
+              ? `${partidoSelecionado.nome_completo} - ${partidoSelecionado.sigla}`
               : placeholder}
           </span>
         </span>
@@ -489,7 +489,7 @@ function Cadastro() {
         console.error('Erro ao buscar partidos:', err);
         mostrarErro(
           err?.message
-            ? Não foi possível carregar os partidos: ${err.message}
+            ? `Não foi possível carregar os partidos: ${err.message}`
             : 'Não foi possível carregar a lista de partidos.',
         );
       })
@@ -589,7 +589,7 @@ function Cadastro() {
         style={{
           width: '50vw',
           backgroundColor: '#FFA400',
-          clipPath: polygon(0% 50%, 100% 0%, calc(100% - ${gap}) 50%, 100% 100%),
+          clipPath: `polygon(0% 50%, 100% 0%, calc(100% - ${gap}) 50%, 100% 100%)`,
         }}
       />
 
@@ -598,7 +598,7 @@ function Cadastro() {
         style={{
           width: '50vw',
           backgroundColor: '#FFA400',
-          clipPath: polygon(${gap} 0%, 100% 50%, ${gap} 100%, 0% 50%),
+          clipPath: `polygon(${gap} 0%, 100% 50%, ${gap} 100%, 0% 50%)`,
         }}
       />
 
