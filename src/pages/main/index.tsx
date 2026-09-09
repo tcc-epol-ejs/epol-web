@@ -9,6 +9,7 @@ import PipoFeliz from '../../assets/Imagens/pipoFeliz.png';
 import PipoTituloEleitor from '../../assets/Imagens/pipoTituloEleitor.png';
 import { GiStarFlag } from 'react-icons/gi';
 import { FaArrowRightLong, FaPeopleGroup } from 'react-icons/fa6';
+import { useNavigate } from 'react-router-dom';
 
 const cards = [
   {
@@ -34,6 +35,7 @@ const SET_SHIFT = cards.length * (CARD_WIDTH + GAP);
 
 export default function Main() {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+  const navigate = useNavigate();
 
   return (
     <>
@@ -183,7 +185,10 @@ export default function Main() {
                     Aqui no <b className="text-[#333] font-semibold">EPOL</b>,
                     você descobre.
                   </span>
-                  <button className="font-sans flex items-center gap-2 bg-[#2A2A72] hover:bg-[#202056] text-[#FFFBF2] font-bold text-sm tracking-wide px-5 py-3.5 rounded-full transition-all hover:-translate-y-px whitespace-nowrap">
+                  <button
+                    onClick={() => navigate('/searchpol')}
+                    className="font-sans flex items-center gap-2 bg-[#2A2A72] hover:bg-[#202056] text-[#FFFBF2] font-bold text-sm tracking-wide px-5 py-3.5 rounded-full transition-all hover:-translate-y-px whitespace-nowrap"
+                  >
                     Pesquisar
                     <FaArrowRightLong />
                   </button>
