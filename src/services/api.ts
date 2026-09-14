@@ -49,7 +49,7 @@ export interface Candidato {
   id: string;
   candidatura: 'Presidente' | 'Governador';
   numero_candidatura: string | null;
-  numero_urna: number;
+  numero_urna: number | null;
   nome_completo: string;
   nome_politico: string;
   data_nascimento: string;
@@ -74,6 +74,32 @@ export type CandidatoInput = Omit<
   Candidato,
   'id' | 'created_at' | 'updated_at' | 'partidos'
 >;
+
+// ---------- PERGUNTAS ----------
+
+export interface Pergunta {
+  id: string;
+  texto: string;
+  categoria: string;
+  tag: string[] | null;
+  ativa: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export type PerguntaInput = Omit<Pergunta, 'id' | 'created_at' | 'updated_at'>;
+
+// ---------- RESPOSTAS / COMPATIBILIDADE ----------
+
+export interface CompatibilidadePartido {
+  partido_id: string;
+  nome_completo: string;
+  sigla: string;
+  score: number;
+  compatibilidade_pct: number;
+}
+
+// Todas exigem usuário logado (o backend valida o token e usa req.user.id).
 
 // ---------- AUTH ----------
 
@@ -151,10 +177,65 @@ export const excluirCandidato = (id: string) =>
     method: 'DELETE',
   });
 
+// ---------- PERGUNTAS ----------
+
+// Por padrão o backend já filtra ativa = true. Passe { todas: true } pra
+// trazer também as desativadas (uso administrativo).
+export const listarPerguntas = (opcoes?: { todas?: boolean }) => {
+  const query = opcoes?.todas ? '?todas=true' : '';
+  return request<Pergunta[]>(`/api/perguntas${query}`);
+};
+
+export const buscarPergunta = (id: string) =>
+  request<Pergunta>(`/api/perguntas/${id}`);
+
+export const cadastrarPergunta = (dados: PerguntaInput) =>
+  request<Pergunta>('/api/perguntas', {
+    method: 'POST',
+    body: JSON.stringify(dados),
+  });
+
+export const atualizarPergunta = (id: string, dados: Partial<PerguntaInput>) =>
+  request<Pergunta>(`/api/perguntas/${id}`, {
+    method: 'PUT',
+    body: JSON.stringify(dados),
+  });
+
+export const excluirPergunta = (id: string) =>
+  request<{ mensagem: string }>(`/api/perguntas/${id}`, {
+    method: 'DELETE',
+  });
+
+// ---------- RESPOSTAS / COMPATIBILIDADE ----------
+// Seguem o mesmo padrão do `me(token)`: o token vem explícito porque essas
+// rotas exigem usuário logado.
+
+export const salvarResposta = (
+  token: string,
+  pergunta_id: string,
+  valor: -1 | 0 | 1,
+) =>
+  request<{ id: string }>('/api/respostas', {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}` },
+    body: JSON.stringify({ pergunta_id, valor }),
+  });
+
+export const limparRespostas = (token: string) =>
+  request<{ mensagem: string }>('/api/respostas', {
+    method: 'DELETE',
+    headers: { Authorization: `Bearer ${token}` },
+  });
+
+export const buscarCompatibilidade = (token: string) =>
+  request<CompatibilidadePartido[]>('/api/respostas/compatibilidade', {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+
 async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   const res = await fetch(`${API_URL}${path}`, {
-    headers: { 'Content-Type': 'application/json', ...options.headers },
     ...options,
+    headers: { 'Content-Type': 'application/json', ...options.headers },
   });
   const data = await res.json();
   if (!res.ok) throw new Error(data.erro || 'Erro na requisição');
