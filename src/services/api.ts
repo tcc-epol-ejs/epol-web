@@ -49,7 +49,7 @@ export interface Candidato {
   id: string;
   candidatura: 'Presidente' | 'Governador';
   numero_candidatura: string | null;
-  numero_urna: number;
+  numero_urna: number | null;
   nome_completo: string;
   nome_politico: string;
   data_nascimento: string;

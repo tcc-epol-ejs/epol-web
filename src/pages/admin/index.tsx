@@ -8,7 +8,16 @@ import LogoEPOL from '../../assets/SVGs/LogoEPOL.svg';
 import { ToastContainer, useToasts } from '../../components/toast';
 import DateField from '../../components/inputs/data';
 import ModalSelectField from '../../components/selects/selectModal';
-import { cadastrarCandidato, cadastrarPartido } from '../../services/api';
+import {
+  cadastrarCandidato,
+  cadastrarPartido,
+  listarPartidos,
+} from '../../services/api';
+import type {
+  CandidatoInput,
+  FormacaoAcademica,
+  Partido,
+} from '../../services/api';
 
 const bolasConfig = [
   { size: 280, top: '-40px', left: '-30px', opacity: 0.25 },
@@ -170,6 +179,7 @@ interface CandidatoFormData {
   cargo_atual: string;
   uf_candidatura: string; // obrigatório quando candidatura === 'Governador'
   vice: string;
+  partido_id: string;
   tempo_atuacao_anos: string;
   feitos_url: string; // textarea: uma URL por linha
   feitos_resumo: string; // textarea: um feito por linha
@@ -190,6 +200,7 @@ const initialCandidatoForm: CandidatoFormData = {
   cargo_atual: '',
   uf_candidatura: '',
   vice: '',
+  partido_id: '',
   tempo_atuacao_anos: '',
   feitos_url: '',
   feitos_resumo: '',
@@ -210,6 +221,7 @@ const ROTULOS_CANDIDATO: Record<keyof CandidatoFormData, string> = {
   cargo_atual: 'Cargo Atual',
   uf_candidatura: 'UF de Candidatura',
   vice: 'Vice',
+  partido_id: 'Partido',
   tempo_atuacao_anos: 'Tempo de Atuação (anos)',
   feitos_url: 'URLs dos Feitos',
   feitos_resumo: 'Resumo dos Feitos',
@@ -223,6 +235,7 @@ const CAMPOS_OBRIGATORIOS_CANDIDATO: (keyof CandidatoFormData)[] = [
   'naturalidade',
   'uf_naturalidade',
   'cargo_atual',
+  'partido_id',
 ];
 
 function textareaParaArray(texto: string): string[] {
@@ -242,7 +255,7 @@ export default function Admin() {
     useState<PartidoFormData>(initialPartidoForm);
   const [candidatoForm, setCandidatoForm] =
     useState<CandidatoFormData>(initialCandidatoForm);
-
+  const [partidos, setPartidos] = useState<Partido[]>([]);
   const { toasts, mostrarErro, mostrarSucesso, fecharToast } = useToasts();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [visible, setVisible] = useState(true);
@@ -257,6 +270,14 @@ export default function Admin() {
 
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  useEffect(() => {
+    listarPartidos()
+      .then(setPartidos)
+      .catch(() =>
+        mostrarErro('Não foi possível carregar a lista de partidos.'),
+      );
   }, []);
 
   function updatePartidoField(campo: keyof PartidoFormData, valor: string) {
@@ -312,6 +333,22 @@ export default function Admin() {
     }
 
     return true;
+  }
+
+  function parseFormacaoAcademica(texto: string): FormacaoAcademica[] {
+    return texto
+      .split('\n')
+      .map((linha) => linha.trim())
+      .filter(Boolean)
+      .map((linha) => {
+        const partes = linha.split('-').map((p) => p.trim());
+        const [curso = '', instituicao = '', ano = ''] = partes;
+        return {
+          curso,
+          instituicao,
+          ano_conclusao: Number(ano) || 0,
+        };
+      });
   }
 
   function validarCandidato(): boolean {
@@ -396,24 +433,31 @@ export default function Admin() {
         mostrarSucesso('Partido adicionado com sucesso!');
         setPartidoForm(initialPartidoForm);
       } else {
-        const payloadCandidato = {
-          ...candidatoForm,
+        const payloadCandidato: CandidatoInput = {
+          candidatura: candidatoForm.candidatura as 'Presidente' | 'Governador',
+          numero_candidatura: candidatoForm.numero_candidatura || null,
           numero_urna: candidatoForm.numero_urna
             ? Number(candidatoForm.numero_urna)
             : null,
-          tempo_atuacao_anos: candidatoForm.tempo_atuacao_anos
-            ? Number(candidatoForm.tempo_atuacao_anos)
-            : 0,
-          formacao_academica: textareaParaArray(
-            candidatoForm.formacao_academica,
-          ),
-          feitos_url: textareaParaArray(candidatoForm.feitos_url),
-          feitos_resumo: textareaParaArray(candidatoForm.feitos_resumo),
-          numero_candidatura: candidatoForm.numero_candidatura || null,
-          uf_candidatura: candidatoForm.uf_candidatura || null,
-          vice: candidatoForm.vice || null,
+          nome_completo: candidatoForm.nome_completo,
+          nome_politico: candidatoForm.nome_politico,
+          data_nascimento: candidatoForm.data_nascimento,
+          naturalidade: candidatoForm.naturalidade,
+          uf_naturalidade: candidatoForm.uf_naturalidade,
+          formacao_academica: candidatoForm.formacao_academica
+            ? parseFormacaoAcademica(candidatoForm.formacao_academica)
+            : null,
           profissao_anterior: candidatoForm.profissao_anterior || null,
           foto_url: candidatoForm.foto_url || null,
+          partido_id: candidatoForm.partido_id || null,
+          cargo_atual: candidatoForm.cargo_atual,
+          uf_candidatura: candidatoForm.uf_candidatura || null,
+          vice: candidatoForm.vice || null,
+          tempo_atuacao_anos: candidatoForm.tempo_atuacao_anos
+            ? Number(candidatoForm.tempo_atuacao_anos)
+            : null,
+          feitos_url: textareaParaArray(candidatoForm.feitos_url),
+          feitos_resumo: textareaParaArray(candidatoForm.feitos_resumo),
         };
 
         await cadastrarCandidato(payloadCandidato);
@@ -618,18 +662,6 @@ export default function Admin() {
                           </div>
                           <div className="flex flex-col gap-1.5">
                             <label className="text-xs font-semibold text-[#3f5ca7] uppercase tracking-wider ml-1">
-                              UF da Sede (Opcional)
-                            </label>
-                            <ModalSelectField
-                              opcoes={estadosBrasil}
-                              value={partidoForm.uf_sede}
-                              onChange={(v) => updatePartidoField('uf_sede', v)}
-                              permiteVazio
-                              {...CORES_CAMPO}
-                            />
-                          </div>
-                          <div className="flex flex-col gap-1.5">
-                            <label className="text-xs font-semibold text-[#3f5ca7] uppercase tracking-wider ml-1">
                               Bandeira (Opcional)
                             </label>
                             <Textbox
@@ -796,6 +828,29 @@ export default function Admin() {
                               onChange={(v) =>
                                 updateCandidatoField('cargo_atual', v)
                               }
+                              {...CORES_CAMPO}
+                            />
+                          </div>
+                          <div className="flex flex-col gap-1.5">
+                            <label className="text-xs font-semibold text-[#3f5ca7] uppercase tracking-wider ml-1">
+                              Partido
+                            </label>
+                            <ModalSelectField
+                              opcoes={partidos.map((p) => p.sigla)}
+                              value={
+                                partidos.find(
+                                  (p) => p.id === candidatoForm.partido_id,
+                                )?.sigla ?? ''
+                              }
+                              onChange={(sigla) => {
+                                const partido = partidos.find(
+                                  (p) => p.sigla === sigla,
+                                );
+                                updateCandidatoField(
+                                  'partido_id',
+                                  partido?.id ?? '',
+                                );
+                              }}
                               {...CORES_CAMPO}
                             />
                           </div>
