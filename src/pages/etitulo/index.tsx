@@ -1,0 +1,129 @@
+import Header from '../../components/header';
+import CarrosselEtitulo from '../../components/carrosselEtitulo';
+import pipo_fechado from '../../assets/Imagens/pipo_fechado.png';
+import etitulo from '../../assets/Imagens/etitulo.png';
+import retanguloazul from '../../assets/Imagens/retanguloazul.png';
+import comoobter from '../../assets/Imagens/comoobter.png';
+import { useRef } from 'react';
+
+const bolasConfig = [
+  { size: 280, top: '-40px', left: '-30px', opacity: 1 },
+  { size: 160, top: '20px', left: '220px', opacity: 0.6 },
+  { size: 100, top: '160px', left: '30px', opacity: 0.75 },
+  { size: 240, top: '-50px', right: '-30px', opacity: 0.85 },
+  { size: 150, top: '60px', right: '220px', opacity: 0.5 },
+  { size: 80, top: '10px', right: '180px', opacity: 0.7 },
+  { size: 260, bottom: '-50px', left: '-40px', opacity: 0.9 },
+  { size: 120, bottom: '-20px', left: '190px', opacity: 0.7 },
+  { size: 300, bottom: '-60px', right: '-40px', opacity: 1 },
+  { size: 160, bottom: '120px', right: '200px', opacity: 0.6 },
+];
+
+function Etitulo() {
+  const trackRef = useRef<HTMLDivElement>(null);
+  const secondSectionRef = useRef<HTMLDivElement>(null);
+
+  const scrollToNextSection = () => {
+    secondSectionRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  return (
+    <>
+      <section className="w-full h-[100dvh]">
+        <div className="w-full fixed top-0 z-[1000]">
+          <Header />
+        </div>
+
+        {/* PRIMEIRA PARTE SEÇÃO */}
+        <div className="relative w-full h-full bg-[#eaf6ff] flex justify-between items-start overflow-hidden pt-[200px] pb-[80px]">
+          {/* COLUNA ESQUERDA - IMAGEM COM TEXTO */}
+          <div className="flex flex-col items-start pl-[150px] max-w-[1800px] mt-[100px]">
+            <img
+              src={etitulo}
+              alt="etitulo"
+              className="w-full max-w-none scale-150"
+            />
+          </div>
+
+          {/* COLUNA DIREITA - MASCOTE */}
+          <div className="shrink-0 flex justify-end" style={{ width: 500 }}>
+            <div
+              ref={trackRef}
+              className="relative mt-[40px]"
+              style={{ width: 480, height: 500 }} // era 378 x 392
+            >
+              <img
+                src={retanguloazul}
+                alt="retanguloazul"
+                className="absolute top-0 left-20 w-full h-full"
+              />
+              <img
+                src={pipo_fechado}
+                alt="pipo_fechado"
+                className="absolute"
+                style={{
+                  bottom: '-35%',
+                  left: '15%',
+                  width: '200%',
+                  height: '140%',
+                  objectFit: 'cover',
+                }}
+              />
+            </div>
+          </div>
+
+          {/* SETA ANIMADA */}
+          <button
+            onClick={scrollToNextSection}
+            aria-label="Rolar para a próxima seção"
+            className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center animate-bounce z-[1] cursor-pointer"
+          >
+            <svg
+              width="32"
+              height="32"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="#4A4A8A"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M6 9l6 6 6-6" />
+            </svg>
+          </button>
+        </div>
+
+        <div
+          ref={secondSectionRef}
+          className="relative w-full h-[100dvh] bg-[#BDC3EA] overflow-hidden flex flex-col items-center pt-[40px] gap-[60px]"
+        >
+          <img src={comoobter} alt="comoobter" className="w-[35%] max-w-none" />
+
+          <div className="relative z-1000 w-[1200px] h-[550px] flex items-center justify-center gap-[40px]">
+            <CarrosselEtitulo />
+          </div>
+
+          {bolasConfig.map((b, i) => (
+            <div
+              key={i}
+              className="absolute rounded-full"
+              style={{
+                width: b.size,
+                height: b.size,
+                top: 'top' in b ? b.top : undefined,
+                bottom: 'bottom' in b ? b.bottom : undefined,
+                left: 'left' in b ? b.left : undefined,
+                right: 'right' in b ? b.right : undefined,
+                backgroundColor: '#8888D3',
+                opacity: b.opacity,
+                zIndex: 0,
+              }}
+            />
+          ))}
+        </div>
+      </section>
+    </>
+  );
+}
+
+export default Etitulo;
