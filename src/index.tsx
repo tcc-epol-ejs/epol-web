@@ -5,6 +5,7 @@ import Cadastro from './pages/cadastro';
 import RecuperarSenha from './pages/recuperar_senha';
 import Main from './pages/main';
 import Admin from './pages/admin';
+import SearchPol from './pages/searchpol';
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
         <Route path="/recuperar-senha" element={<RecuperarSenha />} />
         <Route path="/main" element={<Main />} />
         <Route path="/admin" element={<Admin />} />
+        <Route path="/searchpol" element={<SearchPol />} />
       </Routes>
     </BrowserRouter>
   );

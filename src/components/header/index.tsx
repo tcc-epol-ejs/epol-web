@@ -6,6 +6,7 @@ import { useAuth } from '../../contexts/AuthContext';
 
 interface HeaderProps {
   isBgWhite?: boolean;
+  disableScrollHide?: boolean;
 }
 
 interface NavItem {
@@ -21,7 +22,7 @@ const NAV_ITEMS: NavItem[] = [
   { label: 'Título de Eleitor', path: '/titulo-de-eleitor' },
 ];
 
-export default function Header({ isBgWhite }: HeaderProps) {
+export default function Header({ isBgWhite, disableScrollHide }: HeaderProps) {
   const [visible, setVisible] = useState(true);
   const lastScrollY = useRef(0);
   const navigate = useNavigate();
@@ -31,6 +32,10 @@ export default function Header({ isBgWhite }: HeaderProps) {
   const HEADER_REVEAL_THRESHOLD = 20; // distância do topo (em px) pra reaparecer
 
   useEffect(() => {
+    if (disableScrollHide) {
+      return;
+    }
+
     const handleScroll = () => {
       const currentY = window.scrollY;
       setVisible(currentY < HEADER_REVEAL_THRESHOLD);
@@ -38,7 +43,7 @@ export default function Header({ isBgWhite }: HeaderProps) {
 
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  }, [disableScrollHide]);
 
   const nomeExibido = usuario?.apelido || usuario?.nome || '';
 
@@ -47,8 +52,8 @@ export default function Header({ isBgWhite }: HeaderProps) {
       className={`
         w-[calc(100%-124px)] mx-[62px] mt-[42px] h-[80px] pl-[38px] pr-[11.5px] py-[11.5px]
          rounded-full shadow-xl flex items-center justify-between border-2 border-[#FFA400]
-        transition-transform duration-[800ms] ease-in-out
-        ${visible ? 'translate-y-0' : '-translate-y-[200px]'} ${isBgWhite ? 'bg-[#2A2A72]' : 'bg-white'}
+        ${disableScrollHide ? '' : 'transition-transform duration-[800ms] ease-in-out'}
+        ${disableScrollHide || visible ? 'translate-y-0' : '-translate-y-[200px]'} ${isBgWhite ? 'bg-[#2A2A72]' : 'bg-white'}
       `}
     >
       <div className="flex items-center gap-10">
