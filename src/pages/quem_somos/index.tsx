@@ -30,7 +30,7 @@ const membros = [
     fotoPerfil: PerfilDiogo,
   },
   {
-    nome: 'Emanuela',
+    nome: 'Emanuella',
     cargo: 'Desenvolvedora Full-Stack',
     descricao:
       '"Para mim o Epol demonstra que a política é o principal passo para mudar a realidade."',
