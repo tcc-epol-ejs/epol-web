@@ -9,6 +9,7 @@ import QuemSomos from './pages/quem_somos';
 import Main from './pages/main';
 import Admin from './pages/admin';
 import SearchPol from './pages/searchpol';
+import PaginaPartido from './pages/pagina_partido';
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
         <Route path="/main" element={<Main />} />
         <Route path="/admin" element={<Admin />} />
         <Route path="/searchpol" element={<SearchPol />} />
+        <Route path="/pagina_partido" element={<PaginaPartido />} />
       </Routes>
     </BrowserRouter>
   );
