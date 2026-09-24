@@ -14,6 +14,7 @@ import { useNavigate } from 'react-router-dom';
 const cards = [
   {
     asset: MatchPolitico,
+    path: '/match-politico',
     title: 'match político',
     text: 'Descubra quais partidos mais combinam com suas ideias em poucos minutos.',
   },
@@ -86,6 +87,7 @@ export default function Main() {
                       width={350}
                       height={350}
                       asset={card.asset}
+                      path={card.path}
                     />
                     <h2 className="font-black uppercase forced-small-caps leading-10 tracking-wider text-[20px] text-[#333]">
                       {card.title}
