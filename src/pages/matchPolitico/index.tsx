@@ -459,8 +459,8 @@ function IntroScreen({ onStart }: IntroScreenProps) {
       <Blobs />
       <div className="relative z-10 bg-white rounded-[28px] p-7 sm:p-9 w-full max-w-[560px] shadow-[0_30px_60px_rgba(15,12,60,0.35)] text-center">
         <h1 className="[font-family:'Sora',sans-serif] font-extrabold text-[24px] sm:text-[28px] text-[#1B1B3A] mt-4 mb-2">
-          Descubra seu{' '}
-          <em className="italic text-[#FF9F1C] not-italic">match</em> político
+          Descubra seu <em className=" text-[#FF9F1C] not-italic">match</em>{' '}
+          político
         </h1>
         <p className="text-[14px] text-[#5b5776] leading-[1.5] mb-6 max-w-[420px] mx-auto">
           Você vai responder algumas perguntas rápidas sobre economia, educação,
