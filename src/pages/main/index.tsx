@@ -9,6 +9,7 @@ import PipoFeliz from '../../assets/Imagens/pipoFeliz.png';
 import PipoTituloEleitor from '../../assets/Imagens/pipoTituloEleitor.png';
 import { GiStarFlag } from 'react-icons/gi';
 import { FaArrowRightLong, FaPeopleGroup } from 'react-icons/fa6';
+import { useNavigate } from 'react-router-dom';
 
 const cards = [
   {
@@ -35,6 +36,7 @@ const SET_SHIFT = cards.length * (CARD_WIDTH + GAP);
 
 export default function Main() {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+  const navigate = useNavigate();
 
   return (
     <>
@@ -235,7 +237,10 @@ export default function Main() {
                   participação política. Aqui, a informação vira ação.
                 </p>
 
-                <button className="flex items-center font-sans gap-2 bg-[#2A2A72] hover:bg-[#202056] text-[#FFFBF2] font-bold text-sm tracking-wide px-7 py-4 rounded-full transition-all hover:-translate-y-px w-fit">
+                <button
+                  onClick={() => navigate('/etitulo')}
+                  className="flex items-center font-sans gap-2 bg-[#2A2A72] hover:bg-[#202056] text-[#FFFBF2] font-bold text-sm tracking-wide px-7 py-4 rounded-full transition-all hover:-translate-y-px w-fit"
+                >
                   Descobrir mais
                   <FaArrowRightLong />
                 </button>
