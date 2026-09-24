@@ -14,6 +14,7 @@ import { useNavigate } from 'react-router-dom';
 const cards = [
   {
     asset: MatchPolitico,
+    path: '/match-politico',
     title: 'match político',
     text: 'Descubra quais partidos mais combinam com suas ideias em poucos minutos.',
   },
@@ -86,6 +87,7 @@ export default function Main() {
                       width={350}
                       height={350}
                       asset={card.asset}
+                      path={card.path}
                     />
                     <h2 className="font-black uppercase forced-small-caps leading-10 tracking-wider text-[20px] text-[#333]">
                       {card.title}
@@ -238,7 +240,10 @@ export default function Main() {
                   participação política. Aqui, a informação vira ação.
                 </p>
 
-                <button className="flex items-center font-sans gap-2 bg-[#2A2A72] hover:bg-[#202056] text-[#FFFBF2] font-bold text-sm tracking-wide px-7 py-4 rounded-full transition-all hover:-translate-y-px w-fit">
+                <button
+                  onClick={() => navigate('/etitulo')}
+                  className="flex items-center font-sans gap-2 bg-[#2A2A72] hover:bg-[#202056] text-[#FFFBF2] font-bold text-sm tracking-wide px-7 py-4 rounded-full transition-all hover:-translate-y-px w-fit"
+                >
                   Descobrir mais
                   <FaArrowRightLong />
                 </button>

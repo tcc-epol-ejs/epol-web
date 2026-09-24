@@ -17,9 +17,10 @@ interface NavItem {
 const NAV_ITEMS: NavItem[] = [
   { label: 'Página Inicial', path: '/main' },
   { label: 'SearchPol', path: '/searchpol' },
+  { label: 'Match Político', path: '/match-politico' },
   { label: 'Visualizador', path: '/visualizador' },
   { label: 'Match', path: '/match' },
-  { label: 'Título de Eleitor', path: '/titulo-de-eleitor' },
+  { label: 'Título de Eleitor', path: '/etitulo' },
 ];
 
 export default function Header({ isBgWhite, disableScrollHide }: HeaderProps) {
