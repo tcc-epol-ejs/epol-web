@@ -19,7 +19,7 @@ function App() {
         <Route path="/cadastro" element={<Cadastro />} />
         <Route path="/recuperar-senha" element={<RecuperarSenha />} />
         <Route path="/etitulo" element={<Etitulo />} />
-        <Route path="/match-politico" element={<MatchPolitico />} />
+        <Route path="/matchPolitico" element={<MatchPolitico />} />
         <Route path="/quem-somos" element={<QuemSomos />} />
         <Route path="/main" element={<Main />} />
         <Route path="/admin" element={<Admin />} />
