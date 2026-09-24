@@ -1,7 +1,13 @@
 // components/StepCarousel.tsx
 import { useState } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-
+import pipotitulo from '../assets/Imagens/pipotitulo.png';
+import passos from '../assets/Imagens/passos.png';
+import passo3 from '../assets/Imagens/passo3.png';
+import site from '../assets/Imagens/site.png';
+import passo2 from '../assets/Imagens/passo2.png';
+import passo4 from '../assets/Imagens/passo4.png';
+import app from '../assets/Imagens/app.png';
 type Step = {
   number: number;
   title: string;
@@ -21,7 +27,7 @@ const steps: Step[] = [
       'Voto é obrigatório ou facultativo? O voto é obrigatório para todos os cidadãos brasileiros alfabetizados com idade entre 18 e 70 anos. Para os jovens de 16 e 17 anos, o voto é facultativo, ou seja, você pode escolher se quer ou não votar.',
     textAfter:
       'Sem título, depois dos 18 anos a pessoa não consegue tirar passaporte, se inscrever em concurso público, matricular em faculdade pública, entre outras coisas. Então, se você tem 16 ou 17 anos, aproveite para tirar seu título de eleitor e garantir que sua voz seja ouvida nas próximas eleições!',
-    image: '/src/assets/Imagens/pipotitulo.png',
+    image: 'pipotitulo.png',
     tagLabel: 'VAMOS LÁ!',
     imageFit: 'contain',
   },
@@ -34,7 +40,7 @@ const steps: Step[] = [
       label: 'Acessar Título Net',
     },
     textAfter: `2. Idade mínima: 15 anos. Só que se você tirar o título com 15, só vai poder votar de verdade quando completar 16 até a próxima eleição.`,
-    image: '/src/assets/Imagens/passos.png',
+    image: 'passos.png',
     tagLabel: 'ATENCAO!',
   },
   {
@@ -43,7 +49,7 @@ const steps: Step[] = [
     textBefore:
       '1. Separe um documento oficial com foto: RG, Certidão de Nascimento (se for solteiro/a), Certidão de Casamento, Passaporte ou Carteira de Trabalho.',
     textAfter: `2. Leve também um comprovante de endereço (pode ser digital ou cópia), de preferência no seu nome ou dos seus pais e emitido nos últimos 3 meses.`,
-    image: '/src/assets/Imagens/passo3.png',
+    image: 'passo3.png',
     tagLabel: 'NAO ESQUEÇA!',
   },
   {
@@ -56,7 +62,7 @@ const steps: Step[] = [
       url: 'https://www.tse.jus.br/servicos-eleitorais/autoatendimento-eleitoral#/atendimento-eleitor',
       label: 'Acessar Título Net',
     },
-    image: '/src/assets/Imagens/site.png',
+    image: 'site.png',
     tagLabel: 'AGENDE SEU HORÁRIO!',
   },
   {
@@ -65,7 +71,7 @@ const steps: Step[] = [
     textBefore:
       'Agora é só preencher o formulário com seus dados: nome completo, data de nascimento, endereço e contato. Confira tudo direitinho antes de enviar pois dado errado pode atrasar seu processo!',
     textAfter: '',
-    image: '/src/assets/Imagens/passo2.png',
+    image: 'passo2.png',
     tagLabel: 'MUITO IMPORTANTE!',
   },
   {
@@ -74,7 +80,7 @@ const steps: Step[] = [
     textBefore:
       'Revisou tudo? Então é só enviar. Você vai receber uma confirmação por e-mail avisando que seu pedido foi recebido. Depois disso é só aguardar a liberação do seu título.',
     textAfter: '',
-    image: '/src/assets/Imagens/passo4.png',
+    image: 'passo4.png',
     tagLabel: 'Tire seu título!',
   },
   {
@@ -84,7 +90,7 @@ const steps: Step[] = [
       'Depois que seu título for aprovado, você vai receber um e-mail de confirmação. A partir daí, você já pode baixar o app e-Título para acompanhar sua situação eleitoral e descobrir seu local de votação antes do dia da eleição.',
     textAfter:
       'Utilize o app e-Título para acessar seu título digital, verificar se está apto a votar, conferir seu local de votação e muito mais. É uma forma prática e segura de manter tudo em dia com a Justiça Eleitoral!',
-    image: '/src/assets/Imagens/app.png',
+    image: 'app.png',
     tagLabel: 'FICA A DICA!',
   },
   // ... continue os demais passos aqui

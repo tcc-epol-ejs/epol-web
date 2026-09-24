@@ -5,6 +5,8 @@ import Cadastro from './pages/cadastro';
 import RecuperarSenha from './pages/recuperar_senha';
 import Etitulo from './pages/etitulo';
 import Main from './pages/main';
+import Admin from './pages/admin';
+
 function App() {
   return (
     <BrowserRouter>
@@ -14,6 +16,7 @@ function App() {
         <Route path="/cadastro" element={<Cadastro />} />
         <Route path="/recuperar-senha" element={<RecuperarSenha />} />
         <Route path="/etitulo" element={<Etitulo />} />
+        <Route path="/admin" element={<Admin />} />
         <Route path="/main" element={<Main />} />
       </Routes>
     </BrowserRouter>
