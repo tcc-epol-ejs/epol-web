@@ -8,6 +8,7 @@ import MatchPolitico from './pages/matchPolitico';
 import QuemSomos from './pages/quem_somos';
 import Main from './pages/main';
 import Admin from './pages/admin';
+import SearchPol from './pages/searchpol';
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
         <Route path="/quem-somos" element={<QuemSomos />} />
         <Route path="/main" element={<Main />} />
         <Route path="/admin" element={<Admin />} />
+        <Route path="/searchpol" element={<SearchPol />} />
         <Route path="/main" element={<Main />} />
       </Routes>
     </BrowserRouter>

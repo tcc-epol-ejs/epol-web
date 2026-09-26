@@ -187,7 +187,10 @@ export default function Main() {
                     Aqui no <b className="text-[#333] font-semibold">EPOL</b>,
                     você descobre.
                   </span>
-                  <button className="font-sans flex items-center gap-2 bg-[#2A2A72] hover:bg-[#202056] text-[#FFFBF2] font-bold text-sm tracking-wide px-5 py-3.5 rounded-full transition-all hover:-translate-y-px whitespace-nowrap">
+                  <button
+                    onClick={() => navigate('/searchpol')}
+                    className="font-sans flex items-center gap-2 bg-[#2A2A72] hover:bg-[#202056] text-[#FFFBF2] font-bold text-sm tracking-wide px-5 py-3.5 rounded-full transition-all hover:-translate-y-px whitespace-nowrap"
+                  >
                     Pesquisar
                     <FaArrowRightLong />
                   </button>
