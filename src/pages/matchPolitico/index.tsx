@@ -18,6 +18,7 @@ import {
   type Partido as PartidoAPI,
   type CompatibilidadePartido,
 } from '../../services/api';
+import Footer from '../../components/footer/footer';
 
 // -----------------------------------------------------------------------------
 // TIPOS
@@ -996,6 +997,8 @@ export default function MatchPolitico() {
         <Header />
       </div>
       <div className="w-full h-full">{conteudo}</div>
+
+      <Footer />
     </section>
   );
 }

@@ -9,6 +9,7 @@ import {
 import { FormEvent, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import Header from '../../components/header';
 import { Candidato, listarCandidatos } from '../../services/api';
+import Footer from '../../components/footer/footer';
 
 const partidos = [
   {
@@ -873,6 +874,8 @@ function SearchPol() {
             </div>
           </div>
         </div>
+
+        <Footer />
       </section>
     </>
   );

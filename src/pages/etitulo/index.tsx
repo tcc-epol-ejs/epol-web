@@ -6,6 +6,7 @@ import retanguloazul from '../../assets/Imagens/retanguloazul.png';
 import comoobter from '../../assets/Imagens/comoobter.png';
 import { useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Footer from '../../components/footer/footer';
 
 const bolasConfig = [
   { size: 280, top: '-8%', left: '-8%', opacity: 1 },
@@ -127,6 +128,8 @@ function Etitulo() {
             />
           ))}
         </div>
+
+        <Footer />
       </section>
     </>
   );

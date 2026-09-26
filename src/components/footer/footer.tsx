@@ -88,7 +88,7 @@ export default function Footer() {
               Explorar
             </p>
             <button
-              onClick={() => navigate('/')}
+              onClick={() => navigate('/main')}
               className="text-sm text-gray-300 text-left hover:text-white transition-colors"
             >
               Página Inicial
@@ -100,28 +100,28 @@ export default function Footer() {
               SearchPol
             </button>
             <button
-              onClick={() => navigate('/visualizador')}
+              onClick={() => navigate('/match-politico')}
               className="text-sm text-gray-300 text-left hover:text-white transition-colors"
             >
-              Visualizador
+              Match Político
+            </button>
+            <button
+              onClick={() => navigate('/visualizador-geografico')}
+              className="text-sm text-gray-300 text-left hover:text-white transition-colors"
+            >
+              Visualizador Geográfico
             </button>
             <button
               onClick={() => navigate('/urna')}
-              className="text-sm text-gray-300 text-left hover:text-white transition-colors"
-            >
-              Urna
-            </button>
-            <button
-              onClick={() => navigate('/titulo')}
               className="text-sm whitespace-nowrap text-gray-300 text-left hover:text-white transition-colors"
             >
-              Título de Eleitor
+              Urna
             </button>
             <button
               onClick={() => navigate('/quem-somos')}
               className="text-sm text-gray-300 text-left hover:text-white transition-colors"
             >
-              Quem Somos
+              Quem Somos?
             </button>
           </div>
         )}

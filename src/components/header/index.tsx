@@ -18,9 +18,9 @@ const NAV_ITEMS: NavItem[] = [
   { label: 'Página Inicial', path: '/main' },
   { label: 'SearchPol', path: '/searchpol' },
   { label: 'Match Político', path: '/match-politico' },
-  { label: 'Visualizador', path: '/visualizador' },
-  { label: 'Match', path: '/match' },
-  { label: 'Título de Eleitor', path: '/etitulo' },
+  { label: 'Visualizador Geográfico', path: '/visualizador-geografico' },
+  { label: 'Urna', path: '/urna' },
+  { label: 'Quem Somos?', path: '/quem-somos' },
 ];
 
 export default function Header({ isBgWhite, disableScrollHide }: HeaderProps) {
