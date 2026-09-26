@@ -1,0 +1,133 @@
+import { useEffect, useRef, useState } from 'react';
+import LogoEPOL from '../../assets/SVGs/LogoEPOL.svg';
+import LogoEpolBranco from '../../assets/Imagens/Logos/logoepol.png';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { useAuth } from '../../contexts/AuthContext';
+
+interface HeaderProps {
+  isBgWhite?: boolean;
+  disableScrollHide?: boolean;
+}
+
+interface NavItem {
+  label: string;
+  path: string;
+}
+
+const NAV_ITEMS: NavItem[] = [
+  { label: 'Página Inicial', path: '/main' },
+  { label: 'SearchPol', path: '/searchpol' },
+  { label: 'Match Político', path: '/match-politico' },
+  { label: 'Visualizador Geográfico', path: '/visualizador-geografico' },
+  { label: 'Urna', path: '/urna' },
+  { label: 'Quem Somos?', path: '/quem-somos' },
+];
+
+export default function Header({ isBgWhite, disableScrollHide }: HeaderProps) {
+  const [visible, setVisible] = useState(true);
+  const lastScrollY = useRef(0);
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { usuario, carregando, logout } = useAuth();
+
+  const HEADER_REVEAL_THRESHOLD = 20; // distância do topo (em px) pra reaparecer
+
+  function handleSair() {
+    logout();
+    navigate('/');
+  }
+
+  useEffect(() => {
+    if (disableScrollHide) {
+      return;
+    }
+
+    const handleScroll = () => {
+      const currentY = window.scrollY;
+      setVisible(currentY < HEADER_REVEAL_THRESHOLD);
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [disableScrollHide]);
+
+  const nomeExibido = usuario?.apelido || usuario?.nome || '';
+
+  return (
+    <header
+      className={`
+        w-[calc(100%-124px)] mx-[62px] mt-[42px] h-[80px] pl-[38px] pr-[11.5px] py-[11.5px]
+         rounded-full shadow-xl flex items-center justify-between border-2 border-[#FFA400]
+        ${disableScrollHide ? '' : 'transition-transform duration-[800ms] ease-in-out'}
+        ${disableScrollHide || visible ? 'translate-y-0' : '-translate-y-[200px]'} ${isBgWhite ? 'bg-[#2A2A72]' : 'bg-white'}
+      `}
+    >
+      <div className="flex items-center gap-10">
+        {isBgWhite ? (
+          <img
+            src={LogoEpolBranco}
+            alt=""
+            className="w-[90px] mt-1.5 shrink-0"
+          />
+        ) : (
+          <img src={LogoEPOL} alt="" className="w-[90px] mt-1.5 shrink-0" />
+        )}
+
+        {usuario && !carregando && (
+          <nav className="hidden md:flex items-center gap-7">
+            {NAV_ITEMS.map((item) => {
+              const isActive = location.pathname === item.path;
+              return (
+                <button
+                  key={item.path}
+                  onClick={() => navigate(item.path)}
+                  className={`
+                    border-none outline-none bg-transparent text-[14px] font-semibold whitespace-nowrap
+                    transition-colors
+                    ${isActive ? 'text-[#FFA400]' : isBgWhite ? 'text-[#FFFBF2]' : 'text-[#333]'} hover:text-[#FFA400] `}
+                >
+                  {item.label}
+                </button>
+              );
+            })}
+          </nav>
+        )}
+      </div>
+
+      {carregando ? (
+        <div className="w-[160px] h-[45px]" />
+      ) : usuario ? (
+        <button
+          onClick={handleSair}
+          className={`flex items-center gap-2.5 pr-2 pl-1.5 py-1.5 rounded-full ${isBgWhite ? 'hover:bg-[#383899]' : 'hover:bg-[#FFF6E8]'}  transition-colors border-none outline-none`}
+        >
+          <span
+            className={`text-[14px] font-semibold ${isBgWhite ? 'text-[#FFFBF2]' : 'text-[#333]'} `}
+          >
+            {nomeExibido}
+          </span>
+          <div className="w-[40px] h-[40px] rounded-full bg-[#FFA400] flex items-center justify-center shrink-0">
+            <span className="text-white font-bold text-[16px]">
+              {nomeExibido.charAt(0).toUpperCase()}
+            </span>
+          </div>
+        </button>
+      ) : (
+        <div className="flex gap-5">
+          <button
+            onClick={() => navigate('/login')}
+            className="border-none outline-none text-[14px] font-semibold text-[#FFA400] hover:underline"
+          >
+            Entrar
+          </button>
+          <button
+            onClick={() => navigate('/cadastro')}
+            className="border-none outline-none font-semibold px-[22px] text-[14px] py-1.5 h-[53px] rounded-full text-center bg-[#FFA400] text-[#333] hover:brightness-[.85]"
+          >
+            Cadastre-se
+          </button>
+        </div>
+      )}
+    </header>
+  );
+}
