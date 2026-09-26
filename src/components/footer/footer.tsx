@@ -144,7 +144,7 @@ export default function Footer() {
 
           {usuario && !carregando && (
             <button
-              onClick={() => navigate('/titulo')}
+              onClick={() => navigate('/etitulo')}
               className="w-full bg-[#4F46E5] hover:bg-[#4338CA] transition-colors text-white text-xs font-semibold tracking-wide uppercase rounded-full py-2.5 flex items-center justify-center gap-1.5"
             >
               Tire seu Título de Eleitor

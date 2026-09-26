@@ -10,6 +10,9 @@ import { FormEvent, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import Header from '../../components/header';
 import { Candidato, listarCandidatos } from '../../services/api';
 import Footer from '../../components/footer/footer';
+import { IoMdAdd } from 'react-icons/io';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../contexts/AuthContext';
 
 const partidos = [
   {
@@ -304,6 +307,8 @@ function SearchPol() {
   const [candidatos, setCandidatos] = useState<Candidato[]>([]);
   const [candidatosLoading, setCandidatosLoading] = useState(true);
   const [candidatosError, setCandidatosError] = useState('');
+  const navigate = useNavigate();
+  const { usuario } = useAuth();
 
   useLayoutEffect(() => {
     resultadosRef.current?.scrollTo({ top: 0, behavior: 'auto' });
@@ -685,6 +690,17 @@ function SearchPol() {
               >
                 <FiSearch aria-hidden="true" className="text-[22px]" />
               </button>
+
+              {usuario?.adm && (
+                <button
+                  onClick={() => navigate('/admin')}
+                  aria-label="Adicionar"
+                  title="Adicionar"
+                  className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-[#FFA400] text-white transition-transform hover:opacity-85"
+                >
+                  <IoMdAdd aria-hidden="true" className="text-[22px]" />
+                </button>
+              )}
             </form>
 
             <div

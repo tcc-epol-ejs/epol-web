@@ -527,10 +527,10 @@ export default function Admin() {
             <div>
               <button
                 type="button"
-                onClick={() => navigate('/main')}
+                onClick={() => navigate('/searchpol')}
                 className="px-4 py-4 text-xs font-semibold text-[#3f5ca7] hover:underline"
               >
-                Voltar ao site principal
+                Voltar
               </button>
             </div>
           </div>

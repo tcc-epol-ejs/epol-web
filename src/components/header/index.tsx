@@ -28,9 +28,14 @@ export default function Header({ isBgWhite, disableScrollHide }: HeaderProps) {
   const lastScrollY = useRef(0);
   const navigate = useNavigate();
   const location = useLocation();
-  const { usuario, carregando } = useAuth();
+  const { usuario, carregando, logout } = useAuth();
 
   const HEADER_REVEAL_THRESHOLD = 20; // distância do topo (em px) pra reaparecer
+
+  function handleSair() {
+    logout();
+    navigate('/');
+  }
 
   useEffect(() => {
     if (disableScrollHide) {
@@ -93,7 +98,7 @@ export default function Header({ isBgWhite, disableScrollHide }: HeaderProps) {
         <div className="w-[160px] h-[45px]" />
       ) : usuario ? (
         <button
-          onClick={() => navigate('/perfil')}
+          onClick={handleSair}
           className={`flex items-center gap-2.5 pr-2 pl-1.5 py-1.5 rounded-full ${isBgWhite ? 'hover:bg-[#383899]' : 'hover:bg-[#FFF6E8]'}  transition-colors border-none outline-none`}
         >
           <span
