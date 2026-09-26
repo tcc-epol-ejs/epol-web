@@ -240,7 +240,10 @@ export default function Main() {
                   participação política. Aqui, a informação vira ação.
                 </p>
 
-                <button className="flex items-center font-sans gap-2 bg-[#2A2A72] hover:bg-[#202056] text-[#FFFBF2] font-bold text-sm tracking-wide px-7 py-4 rounded-full transition-all hover:-translate-y-px w-fit">
+                <button
+                  onClick={() => navigate('/etitulo')}
+                  className="flex items-center font-sans gap-2 bg-[#2A2A72] hover:bg-[#202056] text-[#FFFBF2] font-bold text-sm tracking-wide px-7 py-4 rounded-full transition-all hover:-translate-y-px w-fit"
+                >
                   Descobrir mais
                   <FaArrowRightLong />
                 </button>
