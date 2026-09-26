@@ -1,6 +1,6 @@
 // components/StepCarousel.tsx
 import { useState } from 'react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 import pipotitulo from '../../assets/Imagens/pipotitulo.png';
 import passos from '../../assets/Imagens/passos.png';
 import passo3 from '../../assets/Imagens/passo3.png';
@@ -137,7 +137,7 @@ export default function StepCarousel() {
           className="arrow-left shrink-0 text-[#2a2a72] rounded-full p-[6px] hover:scale-125 hover:shadow-[0_0_16px_4px_rgba(42,42,114,0.4)] active:scale-95 transition-transform duration-200 ease-out"
           aria-label="Anterior"
         >
-          <ChevronLeft size={28} />
+          <FiChevronLeft size={28} />
         </button>
 
         {/* CARD */}
@@ -198,7 +198,7 @@ export default function StepCarousel() {
           className="arrow-right shrink-0 text-[#2a2a72] rounded-full p-[6px] hover:scale-125 hover:shadow-[0_0_16px_4px_rgba(42,42,114,0.4)] active:scale-95 transition-transform duration-200 ease-out"
           aria-label="Próximo"
         >
-          <ChevronRight size={28} />
+          <FiChevronRight size={28} />
         </button>
       </div>
 
