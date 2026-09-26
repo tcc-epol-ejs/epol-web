@@ -1,6 +1,24 @@
 import { useEffect, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import {
+  FiCamera,
+  FiChevronLeft,
+  FiChevronRight,
+  FiEdit2,
+  FiLock,
+  FiLogOut,
+  FiStar,
+  FiX,
+} from 'react-icons/fi';
+import Header from '../../components/header';
+import { useAuth } from '../../contexts/AuthContext';
 
 function Perfil() {
+  const navigate = useNavigate();
+  // OBS: assumindo que o AuthContext expõe `logout` — ajusta esse nome se
+  // no seu contexto real for diferente (ex: `sair`, `signOut`).
+  const { usuario, carregando, logout } = useAuth();
+
   // -----------------------------------------------------------------------------
   // BLOBS DE FUNDO
   // -----------------------------------------------------------------------------
@@ -165,8 +183,27 @@ function Perfil() {
     { uf: 'TO', nome: 'Tocantins' },
   ];
 
+  function nomeEstado(uf: string): string {
+    return ESTADOS.find((e) => e.uf === uf)?.nome ?? uf;
+  }
+
+  function mascararEmail(email: string): string {
+    const [usuario, dominio] = email.split('@');
+    if (!usuario || !dominio) return email;
+    const visiveis = usuario.slice(0, 2);
+    const escondidos = Math.min(Math.max(usuario.length - 2, 3), 6);
+    return `${visiveis}${'*'.repeat(escondidos)}@${dominio}`;
+  }
+
+  function formatarData(data: string): string {
+    if (!data) return '—';
+    const [ano, mes, dia] = data.split('-');
+    if (!ano || !mes || !dia) return data;
+    return `${dia}/${mes}/${ano}`;
+  }
+
   // Dados de teste — quando a página individual de partidos/candidatos existir,
-  // isso passa a vir da tabela de favoritos do usuário.
+  // isso passa a vir da tabela de favoritos do usuário, com foto/bandeira reais.
   interface PartidoFavorito {
     id: string;
     sigla: string;
@@ -182,6 +219,13 @@ function Perfil() {
 
   const PARTIDOS_TESTE: PartidoFavorito[] = [
     { id: 'p1', sigla: 'REDE', nome: 'Rede Sustentabilidade', cor: '#3FA796' },
+    {
+      id: 'p2',
+      sigla: 'PSOL',
+      nome: 'Partido Socialismo e Liberdade',
+      cor: '#B3282D',
+    },
+    { id: 'p3', sigla: 'NOVO', nome: 'Partido Novo', cor: '#FF6600' },
   ];
 
   const CANDIDATOS_TESTE: CandidatoFavorito[] = [
@@ -198,6 +242,51 @@ function Perfil() {
       cargo: 'Governadora',
       partido: 'PSDB',
     },
+    {
+      id: 'c4',
+      nome: 'Bruno Kowalski',
+      cargo: 'Deputado Estadual',
+      partido: 'NOVO',
+    },
+    { id: 'c5', nome: 'Thiago Bezerra', cargo: 'Senador', partido: 'PSOL' },
+    {
+      id: 'c6',
+      nome: 'Renata Fontoura',
+      cargo: 'Governadora',
+      partido: 'PSDB',
+    },
+    {
+      id: 'c7',
+      nome: 'Bruno Kowalski',
+      cargo: 'Deputado Estadual',
+      partido: 'NOVO',
+    },
+    { id: 'c8', nome: 'Thiago Bezerra', cargo: 'Senador', partido: 'PSOL' },
+    {
+      id: 'c9',
+      nome: 'Renata Fontoura',
+      cargo: 'Governadora',
+      partido: 'PSDB',
+    },
+    {
+      id: 'c10',
+      nome: 'Bruno Kowalski',
+      cargo: 'Deputado Estadual',
+      partido: 'NOVO',
+    },
+    { id: 'c11', nome: 'Thiago Bezerra', cargo: 'Senador', partido: 'PSOL' },
+    {
+      id: 'c12',
+      nome: 'Renata Fontoura',
+      cargo: 'Governadora',
+      partido: 'PSDB',
+    },
+    {
+      id: 'c13',
+      nome: 'Bruno Kowalski',
+      cargo: 'Deputado Estadual',
+      partido: 'NOVO',
+    },
   ];
 
   // -----------------------------------------------------------------------------
@@ -213,17 +302,34 @@ function Perfil() {
   }
 
   const [form, setForm] = useState<PerfilForm>({
-    nome: 'Camila Duarte',
-    apelido: 'caduarte',
-    email: 'camila.duarte@email.com',
+    nome: '',
+    apelido: '',
+    email: '',
     estado: 'SP',
-    nascimento: '1998-04-12',
+    nascimento: '',
     foto: null,
   });
 
+  // A API (services/api.ts) hoje só devolve nome/apelido/email em `me()`.
+  // Estado, data de nascimento e foto ainda não voltam do backend nesse
+  // endpoint — por enquanto ficam com valor de teste até o back devolver
+  // esses campos também.
+  const sincronizouUsuario = useRef(false);
+  useEffect(() => {
+    if (usuario && !sincronizouUsuario.current) {
+      setForm((f) => ({
+        ...f,
+        nome: usuario.nome ?? f.nome,
+        apelido: usuario.apelido ?? f.apelido,
+        email: usuario.email ?? f.email,
+      }));
+      sincronizouUsuario.current = true;
+    }
+  }, [usuario]);
+
   const [aba, setAba] = useState<'dados' | 'preferencias'>('dados');
-  const [mostrarSenha, setMostrarSenha] = useState(false);
-  const [senha, setSenha] = useState({ atual: '', nova: '', confirmar: '' });
+  const [editando, setEditando] = useState(false);
+  const [rascunho, setRascunho] = useState<PerfilForm>(form);
   const [salvo, setSalvo] = useState(false);
   const fotoInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -237,6 +343,31 @@ function Perfil() {
     setForm((f) => ({ ...f, [campo]: valor }));
   }
 
+  function atualizarRascunho<K extends keyof PerfilForm>(
+    campo: K,
+    valor: PerfilForm[K],
+  ) {
+    setRascunho((r) => ({ ...r, [campo]: valor }));
+  }
+
+  function abrirEdicao() {
+    setRascunho(form);
+    setEditando(true);
+  }
+
+  function cancelarEdicao() {
+    setEditando(false);
+  }
+
+  function salvarEdicao() {
+    // TODO: services/api.ts ainda não tem uma rota de atualização de perfil
+    // (ex: PUT /api/auth/me). Por enquanto isso só simula o retorno de sucesso.
+    setForm(rascunho);
+    setEditando(false);
+    setSalvo(true);
+    setTimeout(() => setSalvo(false), 2400);
+  }
+
   function escolherFoto(e: React.ChangeEvent<HTMLInputElement>) {
     const arquivo = e.target.files?.[0];
     if (!arquivo) return;
@@ -244,14 +375,11 @@ function Perfil() {
     atualizarCampo('foto', url);
   }
 
-  function salvarAlteracoes() {
-    // TODO: integrar com a API — aqui só simula o retorno de sucesso.
-    setSalvo(true);
-    setTimeout(() => setSalvo(false), 2400);
+  function handleSair() {
+    logout();
+    navigate('/');
   }
 
-  const senhasConferem =
-    senha.nova.length === 0 || senha.nova === senha.confirmar;
   const iniciais = form.nome
     .split(' ')
     .filter(Boolean)
@@ -260,12 +388,18 @@ function Perfil() {
     .join('');
 
   return (
-    <div className="relative w-full h-full min-h-[640px] bg-[#2E2A6B] overflow-hidden flex flex-col items-center px-4 py-10">
-      <Blobs tint={aba === 'preferencias' ? 'rgba(232,176,75,0.10)' : null} />
+    <section className="relative w-full bg-[#2E2A6B]">
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <Blobs tint={aba === 'preferencias' ? 'rgba(255,164,0,0.10)' : null} />
+      </div>
 
-      <div className="relative z-10 w-full max-w-[560px] flex flex-col items-center">
-        {/* CABEÇALHO: FOTO + NOME */}
-        <div className="flex justify-center items-center gap-5">
+      <div className="w-full fixed top-0 z-[1000]">
+        <Header />
+      </div>
+
+      <div className="relative z-10 w-full flex flex-col items-center px-4 pt-[170px] pb-16">
+        <div className="w-full max-w-[560px] flex flex-col items-center">
+          {/* CABEÇALHO: FOTO + NOME */}
           <div className="relative">
             <div className="w-28 h-28 rounded-full border-[3px] border-white/25 bg-[#463F9E] flex items-center justify-center overflow-hidden shadow-[0_8px_30px_rgba(0,0,0,0.25)]">
               {form.foto ? (
@@ -275,10 +409,7 @@ function Perfil() {
                   className="w-full h-full object-cover"
                 />
               ) : (
-                <span
-                  className="text-3xl text-[#E9E6FF]"
-                  style={{ fontFamily: "'Fraunces', 'Georgia', serif" }}
-                >
+                <span className="text-3xl font-bold text-[#E9E6FF]">
                   {iniciais || '?'}
                 </span>
               )}
@@ -287,23 +418,9 @@ function Perfil() {
               type="button"
               onClick={() => fotoInputRef.current?.click()}
               aria-label="Alterar foto de perfil"
-              className="absolute bottom-0 right-0 w-9 h-9 rounded-full bg-[#E8B04B] text-[#2E2A6B] flex items-center justify-center shadow-md hover:brightness-105 transition"
+              className="absolute bottom-0 right-0 w-9 h-9 rounded-full bg-[#FFA400] text-[#2E2A6B] flex items-center justify-center shadow-md hover:brightness-105 transition"
             >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                <path
-                  d="M4 7h3l1.5-2h7L17 7h3a1 1 0 0 1 1 1v11a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1z"
-                  stroke="currentColor"
-                  strokeWidth="1.8"
-                  strokeLinejoin="round"
-                />
-                <circle
-                  cx="12"
-                  cy="13"
-                  r="3.4"
-                  stroke="currentColor"
-                  strokeWidth="1.8"
-                />
-              </svg>
+              <FiCamera size={16} strokeWidth={2} />
             </button>
             <input
               ref={fotoInputRef}
@@ -313,280 +430,284 @@ function Perfil() {
               className="hidden"
             />
           </div>
-          <div className="flex flex-col ">
-            <h1
-              className="mt-4 text-2xl text-[#F5F3FF]"
-              style={{ fontFamily: "'Fraunces', 'Georgia', serif" }}
+
+          <h1 className="mt-4 text-2xl text-[#F5F3FF] [font-family:'Montserrat',sans-serif] font-bold">
+            {form.nome || (carregando ? 'Carregando...' : 'Seu nome')}
+          </h1>
+          <p className="text-sm text-[#B6AEE8]">@{form.apelido || 'apelido'}</p>
+
+          {/* SELETOR DE ABAS */}
+          <div className="mt-7 flex gap-8 border-b border-white/10 w-full justify-center">
+            {(['dados', 'preferencias'] as const).map((chave) => (
+              <button
+                key={chave}
+                onClick={() => setAba(chave)}
+                className={`relative pb-3 text-sm transition-colors ${
+                  aba === chave
+                    ? 'text-[#F5F3FF]'
+                    : 'text-[#9A92D6] hover:text-[#C9C3F2]'
+                }`}
+              >
+                {chave === 'dados' ? 'Meus dados' : 'Preferências'}
+                {aba === chave && (
+                  <span className="absolute left-0 right-0 -bottom-[1px] h-[2px] bg-[#FFA400] rounded-full" />
+                )}
+              </button>
+            ))}
+          </div>
+
+          {/* CONTEÚDO */}
+          <div className="mt-6 w-full bg-white/[0.06] backdrop-blur-xl border border-white/10 rounded-tl-[36px] rounded-br-[36px] rounded-tr-xl rounded-bl-xl p-6 sm:p-8">
+            {aba === 'dados' ? (
+              <div className="flex flex-col gap-5">
+                {salvo && (
+                  <span className="text-sm text-[#B7E8C0] text-center">
+                    Alterações salvas
+                  </span>
+                )}
+
+                <LinhaDado label="Nome completo" valor={form.nome || '—'} />
+                <LinhaDado
+                  label="Apelido"
+                  valor={form.apelido ? `@${form.apelido}` : '—'}
+                />
+                <LinhaDado
+                  label="E-mail"
+                  valor={form.email ? mascararEmail(form.email) : '—'}
+                />
+                <div className="grid sm:grid-cols-2 gap-5">
+                  <LinhaDado label="Estado" valor={nomeEstado(form.estado)} />
+                  <LinhaDado
+                    label="Data de nascimento"
+                    valor={formatarData(form.nascimento)}
+                  />
+                </div>
+
+                <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-3 pt-2">
+                  <button
+                    type="button"
+                    onClick={abrirEdicao}
+                    className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#FFA400] text-[#2E2A6B] text-sm font-semibold hover:brightness-105 transition"
+                  >
+                    <FiEdit2 size={14} strokeWidth={2.5} />
+                    Editar informações
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => navigate('/recuperar-senha')}
+                    className="flex items-center gap-1.5 text-sm text-[#FFA400] hover:brightness-110"
+                  >
+                    <FiLock size={14} strokeWidth={2.5} />
+                    Alterar senha
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="flex flex-col gap-8">
+                <section>
+                  <h2 className="text-sm text-[#B6AEE8] mb-4">
+                    Partido preferido
+                  </h2>
+                  {partidos.length === 0 ? (
+                    <EstadoVazio texto="Você ainda não favoritou nenhum partido." />
+                  ) : (
+                    <CarrosselAvatares
+                      itens={partidos.map((p) => ({
+                        id: p.id,
+                        legenda: p.sigla,
+                        cor: p.cor,
+                        rotulo: p.sigla.slice(0, 3),
+                      }))}
+                      // TODO: confirmar a rota real da página individual do partido.
+                      aoClicar={(id) => navigate(`/partido/${id}`)}
+                      aoRemover={(id) =>
+                        setPartidos((cur) => cur.filter((x) => x.id !== id))
+                      }
+                    />
+                  )}
+                </section>
+
+                <section>
+                  <h2 className="text-sm text-[#B6AEE8] mb-4">
+                    Candidatos favoritos
+                  </h2>
+                  {candidatos.length === 0 ? (
+                    <EstadoVazio texto="Você ainda não favoritou nenhum candidato." />
+                  ) : (
+                    <CarrosselAvatares
+                      itens={candidatos.map((c) => ({
+                        id: c.id,
+                        legenda: c.nome,
+                        rotulo: c.nome
+                          .split(' ')
+                          .map((p) => p[0])
+                          .slice(0, 2)
+                          .join(''),
+                      }))}
+                      // TODO: confirmar a rota real da página individual do candidato.
+                      aoClicar={(id) => navigate(`/candidato/${id}`)}
+                      aoRemover={(id) =>
+                        setCandidatos((cur) => cur.filter((x) => x.id !== id))
+                      }
+                    />
+                  )}
+                </section>
+
+                <p className="text-xs text-[#8A82C4] leading-relaxed">
+                  Esses dados são de teste. Quando os partidos e candidatos
+                  estiverem conectados à API, a foto/bandeira real de cada um
+                  aparece aqui, e o clique leva para a página individual deles.
+                </p>
+              </div>
+            )}
+          </div>
+
+          {/* ZONA DE CONFIGURAÇÕES — última opção da página */}
+          <div className="mt-10 pt-6 border-t border-white/10 w-full flex justify-center">
+            <button
+              type="button"
+              onClick={handleSair}
+              className="flex items-center gap-2 text-sm text-[#C9C3F2] hover:text-[#D05D5D] transition"
             >
-              {form.nome || 'Seu nome'}
-            </h1>
-            <p className="text-sm text-[#B6AEE8]">
-              @{form.apelido || 'apelido'}
-            </p>
+              <FiLogOut size={15} strokeWidth={2.5} />
+              Sair da conta
+            </button>
           </div>
         </div>
-        {/* SELETOR DE ABAS */}
-        <div className="mt-7 flex gap-8 border-b border-white/10 w-full justify-center">
-          {(['dados', 'preferencias'] as const).map((chave) => (
+      </div>
+
+      {/* MODAL DE EDIÇÃO */}
+      {editando && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
+          <div className="relative w-full max-w-md rounded-[32px] bg-white p-6 sm:p-7 text-[#2d2d6b] shadow-[0_35px_60px_-15px_rgba(0,0,0,0.45)] max-h-[85vh] overflow-y-auto">
             <button
-              key={chave}
-              onClick={() => setAba(chave)}
-              className={`relative pb-3 text-sm transition-colors ${
-                aba === chave
-                  ? 'text-[#F5F3FF]'
-                  : 'text-[#9A92D6] hover:text-[#C9C3F2]'
-              }`}
+              type="button"
+              onClick={cancelarEdicao}
+              aria-label="Fechar"
+              className="absolute top-5 right-5 text-[#8b87a3] hover:text-[#2d2d6b] transition"
             >
-              {chave === 'dados' ? 'Meus dados' : 'Preferências'}
-              {aba === chave && (
-                <span className="absolute left-0 right-0 -bottom-[1px] h-[2px] bg-[#E8B04B] rounded-full" />
-              )}
+              <FiX size={20} />
             </button>
-          ))}
-        </div>
 
-        {/* CONTEÚDO */}
-        <div className="mt-6 w-full bg-white/[0.06] backdrop-blur-xl border border-white/10 rounded-tl-[36px] rounded-br-[36px] rounded-tr-xl rounded-bl-xl p-6 sm:p-8">
-          {aba === 'dados' ? (
-            <div className="flex flex-col gap-5">
-              <Campo label="Nome completo">
+            <h2 className="[font-family:'Montserrat',sans-serif] font-bold text-[19px] mb-5">
+              Editar informações
+            </h2>
+
+            <div className="flex flex-col gap-4">
+              <CampoModal label="Nome completo">
                 <input
-                  value={form.nome}
-                  onChange={(e) => atualizarCampo('nome', e.target.value)}
-                  className="campo-input"
+                  value={rascunho.nome}
+                  onChange={(e) => atualizarRascunho('nome', e.target.value)}
+                  className="campo-input-modal"
                 />
-              </Campo>
+              </CampoModal>
 
-              <div className="grid sm:grid-cols-2 gap-5">
-                <Campo label="Apelido">
+              <div className="grid sm:grid-cols-2 gap-4">
+                <CampoModal label="Apelido">
                   <input
-                    value={form.apelido}
-                    onChange={(e) => atualizarCampo('apelido', e.target.value)}
-                    className="campo-input"
+                    value={rascunho.apelido}
+                    onChange={(e) =>
+                      atualizarRascunho('apelido', e.target.value)
+                    }
+                    className="campo-input-modal"
                   />
-                </Campo>
-                <Campo label="E-mail">
+                </CampoModal>
+                <CampoModal label="E-mail">
                   <input
                     type="email"
-                    value={form.email}
-                    onChange={(e) => atualizarCampo('email', e.target.value)}
-                    className="campo-input"
+                    value={rascunho.email}
+                    onChange={(e) => atualizarRascunho('email', e.target.value)}
+                    className="campo-input-modal"
                   />
-                </Campo>
+                </CampoModal>
               </div>
 
-              <div className="grid sm:grid-cols-2 gap-5">
-                <Campo label="Estado">
+              <div className="grid sm:grid-cols-2 gap-4">
+                <CampoModal label="Estado">
                   <select
-                    value={form.estado}
-                    onChange={(e) => atualizarCampo('estado', e.target.value)}
-                    className="campo-input"
+                    value={rascunho.estado}
+                    onChange={(e) =>
+                      atualizarRascunho('estado', e.target.value)
+                    }
+                    className="campo-input-modal"
                   >
                     {ESTADOS.map((e) => (
-                      <option key={e.uf} value={e.uf} className="text-black">
+                      <option key={e.uf} value={e.uf}>
                         {e.nome}
                       </option>
                     ))}
                   </select>
-                </Campo>
-                <Campo label="Data de nascimento">
+                </CampoModal>
+                <CampoModal label="Data de nascimento">
                   <input
                     type="date"
-                    value={form.nascimento}
+                    value={rascunho.nascimento}
                     onChange={(e) =>
-                      atualizarCampo('nascimento', e.target.value)
+                      atualizarRascunho('nascimento', e.target.value)
                     }
-                    className="campo-input"
+                    className="campo-input-modal"
                   />
-                </Campo>
-              </div>
-
-              <div className="pt-1">
-                <button
-                  type="button"
-                  onClick={() => setMostrarSenha((v) => !v)}
-                  className="text-sm text-[#E8B04B] hover:brightness-110"
-                >
-                  {mostrarSenha
-                    ? 'Cancelar alteração de senha'
-                    : 'Alterar senha'}
-                </button>
-
-                {mostrarSenha && (
-                  <div className="mt-4 flex flex-col gap-4 border-t border-white/10 pt-4">
-                    <Campo label="Senha atual">
-                      <input
-                        type="password"
-                        value={senha.atual}
-                        onChange={(e) =>
-                          setSenha((s) => ({ ...s, atual: e.target.value }))
-                        }
-                        className="campo-input"
-                      />
-                    </Campo>
-                    <div className="grid sm:grid-cols-2 gap-5">
-                      <Campo label="Nova senha">
-                        <input
-                          type="password"
-                          value={senha.nova}
-                          onChange={(e) =>
-                            setSenha((s) => ({ ...s, nova: e.target.value }))
-                          }
-                          className="campo-input"
-                        />
-                      </Campo>
-                      <Campo label="Confirmar nova senha">
-                        <input
-                          type="password"
-                          value={senha.confirmar}
-                          onChange={(e) =>
-                            setSenha((s) => ({
-                              ...s,
-                              confirmar: e.target.value,
-                            }))
-                          }
-                          className="campo-input"
-                        />
-                      </Campo>
-                    </div>
-                    {!senhasConferem && (
-                      <p className="text-xs text-[#F2A6A6]">
-                        As senhas novas não coincidem.
-                      </p>
-                    )}
-                  </div>
-                )}
-              </div>
-
-              <div className="flex items-center justify-end gap-3 pt-2">
-                {salvo && (
-                  <span className="text-sm text-[#B7E8C0]">
-                    Alterações salvas
-                  </span>
-                )}
-                <button
-                  type="button"
-                  onClick={salvarAlteracoes}
-                  disabled={!senhasConferem}
-                  className="px-6 py-2.5 rounded-full bg-[#E8B04B] text-[#2E2A6B] text-sm font-medium hover:brightness-105 disabled:opacity-40 disabled:cursor-not-allowed transition"
-                >
-                  Salvar alterações
-                </button>
+                </CampoModal>
               </div>
             </div>
-          ) : (
-            <div className="flex flex-col gap-7">
-              <section>
-                <h2 className="text-sm text-[#B6AEE8] mb-3">
-                  Partido preferido
-                </h2>
-                {partidos.length === 0 ? (
-                  <EstadoVazio texto="Você ainda não favoritou nenhum partido." />
-                ) : (
-                  <div className="flex flex-col gap-2">
-                    {partidos.map((p) => (
-                      <div
-                        key={p.id}
-                        className="flex items-center gap-3 bg-white/[0.05] border border-white/10 rounded-2xl px-4 py-3"
-                      >
-                        <span
-                          className="w-9 h-9 rounded-full flex items-center justify-center text-xs font-semibold text-[#1c1a45]"
-                          style={{ background: p.cor }}
-                        >
-                          {p.sigla.slice(0, 3)}
-                        </span>
-                        <div className="flex-1">
-                          <p className="text-sm text-[#F5F3FF]">{p.nome}</p>
-                          <p className="text-xs text-[#9A92D6]">{p.sigla}</p>
-                        </div>
-                        <BotaoFavorito
-                          ativo
-                          onClick={() =>
-                            setPartidos((cur) =>
-                              cur.filter((x) => x.id !== p.id),
-                            )
-                          }
-                        />
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </section>
 
-              <section>
-                <h2 className="text-sm text-[#B6AEE8] mb-3">
-                  Candidatos favoritos
-                </h2>
-                {candidatos.length === 0 ? (
-                  <EstadoVazio texto="Você ainda não favoritou nenhum candidato." />
-                ) : (
-                  <div className="flex flex-col gap-2">
-                    {candidatos.map((c) => (
-                      <div
-                        key={c.id}
-                        className="flex items-center gap-3 bg-white/[0.05] border border-white/10 rounded-2xl px-4 py-3"
-                      >
-                        <span className="w-9 h-9 rounded-full bg-[#463F9E] flex items-center justify-center text-xs text-[#E9E6FF]">
-                          {c.nome
-                            .split(' ')
-                            .map((p) => p[0])
-                            .slice(0, 2)
-                            .join('')}
-                        </span>
-                        <div className="flex-1">
-                          <p className="text-sm text-[#F5F3FF]">{c.nome}</p>
-                          <p className="text-xs text-[#9A92D6]">
-                            {c.cargo} · {c.partido}
-                          </p>
-                        </div>
-                        <BotaoFavorito
-                          ativo
-                          onClick={() =>
-                            setCandidatos((cur) =>
-                              cur.filter((x) => x.id !== c.id),
-                            )
-                          }
-                        />
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </section>
-
-              <p className="text-xs text-[#8A82C4] leading-relaxed">
-                Esses dados são de teste. Quando a página individual de partidos
-                e candidatos existir, o botão de favoritar em cada uma delas vai
-                alimentar essa lista automaticamente.
-              </p>
+            <div className="flex items-center justify-end gap-3 mt-6">
+              <button
+                type="button"
+                onClick={cancelarEdicao}
+                className="px-5 py-2.5 rounded-full text-sm font-semibold text-[#5b5776] hover:bg-[#F4F3FA] transition"
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                onClick={salvarEdicao}
+                className="px-6 py-2.5 rounded-full bg-[#2E2A47] text-white text-sm font-semibold hover:brightness-110 transition"
+              >
+                Salvar alterações
+              </button>
             </div>
-          )}
+          </div>
         </div>
-      </div>
+      )}
 
       <style>{`
-        .campo-input {
+        .campo-input-modal {
           width: 100%;
-          background: rgba(255,255,255,0.05);
-          border: 1px solid rgba(255,255,255,0.14);
+          background: #F7F5FF;
+          border: 1px solid #E4E0F7;
           border-radius: 12px;
           padding: 10px 14px;
           font-size: 14px;
-          color: #F5F3FF;
+          color: #2d2d6b;
           outline: none;
           transition: border-color 0.15s ease;
         }
-        .campo-input:focus {
-          border-color: #E8B04B;
+        .campo-input-modal:focus {
+          border-color: #FFA400;
         }
-        .campo-input::placeholder {
-          color: #8A82C4;
+        .carrossel-scroll {
+          scrollbar-width: none;
+          -ms-overflow-style: none;
+        }
+        .carrossel-scroll::-webkit-scrollbar {
+          display: none;
         }
       `}</style>
+    </section>
+  );
+}
+
+function LinhaDado({ label, valor }: { label: string; valor: string }) {
+  return (
+    <div className="flex flex-col gap-1">
+      <span className="text-xs text-[#9A92D6]">{label}</span>
+      <span className="text-sm text-[#F5F3FF]">{valor}</span>
     </div>
   );
 }
 
-function Campo({
+function CampoModal({
   label,
   children,
 }: {
@@ -595,7 +716,7 @@ function Campo({
 }) {
   return (
     <label className="flex flex-col gap-1.5">
-      <span className="text-xs text-[#9A92D6]">{label}</span>
+      <span className="text-xs text-[#5b5776] font-semibold">{label}</span>
       {children}
     </label>
   );
@@ -609,34 +730,129 @@ function EstadoVazio({ texto }: { texto: string }) {
   );
 }
 
-function BotaoFavorito({
-  ativo,
-  onClick,
+// -----------------------------------------------------------------------------
+// CARROSSEL DE AVATARES — usado pra partidos e candidatos favoritos
+// -----------------------------------------------------------------------------
+interface ItemCarrossel {
+  id: string;
+  legenda: string;
+  rotulo: string;
+  cor?: string;
+  foto?: string | null;
+}
+
+function CarrosselAvatares({
+  itens,
+  aoClicar,
+  aoRemover,
 }: {
-  ativo: boolean;
-  onClick: () => void;
+  itens: ItemCarrossel[];
+  aoClicar: (id: string) => void;
+  aoRemover: (id: string) => void;
 }) {
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [podeEsquerda, setPodeEsquerda] = useState(false);
+  const [podeDireita, setPodeDireita] = useState(false);
+
+  function atualizarSetas() {
+    const el = scrollRef.current;
+    if (!el) return;
+    setPodeEsquerda(el.scrollLeft > 4);
+    setPodeDireita(el.scrollLeft + el.clientWidth < el.scrollWidth - 4);
+  }
+
+  useEffect(() => {
+    atualizarSetas();
+    const el = scrollRef.current;
+    if (!el) return;
+    const onScroll = () => atualizarSetas();
+    el.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll);
+    return () => {
+      el.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onScroll);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [itens.length]);
+
+  function rolar(direcao: 1 | -1) {
+    scrollRef.current?.scrollBy({ left: direcao * 220, behavior: 'smooth' });
+  }
+
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      aria-label={ativo ? 'Remover dos favoritos' : 'Adicionar aos favoritos'}
-      className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/10 transition"
-    >
-      <svg
-        width="18"
-        height="18"
-        viewBox="0 0 24 24"
-        fill={ativo ? '#E8B04B' : 'none'}
+    <div className="relative flex items-center">
+      {podeEsquerda && (
+        <button
+          type="button"
+          onClick={() => rolar(-1)}
+          aria-label="Ver anteriores"
+          className="absolute left-[-8px] z-10 w-7 h-7 rounded-full bg-[#2E2A6B] border border-white/20 text-white flex items-center justify-center shadow-md hover:bg-[#3A3480] transition"
+        >
+          <FiChevronLeft size={15} />
+        </button>
+      )}
+
+      <div
+        ref={scrollRef}
+        className="carrossel-scroll flex gap-4 overflow-x-auto scroll-smooth px-1 py-1"
       >
-        <path
-          d="M12 4.5l2.4 5.1 5.6.7-4.1 3.9 1.1 5.5-4.9-2.8-4.9 2.8 1.1-5.5-4.1-3.9 5.6-.7L12 4.5z"
-          stroke="#E8B04B"
-          strokeWidth="1.5"
-          strokeLinejoin="round"
-        />
-      </svg>
-    </button>
+        {itens.map((item) => (
+          <div key={item.id} className="relative shrink-0 w-[68px]">
+            <button
+              type="button"
+              onClick={() => aoClicar(item.id)}
+              className="flex flex-col items-center gap-1.5 w-full group"
+            >
+              <span
+                className="w-16 h-16 rounded-full flex items-center justify-center text-xs font-bold text-white overflow-hidden border-2 border-white/10 group-hover:border-[#FFA400] transition"
+                style={{ background: item.cor ?? '#463F9E' }}
+              >
+                {item.foto ? (
+                  <img
+                    src={item.foto}
+                    alt={item.legenda}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  item.rotulo
+                )}
+              </span>
+              <span className="text-[11px] text-[#B6AEE8] text-center leading-tight line-clamp-2 w-full">
+                {item.legenda}
+              </span>
+            </button>
+
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                aoRemover(item.id);
+              }}
+              aria-label="Remover dos favoritos"
+              className="absolute -top-0.5 -right-0.5 w-5 h-5 rounded-full bg-[#2E2A6B] border border-white/20 flex items-center justify-center hover:bg-[#3A3480] transition"
+            >
+              <FiStar
+                size={10}
+                strokeWidth={2}
+                color="#FFA400"
+                fill="#FFA400"
+              />
+            </button>
+          </div>
+        ))}
+      </div>
+
+      {podeDireita && (
+        <button
+          type="button"
+          onClick={() => rolar(1)}
+          aria-label="Ver mais"
+          className="absolute right-[-8px] z-10 w-7 h-7 rounded-full bg-[#2E2A6B] border border-white/20 text-white flex items-center justify-center shadow-md hover:bg-[#3A3480] transition"
+        >
+          <FiChevronRight size={15} />
+        </button>
+      )}
+    </div>
   );
 }
 
