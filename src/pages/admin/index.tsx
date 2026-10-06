@@ -18,6 +18,10 @@ import type {
   FormacaoAcademica,
   Partido,
 } from '../../services/api';
+<<<<<<< HEAD
+=======
+import Footer from '../../components/footer/footer';
+>>>>>>> 8dc386b9e0015562ba550350af953f0801dd6614
 
 const bolasConfig = [
   { size: 280, top: '-40px', left: '-30px', opacity: 0.25 },
@@ -526,10 +530,10 @@ export default function Admin() {
             <div>
               <button
                 type="button"
-                onClick={() => navigate('/')}
+                onClick={() => navigate('/searchpol')}
                 className="px-4 py-4 text-xs font-semibold text-[#3f5ca7] hover:underline"
               >
-                Voltar ao site principal
+                Voltar
               </button>
             </div>
           </div>
@@ -1078,6 +1082,8 @@ export default function Admin() {
           </div>
         </div>
       )}
+
+      <Footer />
     </section>
   );
 }

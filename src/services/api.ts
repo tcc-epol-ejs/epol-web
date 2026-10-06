@@ -5,6 +5,7 @@ export interface Usuario {
   nome: string;
   apelido: string | null;
   email: string;
+  adm: boolean;
 }
 
 // ---------- PARTIDOS ----------
