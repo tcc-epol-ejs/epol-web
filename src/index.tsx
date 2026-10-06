@@ -9,6 +9,7 @@ import QuemSomos from './pages/quem_somos';
 import Main from './pages/main';
 import Admin from './pages/admin';
 import SearchPol from './pages/searchpol';
+import VisualizadorGeografico from './pages/visualizador_geografico';
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
         <Route path="/cadastro" element={<Cadastro />} />
         <Route path="/recuperar-senha" element={<RecuperarSenha />} />
         <Route path="/etitulo" element={<Etitulo />} />
+        <Route path="/visualizador" element={<VisualizadorGeografico />} />
         <Route path="/match-politico" element={<MatchPolitico />} />
         <Route path="/quem-somos" element={<QuemSomos />} />
         <Route path="/main" element={<Main />} />
