@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
 import { FiSearch, FiSliders } from 'react-icons/fi';
-
 import Header from '../../components/header';
 import Brazil from '@react-map/brazil';
 import CardEstado from '../../components/cardEstado/index';
@@ -107,10 +106,11 @@ export default function VisualizadorGeografico() {
   return (
     <main className="min-h-screen w-full bg-[#FFA400] overflow-hidden">
       <style>{`
-        .epol-map { width: 100%; max-width: 620px; height: auto; display: block; overflow: visible; }
-        .epol-map path { fill: #D5D5D5; stroke: #B4B4B4; stroke-width: 1.2; cursor: pointer; transition: fill 0.2s ease, filter 0.2s ease; transform-box: fill-box; transform-origin: center; }
-        .epol-map path:hover { fill: #2A82D7; filter: brightness(1.05); }
-      `}</style>
+  .epol-map { width: 100%; max-width: 620px; height: auto; display: block; overflow: visible; }
+  .epol-map svg { width: 100%; height: auto; }
+  .epol-map svg path { fill: #D5D5D5 !important; stroke: #B4B4B4; stroke-width: 1.2; cursor: pointer; transition: fill 0.2s ease, filter 0.2s ease; }
+  .epol-map svg path:hover { fill: #2A82D7 !important; filter: brightness(1.05); }
+`}</style>
 
       <div className="fixed top-0 left-0 z-[1000] w-full">
         <Header isBgWhite />
