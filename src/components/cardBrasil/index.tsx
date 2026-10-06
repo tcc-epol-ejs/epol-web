@@ -8,13 +8,19 @@ interface CardBrasilProps {
 export default function CardBrasil({ candidatos }: CardBrasilProps) {
   const navigate = useNavigate();
 
-  const presidente = candidatos.find(
-    (c) => c.candidatura === 'Presidente' && c.cargo_atual === 'Presidente',
-  );
-  const vicePresidente = candidatos.find(
-    (c) =>
-      c.candidatura === 'Presidente' && c.cargo_atual === 'Vice-Presidente',
-  );
+  const presidentes = candidatos.filter((c) => c.candidatura === 'Presidente');
+  const presidente =
+    presidentes.find(
+      (c) =>
+        c.cargo_atual.toLowerCase().includes('presidente') &&
+        !c.cargo_atual.toLowerCase().includes('vice'),
+    ) ??
+    presidentes[0] ??
+    null;
+
+  const vice =
+    presidentes.find((c) => c.cargo_atual.toLowerCase().includes('vice')) ??
+    null;
 
   return (
     <div className="rounded-2xl bg-white p-4 shadow-lg w-full">
@@ -55,29 +61,29 @@ export default function CardBrasil({ candidatos }: CardBrasilProps) {
         </div>
       )}
 
-      {vicePresidente && (
+      {vice && (
         <div>
           <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">
             Vice-Presidente
           </p>
           <button
-            onClick={() => navigate(`/candidatos/${vicePresidente.id}`)}
+            onClick={() => navigate(`/candidatos/${vice.id}`)}
             className="flex items-center gap-2 w-full text-left hover:opacity-80 transition-opacity"
           >
-            {vicePresidente.foto_url && (
+            {vice.foto_url && (
               <img
-                src={vicePresidente.foto_url}
-                alt={vicePresidente.nome_politico}
+                src={vice.foto_url}
+                alt={vice.nome_politico}
                 className="w-10 h-10 rounded-full object-cover flex-shrink-0"
               />
             )}
             <div>
               <p className="text-xs font-bold text-[#2A2A72]">
-                {vicePresidente.nome_politico}
+                {vice.nome_politico}
               </p>
-              {vicePresidente.partidos && (
+              {vice.partidos && (
                 <p className="text-[10px] text-gray-500">
-                  ({vicePresidente.partidos.sigla})
+                  ({vice.partidos.sigla})
                 </p>
               )}
             </div>
@@ -85,7 +91,7 @@ export default function CardBrasil({ candidatos }: CardBrasilProps) {
         </div>
       )}
 
-      {!presidente && !vicePresidente && (
+      {!presidente && !vice && (
         <p className="text-xs text-gray-400">Nenhum dado cadastrado.</p>
       )}
     </div>

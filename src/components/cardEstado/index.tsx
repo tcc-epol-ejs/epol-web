@@ -19,62 +19,120 @@ export default function CardEstado({
   );
 
   return (
-    <div className="rounded-2xl bg-white p-4 shadow-lg w-full max-w-[260px]">
-      <div className="flex items-center gap-2 mb-3">
-        {governador?.partidos?.bandeira_url && (
-          <img
-            src={governador.partidos.bandeira_url}
-            alt=""
-            className="w-6 h-6 rounded-full object-cover"
-          />
-        )}
-        <p className="font-black text-[#2A2A72] uppercase text-sm tracking-wide">
-          {nomeEstado} ({sigla})
-        </p>
+    <div className="w-full max-w-[285px] rounded-[14px] bg-white px-4 py-3 shadow-[0_5px_15px_rgba(0,0,0,0.15)]">
+      {/* CABEÇALHO */}
+      <div className="mb-3 flex items-center gap-2 border-b border-gray-200 pb-2">
+        {/* Placeholder da bandeira do estado */}
+        <div className="flex h-[25px] w-[35px] items-center justify-center rounded-[4px] bg-[#2A2A72] text-[9px] font-black text-white">
+          {sigla}
+        </div>
+
+        <div className="leading-none">
+          <p className="text-[13px] font-black uppercase text-[#2A2A72]">
+            {nomeEstado}
+          </p>
+
+          <p className="mt-[2px] text-[10px] font-bold text-gray-400">
+            {sigla}
+          </p>
+        </div>
       </div>
 
-      {governador ? (
-        <div>
-          <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">
-            Governador(a)
+      {/* CIDADE */}
+      <div className="mb-3">
+        <p className="mb-1 text-[8px] font-extrabold uppercase tracking-wide text-[#555]">
+          Cidade
+        </p>
+
+        <select
+          defaultValue=""
+          className="h-[27px] w-full rounded-[6px] border border-gray-200 bg-[#F7F7F7] px-2 text-[9px] font-semibold text-[#555] outline-none"
+        >
+          <option value="" disabled>
+            Selecione uma cidade
+          </option>
+
+          <option value="capital">Capital</option>
+        </select>
+      </div>
+
+      {/* GOVERNADOR */}
+      {governador && (
+        <div className="mb-3">
+          <p className="mb-1 text-[8px] font-extrabold uppercase tracking-wide text-[#555]">
+            Governador(a):
           </p>
+
           <button
+            type="button"
             onClick={() => navigate(`/candidatos/${governador.id}`)}
-            className="flex items-center gap-2 w-full text-left hover:opacity-80 transition-opacity"
+            className="flex w-full items-center gap-2 text-left"
           >
-            {governador.foto_url && (
+            {governador.foto_url ? (
               <img
                 src={governador.foto_url}
                 alt={governador.nome_politico}
-                className="w-10 h-10 rounded-full object-cover flex-shrink-0"
+                className="h-[38px] w-[38px] shrink-0 rounded-[5px] object-cover"
               />
+            ) : (
+              <div className="h-[38px] w-[38px] shrink-0 rounded-[5px] bg-gray-200" />
             )}
-            <div>
-              <p className="text-xs font-bold text-[#2A2A72]">
+
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-[9px] font-black leading-tight text-[#2A2A72]">
                 {governador.nome_politico}
               </p>
+
               {governador.partidos && (
-                <p className="text-[10px] text-gray-500">
-                  ({governador.partidos.sigla})
+                <p className="mt-[2px] text-[8px] font-semibold text-gray-400">
+                  {governador.partidos.sigla}
                 </p>
               )}
             </div>
           </button>
-
-          {governador.vice && (
-            <div className="mt-2">
-              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">
-                Vice-Governador(a)
-              </p>
-              <p className="text-xs text-[#2A2A72] font-semibold">
-                {governador.vice}
-              </p>
-            </div>
-          )}
         </div>
-      ) : (
-        <p className="text-xs text-gray-400">Nenhum governador cadastrado.</p>
       )}
+
+      {/* VICE GOVERNADOR */}
+      {governador?.vice && (
+        <div className="mb-3">
+          <p className="mb-1 text-[8px] font-extrabold uppercase tracking-wide text-[#555]">
+            Vice-Governador(a):
+          </p>
+
+          <div className="flex items-center justify-end">
+            <p className="max-w-[190px] text-right text-[9px] font-bold leading-tight text-[#2A2A72]">
+              {governador.vice}
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* PREFEITO */}
+      <div className="mb-3">
+        <p className="mb-1 text-[8px] font-extrabold uppercase tracking-wide text-[#555]">
+          Prefeito(a):
+        </p>
+
+        <div className="flex items-center justify-end">
+          <p className="text-right text-[9px] font-bold text-gray-400">
+            Informação em breve
+          </p>
+        </div>
+      </div>
+
+      {/* VICE-PREFEITO */}
+      <div>
+        <p className="mb-1 text-[8px] font-extrabold uppercase tracking-wide text-[#555]">
+          Vice-Prefeito(a):
+        </p>
+
+        <div className="flex items-center justify-end">
+          <p className="text-right text-[9px] font-bold text-gray-400">
+            Informação em breve
+          </p>
+        </div>
+      </div>
     </div>
   );
 }
