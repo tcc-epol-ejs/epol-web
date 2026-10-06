@@ -1,8 +1,12 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { FiSearch, FiSliders } from 'react-icons/fi';
 
 import Header from '../../components/header';
 import Brazil from '@react-map/brazil';
+import CardEstado from '../../components/cardEstado/index';
+import CardBrasil from '../../components/cardBrasil/index';
+import { listarCandidatos } from '../../services/api';
+import type { Candidato } from '../../services/api';
 
 interface Estado {
   id: string;
@@ -42,32 +46,40 @@ const ESTADOS: Estado[] = [
 
 export default function VisualizadorGeografico() {
   const [estadoHover, setEstadoHover] = useState<string | null>(null);
+  const [estadoFixo, setEstadoFixo] = useState<string | null>(null);
   const [pesquisa, setPesquisa] = useState('');
+  const [candidatos, setCandidatos] = useState<Candidato[]>([]);
+
+  useEffect(() => {
+    listarCandidatos().then(setCandidatos).catch(console.error);
+  }, []);
 
   const estadoEncontrado = useMemo(() => {
     const valor = pesquisa.trim().toLowerCase();
     if (!valor) return null;
     return (
       ESTADOS.find(
-        (estado) =>
-          estado.nome.toLowerCase().includes(valor) ||
-          estado.sigla.toLowerCase() === valor,
+        (e) =>
+          e.nome.toLowerCase().includes(valor) ||
+          e.sigla.toLowerCase() === valor,
       ) ?? null
     );
   }, [pesquisa]);
 
-  const estadoAtual =
-    estadoEncontrado ??
-    ESTADOS.find(
-      (estado) =>
-        estado.nome === estadoHover ||
-        estado.sigla === estadoHover ||
-        estado.id === estadoHover,
-    ) ??
-    null;
+  const siglaAtual =
+    estadoFixo ?? estadoHover ?? estadoEncontrado?.sigla ?? null;
 
-  function obterEstadoDoMapa(event: React.MouseEvent<SVGPathElement>) {
-    const target = event.currentTarget;
+  const estadoAtual = siglaAtual
+    ? (ESTADOS.find(
+        (e) =>
+          e.sigla === siglaAtual ||
+          e.id === siglaAtual ||
+          e.nome === siglaAtual,
+      ) ?? null)
+    : null;
+
+  function obterEstadoDoMapa(event: React.MouseEvent<HTMLDivElement>) {
+    const target = event.target as SVGPathElement;
     const id =
       target.getAttribute('id') ??
       target.getAttribute('name') ??
@@ -76,8 +88,18 @@ export default function VisualizadorGeografico() {
     setEstadoHover(id);
   }
 
+  function clicarEstadoNoMapa(event: React.MouseEvent<HTMLDivElement>) {
+    const target = event.target as SVGPathElement;
+    const id =
+      target.getAttribute('id') ??
+      target.getAttribute('name') ??
+      target.getAttribute('data-id');
+    if (!id) return;
+    setEstadoFixo((prev) => (prev === id ? null : id));
+  }
+
   function limparEstado() {
-    if (!pesquisa) {
+    if (!estadoFixo && !pesquisa) {
       setEstadoHover(null);
     }
   }
@@ -85,43 +107,19 @@ export default function VisualizadorGeografico() {
   return (
     <main className="min-h-screen w-full bg-[#FFA400] overflow-hidden">
       <style>{`
-        .epol-map {
-          width: 100%;
-          max-width: 620px;
-          height: auto;
-          display: block;
-          overflow: visible;
-        }
-
-        .epol-map path {
-          fill: #D5D5D5;
-          stroke: #B4B4B4;
-          stroke-width: 1.2;
-          cursor: pointer;
-          transition:
-            fill 0.2s ease,
-            transform 0.2s ease,
-            filter 0.2s ease;
-          transform-box: fill-box;
-          transform-origin: center;
-        }
-
-        .epol-map path:hover {
-          fill: #2A82D7;
-          filter: brightness(1.05);
-        }
+        .epol-map { width: 100%; max-width: 620px; height: auto; display: block; overflow: visible; }
+        .epol-map path { fill: #D5D5D5; stroke: #B4B4B4; stroke-width: 1.2; cursor: pointer; transition: fill 0.2s ease, filter 0.2s ease; transform-box: fill-box; transform-origin: center; }
+        .epol-map path:hover { fill: #2A82D7; filter: brightness(1.05); }
       `}</style>
 
-      {/* HEADER */}
       <div className="fixed top-0 left-0 z-[1000] w-full">
         <Header isBgWhite />
       </div>
 
-      {/* CONTEÚDO */}
       <section className="min-h-screen w-full px-6 pb-10 pt-[155px] md:px-10 lg:px-[65px]">
-        <div className="mx-auto grid min-h-[calc(100vh-155px)] w-full max-w-[1600px] grid-cols-1 gap-8 lg:grid-cols-[250px_minmax(420px,1fr)_300px]">
+        <div className="mx-auto grid min-h-[calc(100vh-155px)] w-full max-w-[1600px] grid-cols-1 gap-8 lg:grid-cols-[280px_minmax(420px,1fr)_300px]">
           {/* ESQUERDA */}
-          <div className="flex flex-col justify-center">
+          <div className="flex flex-col justify-center gap-4">
             <div className="select-none">
               <h1 className="font-[Fraunces] text-[43px] font-black italic uppercase leading-[0.95] tracking-[-0.03em] text-[#2A2A72] md:text-[48px]">
                 Visualizador
@@ -131,13 +129,13 @@ export default function VisualizadorGeografico() {
               </h2>
             </div>
 
-            <div className="mt-8 min-h-[220px]">
-              {estadoAtual && (
-                <div className="rounded-2xl border border-[#2A2A72]/10 bg-[#FFA400] p-1">
-                  {/* Espaço reservado para o futuro componente */}
-                </div>
-              )}
-            </div>
+            {estadoAtual && (
+              <CardEstado
+                nomeEstado={estadoAtual.nome}
+                sigla={estadoAtual.sigla}
+                candidatos={candidatos}
+              />
+            )}
           </div>
 
           {/* MAPA */}
@@ -145,10 +143,9 @@ export default function VisualizadorGeografico() {
             <div className="w-full max-w-[620px]">
               <div
                 className="epol-map w-full max-w-[620px]"
-                onMouseOver={
-                  obterEstadoDoMapa as unknown as React.MouseEventHandler<HTMLDivElement>
-                }
+                onMouseOver={obterEstadoDoMapa}
                 onMouseOut={limparEstado}
+                onClick={clicarEstadoNoMapa}
               >
                 <Brazil type="select-single" />
               </div>
@@ -163,7 +160,7 @@ export default function VisualizadorGeografico() {
                 <input
                   type="text"
                   value={pesquisa}
-                  onChange={(event) => setPesquisa(event.target.value)}
+                  onChange={(e) => setPesquisa(e.target.value)}
                   placeholder="Pesquisar..."
                   className="min-w-0 flex-1 bg-transparent text-[13px] outline-none placeholder:text-[#A0A0A0]"
                 />
@@ -187,7 +184,10 @@ export default function VisualizadorGeografico() {
                   {estadoEncontrado ? (
                     <button
                       type="button"
-                      onClick={() => setEstadoHover(estadoEncontrado.sigla)}
+                      onClick={() => {
+                        setEstadoFixo(estadoEncontrado.sigla);
+                        setPesquisa('');
+                      }}
                       className="flex w-full items-center justify-between rounded-xl px-3 py-2 text-left transition-colors hover:bg-[#F1F1F1]"
                     >
                       <div>
@@ -211,7 +211,7 @@ export default function VisualizadorGeografico() {
               )}
             </div>
 
-            <div className="min-h-[220px]" />
+            <CardBrasil candidatos={candidatos} />
           </div>
         </div>
       </section>
