@@ -322,6 +322,9 @@ function Perfil() {
         nome: usuario.nome ?? f.nome,
         apelido: usuario.apelido ?? f.apelido,
         email: usuario.email ?? f.email,
+        estado: usuario.estado ?? f.estado,
+        nascimento: usuario.data_nascimento ?? f.nascimento,
+        foto: usuario.foto_perfil_url ?? f.foto,
       }));
       sincronizouUsuario.current = true;
     }
@@ -465,12 +468,13 @@ function Perfil() {
                     Alterações salvas
                   </span>
                 )}
-
-                <LinhaDado label="Nome completo" valor={form.nome || '—'} />
-                <LinhaDado
-                  label="Apelido"
-                  valor={form.apelido ? `@${form.apelido}` : '—'}
-                />
+                <div className="grid sm:grid-cols-2 gap-5">
+                  <LinhaDado label="Nome completo" valor={form.nome || '—'} />
+                  <LinhaDado
+                    label="Apelido"
+                    valor={form.apelido ? `@${form.apelido}` : '—'}
+                  />
+                </div>
                 <LinhaDado
                   label="E-mail"
                   valor={form.email ? mascararEmail(form.email) : '—'}
@@ -483,7 +487,7 @@ function Perfil() {
                   />
                 </div>
 
-                <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-3 pt-2">
+                <div className="flex flex-wrap items-center gap-x-[57px] gap-y-3 pt-2">
                   <button
                     type="button"
                     onClick={abrirEdicao}

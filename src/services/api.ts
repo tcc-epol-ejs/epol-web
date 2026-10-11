@@ -5,6 +5,11 @@ export interface Usuario {
   nome: string;
   apelido: string | null;
   email: string;
+  estado: string;
+  data_nascimento: string; // "YYYY-MM-DD"
+  partido_preferencia_id: string | null;
+  adm: boolean;
+  foto_perfil_url: string | null;
 }
 
 // ---------- PARTIDOS ----------
@@ -116,9 +121,20 @@ export const cadastrar = (dados: {
   senha: string;
   estado: string;
   data_nascimento: string;
+  foto_perfil_url?: string | null;
 }) =>
   request<{ usuario: Usuario }>('/api/auth/cadastro', {
     method: 'POST',
+    body: JSON.stringify(dados),
+  });
+
+export const atualizarPerfil = (
+  token: string,
+  dados: { foto_perfil_url: string | null },
+) =>
+  request<{ usuario: Usuario }>('/api/auth/perfil', {
+    method: 'PATCH',
+    headers: { Authorization: `Bearer ${token}` },
     body: JSON.stringify(dados),
   });
 
@@ -237,7 +253,7 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
     ...options,
     headers: { 'Content-Type': 'application/json', ...options.headers },
   });
-  const data = await res.json();
-  if (!res.ok) throw new Error(data.erro || 'Erro na requisição');
+  const data = await res.json().catch(() => null);
+  if (!res.ok) throw new Error(data?.erro || 'Erro na requisição');
   return data as T;
 }
