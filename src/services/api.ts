@@ -117,7 +117,7 @@ export const cadastrar = (dados: {
   nome: string;
   apelido: string;
   email: string;
-  partido_preferencia_id: string | null;
+  partido_preferencia_id?: string | null;
   senha: string;
   estado: string;
   data_nascimento: string;
@@ -257,3 +257,11 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   if (!res.ok) throw new Error(data?.erro || 'Erro na requisição');
   return data as T;
 }
+
+
+export const excluirConta = (token: string, senha: string) =>
+  request<{ mensagem: string }>('/api/auth/conta', {
+    method: 'DELETE',
+    headers: { Authorization: `Bearer ${token}` },
+    body: JSON.stringify({ senha }),
+  });

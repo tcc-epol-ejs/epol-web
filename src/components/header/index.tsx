@@ -101,10 +101,18 @@ export default function Header({ isBgWhite, disableScrollHide }: HeaderProps) {
           >
             {nomeExibido}
           </span>
-          <div className="w-[40px] h-[40px] rounded-full bg-[#FFA400] flex items-center justify-center shrink-0">
-            <span className="text-white font-bold text-[16px]">
-              {nomeExibido.charAt(0).toUpperCase()}
-            </span>
+          <div className="w-[40px] h-[40px] rounded-full bg-[#FFA400] border-[2px] border-[#FFA400] flex items-center justify-center shrink-0 overflow-hidden">
+            {usuario.foto_perfil_url ? (
+              <img
+                src={usuario.foto_perfil_url}
+                alt="Foto de perfil"
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <span className="text-white font-bold text-[16px]">
+                {nomeExibido.charAt(0).toUpperCase()}
+              </span>
+            )}
           </div>
         </button>
       ) : (

@@ -9,15 +9,23 @@ import {
   FiLogOut,
   FiStar,
   FiX,
+  FiTrash2,
 } from 'react-icons/fi';
 import Header from '../../components/header';
 import { useAuth } from '../../contexts/AuthContext';
+import { atualizarPerfil, excluirConta } from '../../services/api';
+import {
+  uploadFotoPerfil,
+  FOTO_MAX_BYTES,
+  FOTO_TIPOS,
+} from '../../services/supabase';
+import SeletorPfpModal from '../../components/seletorPfpModal/index';
 
 function Perfil() {
   const navigate = useNavigate();
   // OBS: assumindo que o AuthContext expõe `logout` — ajusta esse nome se
   // no seu contexto real for diferente (ex: `sair`, `signOut`).
-  const { usuario, carregando, logout } = useAuth();
+  const { usuario, carregando, logout, token, salvarSessao } = useAuth();
 
   // -----------------------------------------------------------------------------
   // BLOBS DE FUNDO
@@ -316,25 +324,31 @@ function Perfil() {
   // esses campos também.
   const sincronizouUsuario = useRef(false);
   useEffect(() => {
-    if (usuario && !sincronizouUsuario.current) {
-      setForm((f) => ({
-        ...f,
-        nome: usuario.nome ?? f.nome,
-        apelido: usuario.apelido ?? f.apelido,
-        email: usuario.email ?? f.email,
-        estado: usuario.estado ?? f.estado,
-        nascimento: usuario.data_nascimento ?? f.nascimento,
-        foto: usuario.foto_perfil_url ?? f.foto,
-      }));
-      sincronizouUsuario.current = true;
-    }
+    if (!usuario || editando) return;
+    setForm((f) => ({
+      ...f,
+      nome: usuario.nome ?? f.nome,
+      apelido: usuario.apelido ?? f.apelido,
+      email: usuario.email ?? f.email,
+      estado: usuario.estado ?? f.estado,
+      nascimento: usuario.data_nascimento ?? f.nascimento,
+      foto: usuario.foto_perfil_url ?? f.foto,
+    }));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [usuario]);
 
   const [aba, setAba] = useState<'dados' | 'preferencias'>('dados');
   const [editando, setEditando] = useState(false);
   const [rascunho, setRascunho] = useState<PerfilForm>(form);
   const [salvo, setSalvo] = useState(false);
-  const fotoInputRef = useRef<HTMLInputElement | null>(null);
+  const [modalFoto, setModalFoto] = useState(false);
+  const [enviandoFoto, setEnviandoFoto] = useState(false);
+  const [erroFoto, setErroFoto] = useState<string | null>(null);
+  const [modalExclusao, setModalExclusao] = useState(false);
+  const [senhaExclusao, setSenhaExclusao] = useState('');
+  const [confirmSenhaExclusao, setConfirmSenhaExclusao] = useState('');
+  const [erroExclusao, setErroExclusao] = useState<string | null>(null);
+  const [enviandoExclusao, setEnviandoExclusao] = useState(false);
 
   const [partidos, setPartidos] = useState(PARTIDOS_TESTE);
   const [candidatos, setCandidatos] = useState(CANDIDATOS_TESTE);
@@ -371,16 +385,82 @@ function Perfil() {
     setTimeout(() => setSalvo(false), 2400);
   }
 
-  function escolherFoto(e: React.ChangeEvent<HTMLInputElement>) {
-    const arquivo = e.target.files?.[0];
-    if (!arquivo) return;
-    const url = URL.createObjectURL(arquivo);
-    atualizarCampo('foto', url);
+  async function enviarFoto(arquivo: File) {
+    if (!FOTO_TIPOS.includes(arquivo.type)) {
+      setErroFoto('Use uma imagem JPG, PNG ou WEBP.');
+      return;
+    }
+    if (arquivo.size > FOTO_MAX_BYTES) {
+      setErroFoto('A foto deve ter no máximo 2 MB.');
+      return;
+    }
+    if (!token) {
+      setErroFoto('Sua sessão expirou. Entre novamente.');
+      return;
+    }
+
+    setErroFoto(null);
+    setEnviandoFoto(true);
+
+    try {
+      const url = await uploadFotoPerfil(arquivo);
+
+      const { usuario: atualizado } = await atualizarPerfil(token, {
+        foto_perfil_url: url,
+      });
+
+      atualizarCampo('foto', url);
+      salvarSessao(atualizado, token);
+    } catch (err: any) {
+      setErroFoto(err.message || 'Não foi possível atualizar a foto.');
+    } finally {
+      setEnviandoFoto(false);
+    }
   }
 
   function handleSair() {
     logout();
     navigate('/');
+  }
+
+  function abrirExclusao() {
+    setSenhaExclusao('');
+    setConfirmSenhaExclusao('');
+    setErroExclusao(null);
+    setModalExclusao(true);
+  }
+
+  function fecharExclusao() {
+    if (enviandoExclusao) return;
+    setModalExclusao(false);
+  }
+
+  async function confirmarExclusao() {
+    if (!token) {
+      setErroExclusao('Sua sessão expirou. Entre novamente.');
+      return;
+    }
+    if (!senhaExclusao) {
+      setErroExclusao('Informe sua senha.');
+      return;
+    }
+    if (senhaExclusao !== confirmSenhaExclusao) {
+      setErroExclusao('As senhas não coincidem.');
+      return;
+    }
+
+    setErroExclusao(null);
+    setEnviandoExclusao(true);
+
+    try {
+      await excluirConta(token, senhaExclusao);
+      logout();
+      navigate('/');
+    } catch (err: any) {
+      setErroExclusao(err.message || 'Não foi possível excluir a conta.');
+    } finally {
+      setEnviandoExclusao(false);
+    }
   }
 
   const iniciais = form.nome
@@ -419,25 +499,25 @@ function Perfil() {
             </div>
             <button
               type="button"
-              onClick={() => fotoInputRef.current?.click()}
+              onClick={() => setModalFoto(true)}
+              disabled={enviandoFoto}
               aria-label="Alterar foto de perfil"
-              className="absolute bottom-0 right-0 w-9 h-9 rounded-full bg-[#FFA400] text-[#2E2A6B] flex items-center justify-center shadow-md hover:brightness-105 transition"
+              className="absolute bottom-0 right-0 w-9 h-9 rounded-full bg-[#FFA400] text-[#2E2A6B] flex items-center justify-center shadow-md hover:brightness-105 transition disabled:opacity-60"
             >
               <FiCamera size={16} strokeWidth={2} />
             </button>
-            <input
-              ref={fotoInputRef}
-              type="file"
-              accept="image/*"
-              onChange={escolherFoto}
-              className="hidden"
-            />
           </div>
 
           <h1 className="mt-4 text-2xl text-[#F5F3FF] [font-family:'Montserrat',sans-serif] font-bold">
             {form.nome || (carregando ? 'Carregando...' : 'Seu nome')}
           </h1>
           <p className="text-sm text-[#B6AEE8]">@{form.apelido || 'apelido'}</p>
+          {enviandoFoto && (
+            <p className="mt-2 text-xs text-[#B6AEE8]">Enviando foto...</p>
+          )}
+          {erroFoto && (
+            <p className="mt-2 text-xs text-[#F2A0A0]">{erroFoto}</p>
+          )}
 
           {/* SELETOR DE ABAS */}
           <div className="mt-7 flex gap-8 border-b border-white/10 w-full justify-center">
@@ -498,7 +578,11 @@ function Perfil() {
                   </button>
                   <button
                     type="button"
-                    onClick={() => navigate('/recuperar-senha')}
+                    onClick={() =>
+                      navigate('/recuperar-senha', {
+                        state: { origem: 'perfil' },
+                      })
+                    }
                     className="flex items-center gap-1.5 text-sm text-[#FFA400] hover:brightness-110"
                   >
                     <FiLock size={14} strokeWidth={2.5} />
@@ -567,7 +651,7 @@ function Perfil() {
           </div>
 
           {/* ZONA DE CONFIGURAÇÕES — última opção da página */}
-          <div className="mt-10 pt-6 border-t border-white/10 w-full flex justify-center">
+          <div className="mt-10 pt-6 border-t border-white/10 w-full flex justify-center gap-8">
             <button
               type="button"
               onClick={handleSair}
@@ -575,6 +659,14 @@ function Perfil() {
             >
               <FiLogOut size={15} strokeWidth={2.5} />
               Sair da conta
+            </button>
+            <button
+              type="button"
+              onClick={abrirExclusao}
+              className="flex items-center gap-2 text-sm text-[#F2A0A0] hover:text-[#D05D5D] transition"
+            >
+              <FiTrash2 size={15} strokeWidth={2.5} />
+              Excluir conta
             </button>
           </div>
         </div>
@@ -674,6 +766,82 @@ function Perfil() {
           </div>
         </div>
       )}
+
+      {/* MODAL DE EXCLUSÃO DE CONTA */}
+      {modalExclusao && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
+          <div className="relative w-full max-w-md rounded-[32px] bg-white p-6 sm:p-7 text-[#2d2d6b] shadow-[0_35px_60px_-15px_rgba(0,0,0,0.45)]">
+            <button
+              type="button"
+              onClick={fecharExclusao}
+              aria-label="Fechar"
+              className="absolute top-5 right-5 text-[#8b87a3] hover:text-[#2d2d6b] transition"
+            >
+              <FiX size={20} />
+            </button>
+
+            <h2 className="[font-family:'Montserrat',sans-serif] font-bold text-[19px] mb-2">
+              Excluir conta
+            </h2>
+            <p className="text-sm text-[#5b5776] mb-5 leading-relaxed">
+              Essa ação é permanente: seus dados e favoritos serão apagados e
+              não dá para recuperar. Digite sua senha duas vezes para confirmar.
+            </p>
+
+            <div className="flex flex-col gap-4">
+              <CampoModal label="Senha">
+                <input
+                  type="password"
+                  autoComplete="current-password"
+                  value={senhaExclusao}
+                  onChange={(e) => setSenhaExclusao(e.target.value)}
+                  className="campo-input-modal"
+                />
+              </CampoModal>
+              <CampoModal label="Confirmar senha">
+                <input
+                  type="password"
+                  autoComplete="off"
+                  value={confirmSenhaExclusao}
+                  onChange={(e) => setConfirmSenhaExclusao(e.target.value)}
+                  className="campo-input-modal"
+                />
+              </CampoModal>
+            </div>
+
+            {erroExclusao && (
+              <p className="mt-3 text-xs text-[#C0392B]">{erroExclusao}</p>
+            )}
+
+            <div className="flex items-center justify-end gap-3 mt-6">
+              <button
+                type="button"
+                onClick={fecharExclusao}
+                disabled={enviandoExclusao}
+                className="px-5 py-2.5 rounded-full text-sm font-semibold text-[#5b5776] hover:bg-[#F4F3FA] transition disabled:opacity-60"
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                onClick={confirmarExclusao}
+                disabled={
+                  enviandoExclusao || !senhaExclusao || !confirmSenhaExclusao
+                }
+                className="px-6 py-2.5 rounded-full bg-[#C0392B] text-white text-sm font-semibold hover:brightness-110 transition disabled:opacity-50"
+              >
+                {enviandoExclusao ? 'Excluindo...' : 'Excluir conta'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <SeletorPfpModal
+        aberto={modalFoto}
+        onFechar={() => setModalFoto(false)}
+        onEscolher={enviarFoto}
+      />
 
       <style>{`
         .campo-input-modal {
