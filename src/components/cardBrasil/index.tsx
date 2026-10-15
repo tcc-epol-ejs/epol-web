@@ -5,91 +5,81 @@ interface CardBrasilProps {
   candidatos: Candidato[];
 }
 
+function BandeiraBrasil() {
+  return (
+    <svg
+      viewBox="0 0 28 20"
+      className="h-[16px] w-[22px] rounded-[2px] shadow-sm"
+      aria-label="Bandeira do Brasil"
+    >
+      <rect width="28" height="20" fill="#009C3B" />
+      <polygon points="14,2 26,10 14,18 2,10" fill="#FFDF00" />
+      <circle cx="14" cy="10" r="4.2" fill="#002776" />
+      <path
+        d="M9.9 9.4 Q14 8.2 18.1 10.6"
+        stroke="#fff"
+        strokeWidth="0.8"
+        fill="none"
+      />
+    </svg>
+  );
+}
+
+const cargo = (c: Candidato) => c.cargo_atual?.trim().toLowerCase() ?? '';
+
 export default function CardBrasil({ candidatos }: CardBrasilProps) {
   const navigate = useNavigate();
 
-  const presidentes = candidatos.filter((c) => c.candidatura === 'Presidente');
-  const presidente =
-    presidentes.find(
-      (c) =>
-        c.cargo_atual.toLowerCase().includes('presidente') &&
-        !c.cargo_atual.toLowerCase().includes('vice'),
-    ) ??
-    presidentes[0] ??
-    null;
+  const presidente = candidatos.find((c) => cargo(c) === 'presidente') ?? null;
 
   const vice =
-    presidentes.find((c) => c.cargo_atual.toLowerCase().includes('vice')) ??
-    null;
+    candidatos.find((c) =>
+      ['vice-presidente', 'vice presidente'].includes(cargo(c)),
+    ) ?? null;
+
+  function Pessoa({ pessoa, titulo }: { pessoa: Candidato; titulo: string }) {
+    return (
+      <div className="mb-3 last:mb-0">
+        <p className="mb-1 text-[10px] font-bold uppercase tracking-wider text-gray-400">
+          {titulo}
+        </p>
+        <button
+          onClick={() => navigate(`/candidatos/${pessoa.id}`)}
+          className="flex w-full items-center gap-2 text-left transition-opacity hover:opacity-80"
+        >
+          {pessoa.foto_url && (
+            <img
+              src={pessoa.foto_url}
+              alt={pessoa.nome_politico}
+              className="h-10 w-10 flex-shrink-0 rounded-full object-cover"
+            />
+          )}
+          <div>
+            <p className="text-xs font-bold text-[#2A2A72]">
+              {pessoa.nome_politico}
+            </p>
+            {pessoa.partidos && (
+              <p className="text-[10px] text-gray-500">
+                ({pessoa.partidos.sigla})
+              </p>
+            )}
+          </div>
+        </button>
+      </div>
+    );
+  }
 
   return (
-    <div className="rounded-2xl bg-white p-4 shadow-lg w-full">
-      <div className="flex items-center gap-2 mb-3">
-        <span className="text-lg">🇧🇷</span>
-        <p className="font-black text-[#2A2A72] uppercase text-sm tracking-wide">
+    <div className="w-full rounded-2xl bg-white p-4 shadow-lg">
+      <div className="mb-3 flex items-center gap-2">
+        <BandeiraBrasil />
+        <p className="text-sm font-black uppercase tracking-wide text-[#2A2A72]">
           Brasil
         </p>
       </div>
 
-      {presidente && (
-        <div className="mb-3">
-          <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">
-            Presidente
-          </p>
-          <button
-            onClick={() => navigate(`/candidatos/${presidente.id}`)}
-            className="flex items-center gap-2 w-full text-left hover:opacity-80 transition-opacity"
-          >
-            {presidente.foto_url && (
-              <img
-                src={presidente.foto_url}
-                alt={presidente.nome_politico}
-                className="w-10 h-10 rounded-full object-cover flex-shrink-0"
-              />
-            )}
-            <div>
-              <p className="text-xs font-bold text-[#2A2A72]">
-                {presidente.nome_politico}
-              </p>
-              {presidente.partidos && (
-                <p className="text-[10px] text-gray-500">
-                  ({presidente.partidos.sigla})
-                </p>
-              )}
-            </div>
-          </button>
-        </div>
-      )}
-
-      {vice && (
-        <div>
-          <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">
-            Vice-Presidente
-          </p>
-          <button
-            onClick={() => navigate(`/candidatos/${vice.id}`)}
-            className="flex items-center gap-2 w-full text-left hover:opacity-80 transition-opacity"
-          >
-            {vice.foto_url && (
-              <img
-                src={vice.foto_url}
-                alt={vice.nome_politico}
-                className="w-10 h-10 rounded-full object-cover flex-shrink-0"
-              />
-            )}
-            <div>
-              <p className="text-xs font-bold text-[#2A2A72]">
-                {vice.nome_politico}
-              </p>
-              {vice.partidos && (
-                <p className="text-[10px] text-gray-500">
-                  ({vice.partidos.sigla})
-                </p>
-              )}
-            </div>
-          </button>
-        </div>
-      )}
+      {presidente && <Pessoa pessoa={presidente} titulo="Presidente" />}
+      {vice && <Pessoa pessoa={vice} titulo="Vice-Presidente" />}
 
       {!presidente && !vice && (
         <p className="text-xs text-gray-400">Nenhum dado cadastrado.</p>

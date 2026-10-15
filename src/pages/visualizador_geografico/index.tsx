@@ -43,6 +43,23 @@ const ESTADOS: Estado[] = [
   { id: 'TO', nome: 'Tocantins', sigla: 'TO' },
 ];
 
+function normalizar(texto: string) {
+  return texto
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z]/g, '');
+}
+
+function obterSiglaDoElemento(alvo: EventTarget): string | null {
+  const path = (alvo as Element).closest?.('path');
+  const id = path?.getAttribute('id');
+  if (!id) return null;
+
+  const nomeLimpo = normalizar(id.replace(/-r\d+$/, ''));
+  return ESTADOS.find((e) => normalizar(e.nome) === nomeLimpo)?.sigla ?? null;
+}
+
 export default function VisualizadorGeografico() {
   const [estadoHover, setEstadoHover] = useState<string | null>(null);
   const [estadoFixo, setEstadoFixo] = useState<string | null>(null);
@@ -78,23 +95,14 @@ export default function VisualizadorGeografico() {
     : null;
 
   function obterEstadoDoMapa(event: React.MouseEvent<HTMLDivElement>) {
-    const target = event.target as SVGPathElement;
-    const id =
-      target.getAttribute('id') ??
-      target.getAttribute('name') ??
-      target.getAttribute('data-id');
-    if (!id) return;
-    setEstadoHover(id);
+    const sigla = obterSiglaDoElemento(event.target);
+    if (sigla) setEstadoHover(sigla);
   }
 
   function clicarEstadoNoMapa(event: React.MouseEvent<HTMLDivElement>) {
-    const target = event.target as SVGPathElement;
-    const id =
-      target.getAttribute('id') ??
-      target.getAttribute('name') ??
-      target.getAttribute('data-id');
-    if (!id) return;
-    setEstadoFixo((prev) => (prev === id ? null : id));
+    const sigla = obterSiglaDoElemento(event.target);
+    if (!sigla) return;
+    setEstadoFixo((prev) => (prev === sigla ? null : sigla));
   }
 
   function limparEstado() {
@@ -117,7 +125,7 @@ export default function VisualizadorGeografico() {
       </div>
 
       <section className="min-h-screen w-full px-6 pb-10 pt-[155px] md:px-10 lg:px-[65px]">
-        <div className="mx-auto grid min-h-[calc(100vh-155px)] w-full max-w-[1600px] grid-cols-1 gap-8 lg:grid-cols-[280px_minmax(420px,1fr)_300px]">
+        <div className="mx-auto grid min-h-[calc(100vh-155px)] w-full max-w-[1600px] grid-cols-1 gap-8 lg:grid-cols-[280px_minmax(420px,1fr)_300px] items-start pt-8">
           {/* ESQUERDA */}
           <div className="flex flex-col justify-center gap-4">
             <div className="select-none">
