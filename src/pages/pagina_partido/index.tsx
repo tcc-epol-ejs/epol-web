@@ -3,7 +3,12 @@ import type { ReactNode } from 'react';
 import { FiArrowLeft } from 'react-icons/fi';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import Header from '../../components/header';
-import { listarPartidos, type Partido } from '../../services/api';
+import {
+  listarCandidatos,
+  listarPartidos,
+  type Candidato,
+  type Partido,
+} from '../../services/api';
 
 function formatarData(data: string | null) {
   if (!data) return null;
@@ -89,6 +94,9 @@ function PaginaPartido() {
   const [partidos, setPartidos] = useState<Partido[]>([]);
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState('');
+  const [candidatos, setCandidatos] = useState<Candidato[]>([]);
+  const [carregandoCandidatos, setCarregandoCandidatos] = useState(true);
+  const [erroCandidatos, setErroCandidatos] = useState('');
 
   useEffect(() => {
     listarPartidos()
@@ -111,6 +119,37 @@ function PaginaPartido() {
           (item) => String(item.numero_legenda) === numeroSelecionado,
         )
       : partidos[0];
+
+  useEffect(() => {
+    if (!partido) return;
+
+    let ativo = true;
+    setCarregandoCandidatos(true);
+    setErroCandidatos('');
+
+    listarCandidatos()
+      .then((todosCandidatos) => {
+        if (!ativo) return;
+        const associados = todosCandidatos.filter(
+          (candidato) => candidato.partido_id === partido.id,
+        );
+        setCandidatos(associados);
+      })
+      .catch((error: unknown) => {
+        if (!ativo) return;
+        console.error('Erro ao carregar candidatos do partido:', error);
+        setErroCandidatos(
+          'Não foi possível carregar os candidatos deste partido.',
+        );
+      })
+      .finally(() => {
+        if (ativo) setCarregandoCandidatos(false);
+      });
+
+    return () => {
+      ativo = false;
+    };
+  }, [partido]);
 
   return (
     <>
@@ -146,6 +185,7 @@ function PaginaPartido() {
               : 'Nenhum partido cadastrado.'}
           </p>
         ) : (
+          <>
           <article className="grid overflow-hidden rounded-[24px] border-2 border-[#2A2A72] bg-[#f3eff8] shadow-[0_16px_40px_-28px_rgba(42,42,114,0.65)] lg:grid-cols-[minmax(280px,0.85fr)_minmax(0,1.5fr)]">
             <aside className="flex min-h-[300px] items-center justify-center bg-[#F4C62E] p-6 sm:min-h-[380px] sm:p-10 lg:min-h-full">
               <div className="flex aspect-square w-full max-w-[440px] items-center justify-center overflow-hidden rounded-[28px] border-[6px] border-[#2A2A72] bg-white p-6 shadow-[0_18px_45px_-20px_rgba(42,42,114,0.55)] sm:p-10">
@@ -243,6 +283,61 @@ function PaginaPartido() {
               </div>
             </div>
           </article>
+          <section aria-labelledby="candidatos-partido-titulo" className="mt-8">
+            <div aria-hidden="true" className="mb-7 h-px w-full bg-[#2A2A72]/25" />
+            <h2
+              id="candidatos-partido-titulo"
+              className="mb-5 text-left text-xl font-black uppercase tracking-[0.08em] text-[#2A2A72] sm:text-2xl"
+            >
+              Candidatos do partido
+            </h2>
+
+            {carregandoCandidatos ? (
+              <p className="text-sm font-medium text-[#68688e]">
+                Carregando candidatos...
+              </p>
+            ) : erroCandidatos ? (
+              <p role="alert" className="text-sm font-medium text-red-700">
+                {erroCandidatos}
+              </p>
+            ) : candidatos.length === 0 ? (
+              <p className="text-sm font-medium text-[#68688e]">
+                Não há candidatos associados a este partido.
+              </p>
+            ) : (
+              <div className="grid w-full max-w-[1400px] grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                {candidatos.map((candidato) => (
+                  <article
+                    key={candidato.id}
+                    className="flex min-h-[240px] flex-col overflow-hidden rounded-2xl border-2 border-[#2A2A72] bg-white text-[#2A2A72]"
+                  >
+                    <div className="flex h-40 w-full shrink-0 items-center justify-center overflow-hidden bg-[#2A2A72] sm:h-48">
+                      {candidato.foto_url ? (
+                        <img
+                          src={candidato.foto_url}
+                          alt={`Foto de ${candidato.nome_politico || candidato.nome_completo}`}
+                          loading="lazy"
+                          decoding="async"
+                          className="h-full w-full object-cover object-[center_20%]"
+                        />
+                      ) : (
+                        <span className="text-xs font-bold uppercase tracking-[0.1em] text-white/70">
+                          Sem foto
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="flex flex-1 flex-col p-3">
+                      <h3 className="break-words text-base font-bold uppercase leading-tight">
+                        {candidato.nome_politico || candidato.nome_completo}
+                      </h3>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            )}
+          </section>
+          </>
         )}
       </main>
     </>
