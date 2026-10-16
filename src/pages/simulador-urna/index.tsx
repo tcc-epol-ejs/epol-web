@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import Header from '../../components/header';
 import Footer from '../../components/footer/footer';
 
 // ---------- Fundo decorativo ----------
@@ -66,44 +67,9 @@ const CENARIOS: Cenario[] = [
     titulo: 'Eleições Gerais - 2º turno',
     descricao: 'Cenário de treinamento para Eleições Gerais.',
   },
-  {
-    id: 'df-1',
-    titulo: 'Eleições Gerais no Distrito Federal - 1º turno',
-    descricao: 'Cenário de treinamento para Eleições Gerais no DF.',
-  },
-  {
-    id: 'df-2',
-    titulo: 'Eleições Gerais no Distrito Federal - 2º turno',
-    descricao: 'Cenário de treinamento para Eleições Gerais no DF.',
-  },
-  {
-    id: 'exterior-1',
-    titulo: 'Votação no exterior - 1º turno',
-    descricao: 'Cenário de treinamento para votação no exterior.',
-  },
-  {
-    id: 'exterior-2',
-    titulo: 'Votação no exterior - 2º turno',
-    descricao: 'Cenário de treinamento para votação no exterior.',
-  },
-  {
-    id: 'municipais-1',
-    titulo: 'Eleições Municipais - 1º turno',
-    descricao: 'Cenário de treinamento com Vereador e Prefeito.',
-  },
-  {
-    id: 'municipais-2',
-    titulo: 'Eleições Municipais - 2º turno',
-    descricao: 'Cenário de treinamento com Vereador e Prefeito.',
-  },
 ];
 
-const ETAPAS = [
-  'Escolha a eleição e o turno',
-  'Conheça os candidatos',
-  'Informe acessibilidade',
-  'Simule a votação',
-];
+const ETAPAS = ['Escolha a eleição e o turno', 'Simule a votação'];
 
 // ---------- Stepper ----------
 
@@ -162,17 +128,17 @@ function CardCenario({
       type="button"
       onClick={onSelecionar}
       aria-pressed={selecionado}
-      className={`flex min-h-[130px] flex-col items-start gap-2 rounded-md p-5 text-left transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#FFA400] ${
+      className={`flex min-h-[280px] flex-col items-start gap-4 rounded-xl p-8 text-left transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#FFA400] ${
         selecionado
-          ? 'bg-[#eef0fb] ring-2 ring-[#2a2a72]'
+          ? 'bg-[#eef0fb] ring-4 ring-[#2a2a72]'
           : 'bg-white hover:bg-[#f4f4fd]'
       }`}
     >
-      <h3 className="text-base font-bold text-[#1f2a52]">{cenario.titulo}</h3>
-      <p className="text-sm text-[#5A5A70]">{cenario.descricao}</p>
+      <h3 className="text-3xl font-bold text-[#1f2a52]">{cenario.titulo}</h3>
+      <p className="text-xl text-[#5A5A70]">{cenario.descricao}</p>
 
       {selecionado && (
-        <span className="mt-auto rounded-full bg-[#2a2a72] px-3 py-0.5 text-xs font-semibold text-white">
+        <span className="mt-auto rounded-full bg-[#2a2a72] px-4 py-1 text-base font-semibold text-white">
           Seleção atual
         </span>
       )}
@@ -183,17 +149,19 @@ function CardCenario({
 // ---------- Etapa 1 ----------
 
 function SimuladorEtapa1({
+  cenarioInicial,
   onAvancar,
 }: {
-  onAvancar?: (cenario: Cenario) => void;
+  cenarioInicial: Cenario;
+  onAvancar: (cenario: Cenario) => void;
 }) {
-  const [selecionadoId, setSelecionadoId] = useState<string>(CENARIOS[0].id);
+  const [selecionadoId, setSelecionadoId] = useState<string>(cenarioInicial.id);
   const selecionado = CENARIOS.find((c) => c.id === selecionadoId)!;
 
   return (
     <section className="relative z-10 mx-auto w-full max-w-5xl px-4 py-8">
       <header className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-        <h1 className="text-4xl font-bold text-[#2a2a72]">
+        <h1 className="text-5xl font-bold text-[#2a2a72]">
           Simulador de votação
         </h1>
 
@@ -211,7 +179,7 @@ function SimuladorEtapa1({
         <Stepper atual={1} />
 
         <div className="px-6 py-8 sm:px-12">
-          <p className="mb-5 text-base text-[#1f2a52]">
+          <p className="mb-6 text-base text-[#1f2a52]">
             Defina o tipo de eleição e o turno que deseja simular.
           </p>
 
@@ -242,20 +210,73 @@ function SimuladorEtapa1({
     </section>
   );
 }
+function SimuladorEtapa2({
+  cenario,
+  onVoltar,
+}: {
+  cenario: Cenario;
+  onVoltar: () => void;
+}) {
+  return (
+    <section className="relative z-10 mx-auto w-full max-w-5xl px-4 py-8">
+      <header className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <h1 className="text-4xl font-bold text-[#2a2a72]">
+          Simulador de votação
+        </h1>
 
-// ---------- Página ----------
+        <div className="sm:text-right">
+          <p className="text-xs font-semibold text-[#5A5A70]">
+            Cenário selecionado
+          </p>
+          <p className="text-lg font-bold text-[#2a2a72]">{cenario.titulo}</p>
+        </div>
+      </header>
 
+      <div className="mt-6 overflow-hidden rounded-xl bg-[#f4f5f9] shadow-sm">
+        <Stepper atual={2} />
+
+        <div className="px-6 py-8 sm:px-12">
+          {/* conteúdo da urna vai aqui */}
+          <p className="text-base text-[#1f2a52]">
+            Simulando: {cenario.titulo}
+          </p>
+
+          <div className="mt-6 flex justify-between">
+            <button
+              type="button"
+              onClick={onVoltar}
+              className="rounded-full bg-[#8888D3] px-8 py-2.5 text-sm font-bold text-white transition-all hover:brightness-110"
+            >
+              voltar
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
 export default function SimuladorUrna() {
+  const [etapa, setEtapa] = useState<1 | 2>(1);
+  const [cenario, setCenario] = useState<Cenario>(CENARIOS[0]);
+
   return (
     <div>
       <div className="relative min-h-[100dvh] w-full overflow-hidden bg-white">
         <Bolas />
-        <SimuladorEtapa1
-          onAvancar={(cenario) => {
-            // TODO: ir para a etapa 2 (Conheça os candidatos)
-            console.log('Cenário escolhido:', cenario);
-          }}
-        />
+
+        {etapa === 1 && (
+          <SimuladorEtapa1
+            cenarioInicial={cenario}
+            onAvancar={(c) => {
+              setCenario(c);
+              setEtapa(2);
+            }}
+          />
+        )}
+
+        {etapa === 2 && (
+          <SimuladorEtapa2 cenario={cenario} onVoltar={() => setEtapa(1)} />
+        )}
       </div>
 
       <Footer />
