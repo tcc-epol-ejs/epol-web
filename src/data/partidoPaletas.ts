@@ -8,7 +8,7 @@ const paletasPorSigla: Record<string, PaletaPartido> = {
   AVANTE: { cor: '#f3854c', borda: '#a65b34' },
   CIDADANIA: { cor: '#ed0277', borda: '#a00150' },
   DC: { cor: '#6161c0', borda: '#3a3a73' },
-  DEMOCRATA: { cor: '#ddffad', borda: '#9ab279' },
+  DEMOCRATA: { cor: '#103d80', borda: '#061833' },
   MDB: { cor: '#6bcf9b', borda: '#438261' },
   MISSAO: { cor: '#fbc84b', borda: '#ae8b34' },
   MOBILIZA: { cor: '#ffffff', borda: '#b2b2b2' },

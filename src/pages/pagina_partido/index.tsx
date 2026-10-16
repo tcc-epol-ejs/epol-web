@@ -20,6 +20,28 @@ function formatarData(data: string | null) {
   return new Intl.DateTimeFormat('pt-BR').format(new Date(ano, mes - 1, dia));
 }
 
+function obterCorDeTexto(hex: string) {
+  const canais = hex.match(/[A-Fa-f0-9]{2}/g);
+  if (!canais || canais.length < 3) return '#ffffff';
+
+  const luminancia = canais
+    .slice(0, 3)
+    .map((canal) => parseInt(canal, 16) / 255)
+    .map((canal) =>
+      canal <= 0.04045 ? canal / 12.92 : ((canal + 0.055) / 1.055) ** 2.4,
+    )
+    .reduce(
+      (total, canal, index) =>
+        total + canal * [0.2126, 0.7152, 0.0722][index],
+      0,
+    );
+  const contraste = (outraLuminancia: number) =>
+    (Math.max(luminancia, outraLuminancia) + 0.05) /
+    (Math.min(luminancia, outraLuminancia) + 0.05);
+
+  return contraste(0.025) > contraste(1) ? '#2A2A72' : '#ffffff';
+}
+
 function Campo({
   titulo,
   children,
@@ -121,6 +143,7 @@ function PaginaPartido() {
         )
       : partidos[0];
   const paleta = obterPaletaPartido(partido?.sigla ?? '');
+  const corTextoCabecalho = obterCorDeTexto(paleta.borda);
 
   useEffect(() => {
     if (!partido) return;
@@ -219,14 +242,18 @@ function PaginaPartido() {
 
               <div className="min-w-0">
                 <header
-                  className="flex flex-col gap-4 border-b-[6px] bg-[#2A2A72] p-5 text-white sm:flex-row sm:items-center sm:justify-between sm:px-7 sm:py-6"
-                  style={{ borderBottomColor: paleta.borda }}
+                  className="flex flex-col gap-4 border-b-[6px] p-5 sm:flex-row sm:items-center sm:justify-between sm:px-7 sm:py-6"
+                  style={{
+                    backgroundColor: paleta.borda,
+                    borderBottomColor: paleta.borda,
+                    color: corTextoCabecalho,
+                  }}
                 >
                   <div>
                     <h1 className="text-2xl font-black uppercase leading-tight sm:text-3xl">
                       {partido.nome_completo}
                     </h1>
-                    <p className="mt-1 text-sm font-bold uppercase tracking-[0.14em] text-white/70">
+                    <p className="mt-1 text-sm font-bold uppercase tracking-[0.14em] opacity-70">
                       {partido.sigla}
                     </p>
                   </div>
@@ -234,7 +261,7 @@ function PaginaPartido() {
                     className="w-fit shrink-0 rounded-xl border bg-white/10 px-4 py-3"
                     style={{ borderColor: paleta.cor }}
                   >
-                    <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-white/70">
+                    <p className="text-[10px] font-bold uppercase tracking-[0.14em] opacity-70">
                       Número da legenda
                     </p>
                     <p className="mt-1 text-2xl font-black leading-none">
