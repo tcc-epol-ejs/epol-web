@@ -38,9 +38,11 @@ function Campo({
 function ListaInformacoes({
   itens,
   vazio,
+  primeiroItemMaiusculo = false,
 }: {
   itens: string[] | null;
   vazio: string;
+  primeiroItemMaiusculo?: boolean;
 }) {
   if (!itens?.length) {
     return <p className="text-sm leading-relaxed text-[#68688e]">{vazio}</p>;
@@ -48,14 +50,33 @@ function ListaInformacoes({
 
   return (
     <ul className="space-y-2 text-sm leading-relaxed text-[#2A2A72]">
-      {itens.map((item, index) => (
-        <li key={`${item}-${index}`} className="flex gap-2">
-          <span aria-hidden="true" className="font-black text-[#A36BBE]">
-            •
-          </span>
-          <span>{item}</span>
-        </li>
-      ))}
+      {itens.map((item, index) => {
+        const texto =
+          primeiroItemMaiusculo && index === 0
+            ? item.toLocaleUpperCase('pt-BR')
+            : primeiroItemMaiusculo
+              ? item.charAt(0).toLocaleUpperCase('pt-BR') + item.slice(1)
+              : item;
+
+        return (
+          <li key={`${item}-${index}`} className="flex gap-2">
+            {!(primeiroItemMaiusculo && index === 0) && (
+              <span aria-hidden="true" className="font-black text-[#A36BBE]">
+                •
+              </span>
+            )}
+            <span
+              className={
+                primeiroItemMaiusculo && index === 0
+                  ? 'font-black uppercase'
+                  : undefined
+              }
+            >
+              {texto}
+            </span>
+          </li>
+        );
+      })}
     </ul>
   );
 }
@@ -215,6 +236,7 @@ function PaginaPartido() {
                     <ListaInformacoes
                       itens={partido.ideologia}
                       vazio="A ideologia ainda não foi cadastrada."
+                      primeiroItemMaiusculo
                     />
                   </section>
                 </div>
