@@ -7,6 +7,7 @@ import {
   FiSearch,
 } from 'react-icons/fi';
 import { FormEvent, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Header from '../../components/header';
 import { Candidato, listarCandidatos } from '../../services/api';
 
@@ -284,6 +285,7 @@ const partidos = [
 ];
 
 function SearchPol() {
+  const navigate = useNavigate();
   const resultadosRef = useRef<HTMLDivElement>(null);
   const [search, setSearch] = useState('');
   const [searchedTerm, setSearchedTerm] = useState('');
@@ -728,9 +730,16 @@ function SearchPol() {
               {partidosOpen && (
                 <div className="grid w-full max-w-[960px] grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                   {results.map((party) => (
-                    <article
+                    <button
                       key={party.keyword}
-                      className="flex min-h-[200px] w-full flex-col items-center gap-2 rounded-2xl border-2 p-3 text-center"
+                      type="button"
+                      onClick={() =>
+                        navigate(
+                          `/pagina_partido?numero=${encodeURIComponent(party.numero)}`,
+                        )
+                      }
+                      aria-label={`Ver informações do partido ${party.nome}`}
+                      className="flex min-h-[200px] w-full flex-col items-center gap-2 rounded-2xl border-2 p-3 text-center transition-transform hover:-translate-y-1 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-[#2A2A72]"
                       style={{
                         borderColor: party.borda,
                         backgroundColor: party.cor,
@@ -757,7 +766,7 @@ function SearchPol() {
                           {party.numero}
                         </p>
                       </div>
-                    </article>
+                    </button>
                   ))}
                 </div>
               )}

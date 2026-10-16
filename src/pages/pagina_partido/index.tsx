@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { FiArrowLeft } from 'react-icons/fi';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import Header from '../../components/header';
 import { listarPartidos, type Partido } from '../../services/api';
 
@@ -60,8 +61,10 @@ function ListaInformacoes({
 }
 
 function PaginaPartido() {
+  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const idSelecionado = searchParams.get('id');
+  const numeroSelecionado = searchParams.get('numero');
   const [partidos, setPartidos] = useState<Partido[]>([]);
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState('');
@@ -82,7 +85,11 @@ function PaginaPartido() {
 
   const partido = idSelecionado
     ? partidos.find((item) => item.id === idSelecionado)
-    : partidos[0];
+    : numeroSelecionado
+      ? partidos.find(
+          (item) => String(item.numero_legenda) === numeroSelecionado,
+        )
+      : partidos[0];
 
   return (
     <>
@@ -91,6 +98,15 @@ function PaginaPartido() {
       </div>
 
       <main className="mx-auto w-full max-w-[1500px] px-4 py-6 sm:px-6 lg:py-10">
+        <button
+          type="button"
+          onClick={() => navigate('/searchpol')}
+          className="mb-5 inline-flex items-center gap-2 rounded-lg px-3 py-2 font-bold text-[#2A2A72] transition-colors hover:bg-[#2A2A72]/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2A2A72]"
+        >
+          <FiArrowLeft aria-hidden="true" className="text-lg" />
+          Voltar
+        </button>
+
         {carregando ? (
           <p className="py-16 text-center font-semibold text-[#2A2A72]">
             Carregando informações do partido...
@@ -104,7 +120,7 @@ function PaginaPartido() {
           </p>
         ) : !partido ? (
           <p className="rounded-2xl border border-[#2A2A72]/15 bg-white p-6 text-center font-semibold text-[#2A2A72]">
-            {idSelecionado
+            {idSelecionado || numeroSelecionado
               ? 'Não encontramos um partido com esse identificador.'
               : 'Nenhum partido cadastrado.'}
           </p>
