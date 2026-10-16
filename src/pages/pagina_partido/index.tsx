@@ -168,9 +168,14 @@ function PaginaPartido() {
         </button>
 
         {carregando ? (
-          <p className="py-16 text-center font-semibold text-[#2A2A72]">
-            Carregando informações do partido...
-          </p>
+          <div
+            role="status"
+            aria-label="Carregando informações do partido"
+            className="flex min-h-[240px] items-center justify-center"
+          >
+            <span className="h-12 w-12 animate-spin rounded-full border-4 border-[#2A2A72]/20 border-t-[#2A2A72]" />
+            <span className="sr-only">Carregando informações do partido...</span>
+          </div>
         ) : erro ? (
           <p
             role="alert"
