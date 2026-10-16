@@ -1,14 +1,212 @@
+import { useEffect, useState } from 'react';
+import type { ReactNode } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import Header from '../../components/header';
+import { listarPartidos, type Partido } from '../../services/api';
+
+function formatarData(data: string | null) {
+  if (!data) return null;
+
+  const [ano, mes, dia] = data.slice(0, 10).split('-').map(Number);
+  if (!ano || !mes || !dia) return data;
+
+  return new Intl.DateTimeFormat('pt-BR').format(new Date(ano, mes - 1, dia));
+}
+
+function Campo({
+  titulo,
+  children,
+  className = '',
+}: {
+  titulo: string;
+  children: ReactNode;
+  className?: string;
+}) {
+  return (
+    <div className={`rounded-xl bg-white/70 p-4 ${className}`}>
+      <dt className="text-xs font-extrabold uppercase tracking-[0.12em] text-[#68688e]">
+        {titulo}
+      </dt>
+      <dd className="mt-2 break-words text-sm font-semibold leading-relaxed text-[#2A2A72]">
+        {children || 'Não informado'}
+      </dd>
+    </div>
+  );
+}
+
+function ListaInformacoes({
+  itens,
+  vazio,
+}: {
+  itens: string[] | null;
+  vazio: string;
+}) {
+  if (!itens?.length) {
+    return <p className="text-sm leading-relaxed text-[#68688e]">{vazio}</p>;
+  }
+
+  return (
+    <ul className="space-y-2 text-sm leading-relaxed text-[#2A2A72]">
+      {itens.map((item, index) => (
+        <li key={`${item}-${index}`} className="flex gap-2">
+          <span aria-hidden="true" className="font-black text-[#A36BBE]">
+            •
+          </span>
+          <span>{item}</span>
+        </li>
+      ))}
+    </ul>
+  );
+}
 
 function PaginaPartido() {
+  const [searchParams] = useSearchParams();
+  const idSelecionado = searchParams.get('id');
+  const [partidos, setPartidos] = useState<Partido[]>([]);
+  const [carregando, setCarregando] = useState(true);
+  const [erro, setErro] = useState('');
+
+  useEffect(() => {
+    listarPartidos()
+      .then(setPartidos)
+      .catch((error: unknown) => {
+        console.error('Erro ao carregar os dados do partido:', error);
+        setErro(
+          error instanceof Error
+            ? error.message
+            : 'Não foi possível carregar os dados do partido.',
+        );
+      })
+      .finally(() => setCarregando(false));
+  }, []);
+
+  const partido = idSelecionado
+    ? partidos.find((item) => item.id === idSelecionado)
+    : partidos[0];
+
   return (
     <>
       <div className="w-full">
         <Header isBgWhite disableScrollHide />
       </div>
-      <p className="text-red-500 text-[10px] font-semibold text-center my-4">
-        Página do partido em construção!
-      </p>
+
+      <main className="mx-auto w-full max-w-[1500px] px-4 py-6 sm:px-6 lg:py-10">
+        {carregando ? (
+          <p className="py-16 text-center font-semibold text-[#2A2A72]">
+            Carregando informações do partido...
+          </p>
+        ) : erro ? (
+          <p
+            role="alert"
+            className="rounded-2xl border border-red-200 bg-white p-6 text-center font-semibold text-red-700"
+          >
+            Não foi possível carregar o partido: {erro}
+          </p>
+        ) : !partido ? (
+          <p className="rounded-2xl border border-[#2A2A72]/15 bg-white p-6 text-center font-semibold text-[#2A2A72]">
+            {idSelecionado
+              ? 'Não encontramos um partido com esse identificador.'
+              : 'Nenhum partido cadastrado.'}
+          </p>
+        ) : (
+          <article className="grid overflow-hidden rounded-[24px] border-2 border-[#2A2A72] bg-[#f3eff8] shadow-[0_16px_40px_-28px_rgba(42,42,114,0.65)] lg:grid-cols-[minmax(280px,0.85fr)_minmax(0,1.5fr)]">
+            <aside className="flex min-h-[300px] items-center justify-center bg-[#F4C62E] p-6 sm:min-h-[380px] sm:p-10 lg:min-h-full">
+              <div className="flex aspect-square w-full max-w-[440px] items-center justify-center overflow-hidden rounded-[28px] border-[6px] border-[#2A2A72] bg-white p-6 shadow-[0_18px_45px_-20px_rgba(42,42,114,0.55)] sm:p-10">
+                {partido.bandeira_url ? (
+                  <img
+                    src={partido.bandeira_url}
+                    alt={`Bandeira do ${partido.nome_completo}`}
+                    className="h-full w-full object-contain"
+                  />
+                ) : null}
+              </div>
+            </aside>
+
+            <div className="min-w-0">
+              <header className="flex flex-col gap-4 bg-[#2A2A72] p-5 text-white sm:flex-row sm:items-center sm:justify-between sm:px-7 sm:py-6">
+                <div>
+                  <h1 className="text-2xl font-black uppercase leading-tight sm:text-3xl">
+                    {partido.nome_completo}
+                  </h1>
+                  <p className="mt-1 text-sm font-bold uppercase tracking-[0.14em] text-white/70">
+                    {partido.sigla}
+                  </p>
+                </div>
+                <div className="w-fit shrink-0 rounded-xl border border-white/30 bg-white/10 px-4 py-3">
+                  <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-white/70">
+                    Número da legenda
+                  </p>
+                  <p className="mt-1 text-2xl font-black leading-none">
+                    {partido.numero_legenda}
+                  </p>
+                </div>
+              </header>
+
+              <div className="space-y-5 p-4 sm:p-6">
+                <section aria-label="Dados do partido">
+                  <dl className="grid gap-3 sm:grid-cols-2">
+                    <Campo titulo="Data de fundação">
+                      {formatarData(partido.data_fundacao)}
+                    </Campo>
+                    <Campo titulo="Data de deferimento">
+                      {formatarData(partido.data_deferimento)}
+                    </Campo>
+                    <Campo titulo="Fundadores">
+                      {partido.fundadores?.join(', ')}
+                    </Campo>
+                    <Campo titulo="Presidente nacional">
+                      {partido.presidente_nacional}
+                    </Campo>
+                  </dl>
+                </section>
+
+                <div className="grid gap-4">
+                  <section className="rounded-2xl border border-[#2A2A72]/10 bg-white p-5 sm:p-6">
+                    <h2 className="mb-4 border-b border-[#2A2A72]/10 pb-3 text-sm font-black uppercase tracking-[0.12em] text-[#2A2A72]">
+                      Propostas
+                    </h2>
+                    <ListaInformacoes
+                      itens={partido.propostas_url}
+                      vazio="As propostas ainda não foram cadastradas."
+                    />
+                    {!!partido.propostas_url?.length && (
+                      <div className="mt-5 border-t border-[#2A2A72]/10 pt-4">
+                        <h3 className="mb-2 text-xs font-extrabold uppercase tracking-[0.1em] text-[#68688e]">
+                          Saiba mais
+                        </h3>
+                        <ul className="space-y-2">
+                          {partido.propostas_url.map((url, index) => (
+                            <li key={`${url}-${index}`}>
+                              <a
+                                href={url}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="break-all text-sm font-semibold text-[#5B3A8A] underline decoration-[#A36BBE] underline-offset-2 hover:text-[#2A2A72]"
+                              >
+                                Proposta {index + 1}
+                              </a>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </section>
+
+                  <section className="rounded-2xl border border-[#2A2A72]/10 bg-white p-5 sm:p-6">
+                    <h2 className="mb-4 border-b border-[#2A2A72]/10 pb-3 text-sm font-black uppercase tracking-[0.12em] text-[#2A2A72]">
+                      Ideologia
+                    </h2>
+                    <ListaInformacoes
+                      itens={partido.ideologia}
+                      vazio="A ideologia ainda não foi cadastrada."
+                    />
+                  </section>
+                </div>
+              </div>
+            </div>
+          </article>
+        )}
+      </main>
     </>
   );
 }
