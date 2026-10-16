@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 import { FiArrowLeft } from 'react-icons/fi';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import Header from '../../components/header';
+import { obterPaletaPartido } from '../../data/partidoPaletas';
 import {
   listarCandidatos,
   listarPartidos,
@@ -119,6 +120,7 @@ function PaginaPartido() {
           (item) => String(item.numero_legenda) === numeroSelecionado,
         )
       : partidos[0];
+  const paleta = obterPaletaPartido(partido?.sigla ?? '');
 
   useEffect(() => {
     if (!partido) return;
@@ -174,7 +176,9 @@ function PaginaPartido() {
             className="flex min-h-[240px] items-center justify-center"
           >
             <span className="h-12 w-12 animate-spin rounded-full border-4 border-[#2A2A72]/20 border-t-[#2A2A72]" />
-            <span className="sr-only">Carregando informações do partido...</span>
+            <span className="sr-only">
+              Carregando informações do partido...
+            </span>
           </div>
         ) : erro ? (
           <p
@@ -191,157 +195,196 @@ function PaginaPartido() {
           </p>
         ) : (
           <>
-          <article className="grid overflow-hidden rounded-[24px] border-2 border-[#2A2A72] bg-[#f3eff8] shadow-[0_16px_40px_-28px_rgba(42,42,114,0.65)] lg:grid-cols-[minmax(280px,0.85fr)_minmax(0,1.5fr)]">
-            <aside className="flex min-h-[300px] items-center justify-center bg-[#F4C62E] p-6 sm:min-h-[380px] sm:p-10 lg:min-h-full">
-              <div className="flex aspect-square w-full max-w-[440px] items-center justify-center overflow-hidden rounded-[28px] border-[6px] border-[#2A2A72] bg-white p-6 shadow-[0_18px_45px_-20px_rgba(42,42,114,0.55)] sm:p-10">
-                {partido.bandeira_url ? (
-                  <img
-                    src={partido.bandeira_url}
-                    alt={`Bandeira do ${partido.nome_completo}`}
-                    className="h-full w-full object-contain"
-                  />
-                ) : null}
-              </div>
-            </aside>
-
-            <div className="min-w-0">
-              <header className="flex flex-col gap-4 bg-[#2A2A72] p-5 text-white sm:flex-row sm:items-center sm:justify-between sm:px-7 sm:py-6">
-                <div>
-                  <h1 className="text-2xl font-black uppercase leading-tight sm:text-3xl">
-                    {partido.nome_completo}
-                  </h1>
-                  <p className="mt-1 text-sm font-bold uppercase tracking-[0.14em] text-white/70">
-                    {partido.sigla}
-                  </p>
-                </div>
-                <div className="w-fit shrink-0 rounded-xl border border-white/30 bg-white/10 px-4 py-3">
-                  <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-white/70">
-                    Número da legenda
-                  </p>
-                  <p className="mt-1 text-2xl font-black leading-none">
-                    {partido.numero_legenda}
-                  </p>
-                </div>
-              </header>
-
-              <div className="space-y-5 p-4 sm:p-6">
-                <section aria-label="Dados do partido">
-                  <dl className="grid gap-3 sm:grid-cols-2">
-                    <Campo titulo="Data de fundação">
-                      {formatarData(partido.data_fundacao)}
-                    </Campo>
-                    <Campo titulo="Data de deferimento">
-                      {formatarData(partido.data_deferimento)}
-                    </Campo>
-                    <Campo titulo="Fundadores">
-                      {partido.fundadores?.join(', ')}
-                    </Campo>
-                    <Campo titulo="Presidente nacional">
-                      {partido.presidente_nacional}
-                    </Campo>
-                  </dl>
-                </section>
-
-                <div className="grid gap-4">
-                  <section className="rounded-2xl border border-[#2A2A72]/10 bg-white p-5 sm:p-6">
-                    <h2 className="mb-4 border-b border-[#2A2A72]/10 pb-3 text-sm font-black uppercase tracking-[0.12em] text-[#2A2A72]">
-                      Propostas
-                    </h2>
-                    <ListaInformacoes
-                      itens={partido.propostas_url}
-                      vazio="As propostas ainda não foram cadastradas."
-                    />
-                    {!!partido.propostas_url?.length && (
-                      <div className="mt-5 border-t border-[#2A2A72]/10 pt-4">
-                        <h3 className="mb-2 text-xs font-extrabold uppercase tracking-[0.1em] text-[#68688e]">
-                          Saiba mais
-                        </h3>
-                        <ul className="space-y-2">
-                          {partido.propostas_url.map((url, index) => (
-                            <li key={`${url}-${index}`}>
-                              <a
-                                href={url}
-                                target="_blank"
-                                rel="noreferrer"
-                                className="break-all text-sm font-semibold text-[#5B3A8A] underline decoration-[#A36BBE] underline-offset-2 hover:text-[#2A2A72]"
-                              >
-                                Proposta {index + 1}
-                              </a>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-                  </section>
-
-                  <section className="rounded-2xl border border-[#2A2A72]/10 bg-white p-5 sm:p-6">
-                    <h2 className="mb-4 border-b border-[#2A2A72]/10 pb-3 text-sm font-black uppercase tracking-[0.12em] text-[#2A2A72]">
-                      Ideologia
-                    </h2>
-                    <ListaInformacoes
-                      itens={partido.ideologia}
-                      vazio="A ideologia ainda não foi cadastrada."
-                      primeiroItemMaiusculo
-                    />
-                  </section>
-                </div>
-              </div>
-            </div>
-          </article>
-          <section aria-labelledby="candidatos-partido-titulo" className="mt-8">
-            <div aria-hidden="true" className="mb-7 h-px w-full bg-[#2A2A72]/25" />
-            <h2
-              id="candidatos-partido-titulo"
-              className="mb-5 text-left text-xl font-black uppercase tracking-[0.08em] text-[#2A2A72] sm:text-2xl"
+            <article
+              className="grid overflow-hidden rounded-[24px] border-2 bg-[#f3eff8] shadow-[0_16px_40px_-28px_rgba(42,42,114,0.65)] lg:grid-cols-[minmax(280px,0.85fr)_minmax(0,1.5fr)]"
+              style={{ borderColor: paleta.borda }}
             >
-              Candidatos do partido
-            </h2>
+              <aside
+                className="flex min-h-[300px] items-center justify-center p-6 sm:min-h-[380px] sm:p-10 lg:min-h-full"
+                style={{ backgroundColor: paleta.cor }}
+              >
+                <div
+                  className="flex aspect-square w-full max-w-[440px] items-center justify-center overflow-hidden rounded-[28px] border-[6px] bg-white p-6 shadow-[0_18px_45px_-20px_rgba(42,42,114,0.55)] sm:p-10"
+                  style={{ borderColor: paleta.borda }}
+                >
+                  {partido.bandeira_url ? (
+                    <img
+                      src={partido.bandeira_url}
+                      alt={`Bandeira do ${partido.nome_completo}`}
+                      className="h-full w-full object-contain"
+                    />
+                  ) : null}
+                </div>
+              </aside>
 
-            {carregandoCandidatos ? (
-              <p className="text-sm font-medium text-[#68688e]">
-                Carregando candidatos...
-              </p>
-            ) : erroCandidatos ? (
-              <p role="alert" className="text-sm font-medium text-red-700">
-                {erroCandidatos}
-              </p>
-            ) : candidatos.length === 0 ? (
-              <p className="text-sm font-medium text-[#68688e]">
-                Não há candidatos associados a este partido.
-              </p>
-            ) : (
-              <div className="grid w-full max-w-[1400px] grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                {candidatos.map((candidato) => (
-                  <article
-                    key={candidato.id}
-                    className="flex min-h-[240px] flex-col overflow-hidden rounded-2xl border-2 border-[#2A2A72] bg-white text-[#2A2A72]"
+              <div className="min-w-0">
+                <header
+                  className="flex flex-col gap-4 border-b-[6px] bg-[#2A2A72] p-5 text-white sm:flex-row sm:items-center sm:justify-between sm:px-7 sm:py-6"
+                  style={{ borderBottomColor: paleta.borda }}
+                >
+                  <div>
+                    <h1 className="text-2xl font-black uppercase leading-tight sm:text-3xl">
+                      {partido.nome_completo}
+                    </h1>
+                    <p className="mt-1 text-sm font-bold uppercase tracking-[0.14em] text-white/70">
+                      {partido.sigla}
+                    </p>
+                  </div>
+                  <div
+                    className="w-fit shrink-0 rounded-xl border bg-white/10 px-4 py-3"
+                    style={{ borderColor: paleta.cor }}
                   >
-                    <div className="flex h-40 w-full shrink-0 items-center justify-center overflow-hidden bg-[#2A2A72] sm:h-48">
-                      {candidato.foto_url ? (
-                        <img
-                          src={candidato.foto_url}
-                          alt={`Foto de ${candidato.nome_politico || candidato.nome_completo}`}
-                          loading="lazy"
-                          decoding="async"
-                          className="h-full w-full object-cover object-[center_20%]"
-                        />
-                      ) : (
-                        <span className="text-xs font-bold uppercase tracking-[0.1em] text-white/70">
-                          Sem foto
-                        </span>
-                      )}
-                    </div>
+                    <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-white/70">
+                      Número da legenda
+                    </p>
+                    <p className="mt-1 text-2xl font-black leading-none">
+                      {partido.numero_legenda}
+                    </p>
+                  </div>
+                </header>
 
-                    <div className="flex flex-1 flex-col p-3">
-                      <h3 className="break-words text-base font-bold uppercase leading-tight">
-                        {candidato.nome_politico || candidato.nome_completo}
-                      </h3>
-                    </div>
-                  </article>
-                ))}
+                <div className="space-y-5 p-4 sm:p-6">
+                  <section aria-label="Dados do partido">
+                    <dl className="grid gap-3 sm:grid-cols-2">
+                      <Campo titulo="Data de fundação">
+                        {formatarData(partido.data_fundacao)}
+                      </Campo>
+                      <Campo titulo="Data de deferimento">
+                        {formatarData(partido.data_deferimento)}
+                      </Campo>
+                      <Campo titulo="Fundadores">
+                        {partido.fundadores?.join(', ')}
+                      </Campo>
+                      <Campo titulo="Presidente nacional">
+                        {partido.presidente_nacional}
+                      </Campo>
+                    </dl>
+                  </section>
+
+                  <div className="grid gap-4">
+                    <section
+                      className="rounded-2xl border bg-white p-5 sm:p-6"
+                      style={{ borderColor: paleta.borda }}
+                    >
+                      <h2
+                        className="mb-4 border-b pb-3 text-sm font-black uppercase tracking-[0.12em] text-[#2A2A72]"
+                        style={{ borderBottomColor: paleta.cor }}
+                      >
+                        Propostas
+                      </h2>
+                      <ListaInformacoes
+                        itens={partido.propostas_url}
+                        vazio="As propostas ainda não foram cadastradas."
+                      />
+                      {!!partido.propostas_url?.length && (
+                        <div className="mt-5 border-t border-[#2A2A72]/10 pt-4">
+                          <h3 className="mb-2 text-xs font-extrabold uppercase tracking-[0.1em] text-[#68688e]">
+                            Saiba mais
+                          </h3>
+                          <ul className="space-y-2">
+                            {partido.propostas_url.map((url, index) => (
+                              <li key={`${url}-${index}`}>
+                                <a
+                                  href={url}
+                                  target="_blank"
+                                  rel="noreferrer"
+                                  className="break-all text-sm font-semibold text-[#5B3A8A] underline decoration-[#A36BBE] underline-offset-2 hover:text-[#2A2A72]"
+                                >
+                                  Proposta {index + 1}
+                                </a>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                    </section>
+
+                    <section
+                      className="rounded-2xl border bg-white p-5 sm:p-6"
+                      style={{ borderColor: paleta.borda }}
+                    >
+                      <h2
+                        className="mb-4 border-b pb-3 text-sm font-black uppercase tracking-[0.12em] text-[#2A2A72]"
+                        style={{ borderBottomColor: paleta.cor }}
+                      >
+                        Ideologia
+                      </h2>
+                      <ListaInformacoes
+                        itens={partido.ideologia}
+                        vazio="A ideologia ainda não foi cadastrada."
+                        primeiroItemMaiusculo
+                      />
+                    </section>
+                  </div>
+                </div>
               </div>
-            )}
-          </section>
+            </article>
+            <section
+              aria-labelledby="candidatos-partido-titulo"
+              className="mt-8"
+            >
+              <div
+                aria-hidden="true"
+                className="mb-7 h-px w-full"
+                style={{ backgroundColor: paleta.borda }}
+              />
+              <h2
+                id="candidatos-partido-titulo"
+                className="mb-5 text-left text-xl font-black uppercase tracking-[0.08em] sm:text-2xl"
+                style={{ color: paleta.borda }}
+              >
+                Candidatos do partido
+              </h2>
+
+              {carregandoCandidatos ? (
+                <p className="text-sm font-medium text-[#68688e]">
+                  Carregando candidatos...
+                </p>
+              ) : erroCandidatos ? (
+                <p role="alert" className="text-sm font-medium text-red-700">
+                  {erroCandidatos}
+                </p>
+              ) : candidatos.length === 0 ? (
+                <p className="text-sm font-medium text-[#68688e]">
+                  Não há candidatos associados a este partido.
+                </p>
+              ) : (
+                <div className="grid w-full max-w-[1400px] grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                  {candidatos.map((candidato) => (
+                    <article
+                      key={candidato.id}
+                      className="flex min-h-[240px] flex-col overflow-hidden rounded-2xl border-2 bg-white text-[#2A2A72]"
+                      style={{ borderColor: paleta.borda }}
+                    >
+                      <div
+                        className="flex h-40 w-full shrink-0 items-center justify-center overflow-hidden sm:h-48"
+                        style={{ backgroundColor: paleta.cor }}
+                      >
+                        {candidato.foto_url ? (
+                          <img
+                            src={candidato.foto_url}
+                            alt={`Foto de ${candidato.nome_politico || candidato.nome_completo}`}
+                            loading="lazy"
+                            decoding="async"
+                            className="h-full w-full object-cover object-[center_20%]"
+                          />
+                        ) : (
+                          <span className="text-xs font-bold uppercase tracking-[0.1em] text-[#2A2A72]">
+                            Sem foto
+                          </span>
+                        )}
+                      </div>
+
+                      <div className="flex flex-1 flex-col p-3">
+                        <h3 className="break-words text-base font-bold uppercase leading-tight">
+                          {candidato.nome_politico || candidato.nome_completo}
+                        </h3>
+                      </div>
+                    </article>
+                  ))}
+                </div>
+              )}
+            </section>
           </>
         )}
       </main>
