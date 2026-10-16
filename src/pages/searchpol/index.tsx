@@ -43,9 +43,9 @@ const partidos = [
   },
   {
     keyword: 'democrata',
-    nome: 'DEMOCRATAS',
+    nome: 'DEMOCRATA',
     sigla: 'DEMOCRATA',
-    numero: '20',
+    numero: '35',
     foto: '/logos/partidos/democrata.svg',
   },
   {
