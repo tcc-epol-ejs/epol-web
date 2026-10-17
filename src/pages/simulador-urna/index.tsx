@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 import Footer from '../../components/footer/footer';
 import Header from '../../components//header';
 import pipoTriste from '../../assets/Imagens/pipoTriste.png';
+import pipoFeliz from '../../assets/Imagens/pipoFeliz.png';
 
 const bolasConfig = [
   { size: 280, top: '-40px', left: '-30px', opacity: 1 },
@@ -67,7 +68,11 @@ const CENARIOS: Cenario[] = [
   },
 ];
 
-const ETAPAS = ['Escolha a eleição e o turno', 'Simule a votação'];
+const ETAPAS = [
+  'Escolha a eleição e o turno',
+  'Faca sua colinha!',
+  'Simule a votação',
+];
 
 // Candidatos fictícios (pipos)
 interface CandidatoUrna {
@@ -82,13 +87,13 @@ const CANDIDATOS_EXEMPLO: CandidatoUrna[] = [
     numero: '11',
     nome: 'Candidato Exemplo A',
     partido: 'AAA',
-    foto: 'https://via.placeholder.com/150',
+    foto: pipoFeliz,
   },
   {
     numero: '22',
     nome: 'Candidata Exemplo B',
     partido: 'BBB',
-    foto: 'pipoTriste',
+    foto: pipoTriste,
   },
 ];
 
@@ -360,13 +365,21 @@ function SimuladorEtapa2({
                     </div>
 
                     {completo && candidato && (
-                      <div className="mt-4 text-sm leading-6">
-                        <p>
-                          Nome: <strong>{candidato.nome}</strong>
-                        </p>
-                        <p>
-                          Partido: <strong>{candidato.partido}</strong>
-                        </p>
+                      <div className="mt-4 flex items-start gap-4 text-sm leading-6">
+                        <div className="flex-1">
+                          <p>
+                            Nome: <strong>{candidato.nome}</strong>
+                          </p>
+                          <p>
+                            Partido: <strong>{candidato.partido}</strong>
+                          </p>
+                        </div>
+
+                        <img
+                          src={candidato.foto}
+                          alt={`Foto de ${candidato.nome}`}
+                          className="h-24 w-20 flex-shrink-0 border border-black object-cover"
+                        />
                       </div>
                     )}
 
