@@ -2,7 +2,7 @@ import { useState } from 'react';
 import type { ReactNode } from 'react';
 import Footer from '../../components/footer/footer';
 import Header from '../../components//header';
-import pipoTriste from '../../assets/Imagens/pipoTriste.png';
+import pipo_fechado from '../../assets/Imagens/pipo_fechado.png';
 import pipoFeliz from '../../assets/Imagens/pipoFeliz.png';
 
 const bolasConfig = [
@@ -70,7 +70,7 @@ const CENARIOS: Cenario[] = [
 
 const ETAPAS = [
   'Escolha a eleição e o turno',
-  'Faca sua colinha!',
+  'Faça sua colinha!',
   'Simule a votação',
 ];
 
@@ -90,16 +90,16 @@ const CANDIDATOS_EXEMPLO: CandidatoUrna[] = [
     foto: pipoFeliz,
   },
   {
-    numero: '22',
-    nome: 'Candidata Exemplo B',
+    numero: '12',
+    nome: 'Candidato Exemplo B',
     partido: 'BBB',
-    foto: pipoTriste,
+    foto: pipo_fechado,
   },
 ];
 
 function Stepper({ atual }: { atual: number }) {
   return (
-    <ol className="grid grid-cols-1 sm:grid-cols-2 overflow-hidden rounded-t-xl">
+    <ol className="grid grid-cols-1 sm:grid-cols-3 overflow-hidden rounded-t-xl">
       {ETAPAS.map((nome, i) => {
         const numero = i + 1;
         const ativa = numero === atual;
@@ -236,7 +236,80 @@ function SimuladorEtapa1({
     </section>
   );
 }
+// ---------- Etapa 2 (candidatos / colinha) ----------
 
+function SimuladorEtapa2({
+  cenario,
+  onVoltar,
+  onAvancar,
+}: {
+  cenario: Cenario;
+  onVoltar: () => void;
+  onAvancar: () => void;
+}) {
+  return (
+    <section className="relative z-10 mx-auto w-full max-w-5xl px-4 py-8">
+      <Cabecalho cenario={cenario} />
+
+      <div className="mt-6 overflow-hidden rounded-xl bg-[#f4f5f9] shadow-sm">
+        <Stepper atual={2} />
+
+        <div className="px-6 py-8 sm:px-12">
+          <p className="mb-5 text-base text-[#1f2a52]">
+            Conheça os candidatos e anote os números para a hora de votar.
+          </p>
+
+          <div className="rounded-xl bg-[#8888D3] p-6">
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+              {CANDIDATOS_EXEMPLO.map((c) => (
+                <article
+                  key={c.numero}
+                  className="flex items-center gap-4 rounded-xl bg-white p-5"
+                >
+                  <img
+                    src={c.foto}
+                    alt={`Foto de ${c.nome}`}
+                    className="h-28 w-24 flex-shrink-0 rounded-md border border-[#c9c9ee] object-cover"
+                  />
+
+                  <div className="min-w-0">
+                    <p className="text-4xl font-bold text-[#2a2a72]">
+                      {c.numero}
+                    </p>
+                    <h3 className="text-lg font-bold text-[#1f2a52]">
+                      {c.nome}
+                    </h3>
+                    <p className="text-sm text-[#5A5A70]">
+                      Partido: {c.partido}
+                    </p>
+                  </div>
+                </article>
+              ))}
+            </div>
+          </div>
+
+          <div className="mt-6 flex justify-between">
+            <button
+              type="button"
+              onClick={onVoltar}
+              className="rounded-full bg-[#8888D3] px-8 py-2.5 text-sm font-bold text-white transition-all hover:brightness-110 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2a2a72]"
+            >
+              voltar
+            </button>
+
+            <button
+              type="button"
+              onClick={onAvancar}
+              className="rounded-full bg-[#FFA400] px-8 py-2.5 text-sm font-bold text-white transition-all hover:brightness-110 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2a2a72]"
+            >
+              avançar
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
 // ---------- Tecla da urna ----------
 
 function Tecla({
@@ -262,11 +335,11 @@ function Tecla({
   );
 }
 
-// ---------- Etapa 2 (visor + teclado) ----------
+// ---------- Etapa 3 (visor + teclado) ----------
 
 type Fase = 'digitando' | 'branco' | 'fim';
 
-function SimuladorEtapa2({
+function SimuladorEtapa3({
   cenario,
   onVoltar,
 }: {
@@ -317,7 +390,7 @@ function SimuladorEtapa2({
       <Cabecalho cenario={cenario} />
 
       <div className="mt-6 overflow-hidden rounded-xl bg-[#f4f5f9] shadow-sm">
-        <Stepper atual={2} />
+        <Stepper atual={3} />
 
         <div className="px-6 py-8 sm:px-12">
           <div className="mx-auto w-full max-w-[520px] rounded-2xl bg-[#ecece4] p-4 shadow-lg ring-1 ring-black/10">
@@ -488,7 +561,7 @@ function SimuladorEtapa2({
 // ---------- Página ----------
 
 export default function SimuladorUrna() {
-  const [etapa, setEtapa] = useState<1 | 2>(1);
+  const [etapa, setEtapa] = useState<1 | 2 | 3>(1);
   const [cenario, setCenario] = useState<Cenario>(CENARIOS[0]);
 
   return (
@@ -496,6 +569,7 @@ export default function SimuladorUrna() {
       <div className="relative min-h-[100dvh] w-full overflow-hidden bg-white">
         <Bolas />
         <Header />
+
         {etapa === 1 && (
           <SimuladorEtapa1
             cenarioInicial={cenario}
@@ -507,7 +581,15 @@ export default function SimuladorUrna() {
         )}
 
         {etapa === 2 && (
-          <SimuladorEtapa2 cenario={cenario} onVoltar={() => setEtapa(1)} />
+          <SimuladorEtapa2
+            cenario={cenario}
+            onVoltar={() => setEtapa(1)}
+            onAvancar={() => setEtapa(3)}
+          />
+        )}
+
+        {etapa === 3 && (
+          <SimuladorEtapa3 cenario={cenario} onVoltar={() => setEtapa(2)} />
         )}
       </div>
 
