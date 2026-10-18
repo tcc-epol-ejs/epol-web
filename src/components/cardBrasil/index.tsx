@@ -25,49 +25,72 @@ function BandeiraBrasil() {
   );
 }
 
-const cargo = (c: Candidato) => c.cargo_atual?.trim().toLowerCase() ?? '';
+const limpar = (texto?: string | null) =>
+  (texto ?? '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .trim();
 
-export default function CardBrasil({ candidatos }: CardBrasilProps) {
+// Reconhece "Presidente", "Presidente da República", "Presidente do Brasil"...
+// mas NÃO "Presidente do partido X", "Presidente Nacional" etc.
+function ehPresidente(c: Candidato) {
+  const cargo = limpar(c.cargo_atual);
+  return (
+    cargo === 'presidente' ||
+    cargo.startsWith('presidente da republica') ||
+    cargo.startsWith('presidente do brasil')
+  );
+}
+
+function ehVicePresidente(c: Candidato) {
+  const cargo = limpar(c.cargo_atual);
+  return (
+    cargo === 'vice-presidente' ||
+    cargo === 'vice presidente' ||
+    cargo.startsWith('vice-presidente da republica') ||
+    cargo.startsWith('vice presidente da republica') ||
+    cargo.startsWith('vice-presidente do brasil')
+  );
+}
+
+function Pessoa({ pessoa, titulo }: { pessoa: Candidato; titulo: string }) {
   const navigate = useNavigate();
 
-  const presidente = candidatos.find((c) => cargo(c) === 'presidente') ?? null;
-
-  const vice =
-    candidatos.find((c) =>
-      ['vice-presidente', 'vice presidente'].includes(cargo(c)),
-    ) ?? null;
-
-  function Pessoa({ pessoa, titulo }: { pessoa: Candidato; titulo: string }) {
-    return (
-      <div className="mb-3 last:mb-0">
-        <p className="mb-1 text-[10px] font-bold uppercase tracking-wider text-gray-400">
-          {titulo}
-        </p>
-        <button
-          onClick={() => navigate(`/candidatos/${pessoa.id}`)}
-          className="flex w-full items-center gap-2 text-left transition-opacity hover:opacity-80"
-        >
-          {pessoa.foto_url && (
-            <img
-              src={pessoa.foto_url}
-              alt={pessoa.nome_politico}
-              className="h-10 w-10 flex-shrink-0 rounded-full object-cover"
-            />
-          )}
-          <div>
-            <p className="text-xs font-bold text-[#2A2A72]">
-              {pessoa.nome_politico}
+  return (
+    <div className="mb-3 last:mb-0">
+      <p className="mb-1 text-[10px] font-bold uppercase tracking-wider text-gray-400">
+        {titulo}
+      </p>
+      <button
+        onClick={() => navigate(`/candidatos/${pessoa.id}`)}
+        className="flex w-full items-center gap-2 text-left transition-opacity hover:opacity-80"
+      >
+        {pessoa.foto_url && (
+          <img
+            src={pessoa.foto_url}
+            alt={pessoa.nome_politico}
+            className="h-10 w-10 flex-shrink-0 rounded-full object-cover"
+          />
+        )}
+        <div>
+          <p className="text-xs font-bold text-[#2A2A72]">
+            {pessoa.nome_politico}
+          </p>
+          {pessoa.partidos && (
+            <p className="text-[10px] text-gray-500">
+              ({pessoa.partidos.sigla})
             </p>
-            {pessoa.partidos && (
-              <p className="text-[10px] text-gray-500">
-                ({pessoa.partidos.sigla})
-              </p>
-            )}
-          </div>
-        </button>
-      </div>
-    );
-  }
+          )}
+        </div>
+      </button>
+    </div>
+  );
+}
+
+export default function CardBrasil({ candidatos }: CardBrasilProps) {
+  const presidente = candidatos.find(ehPresidente) ?? null;
+  const vice = candidatos.find(ehVicePresidente) ?? null;
 
   return (
     <div className="w-full rounded-2xl bg-white p-4 shadow-lg">
