@@ -1,7 +1,18 @@
 import { useState, useRef, useMemo, useEffect } from 'react';
-import type { PointerEvent as ReactPointerEvent } from 'react';
+import type { PointerEvent as ReactPointerEvent, ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FiX, FiMinus, FiHeart, FiChevronLeft, FiFlag } from 'react-icons/fi';
+import {
+  FiX,
+  FiMinus,
+  FiHeart,
+  FiChevronLeft,
+  FiChevronRight,
+  FiFlag,
+  FiShare2,
+  FiDownload,
+  FiEdit2,
+} from 'react-icons/fi';
+import { FaWhatsapp, FaInstagram } from 'react-icons/fa';
 import Header from '../../components/header';
 import RoundButton from '../../components/botoes/roundButton';
 import PipoCoracao from '../../assets/Imagens/pipoCoracao.png';
@@ -146,6 +157,26 @@ function formatarTag(tag: string): string {
     .join(' ');
 }
 
+// Texto/cores de cada tipo de resposta (usado na revisão e na navegação)
+const VALOR_INFO: Record<Valor, { label: string; chip: string; dot: string }> =
+  {
+    '1': {
+      label: 'Concordo',
+      chip: 'bg-green-100 text-green-700',
+      dot: 'bg-green-500 text-white',
+    },
+    '0': {
+      label: 'Neutro',
+      chip: 'bg-[#EDE9FE] text-[#6F68C9]',
+      dot: 'bg-[#8B84D6] text-white',
+    },
+    '-1': {
+      label: 'Discordo',
+      chip: 'bg-red-100 text-red-600',
+      dot: 'bg-red-500 text-white',
+    },
+  };
+
 // -----------------------------------------------------------------------------
 // MASCOTE — Pipo (usado só na tela de quiz, pra refletir a reação do usuário)
 // -----------------------------------------------------------------------------
@@ -280,6 +311,20 @@ function selecionarPerguntas(todas: Pergunta[], quantidade = 15): Pergunta[] {
   return embaralhar(selecionadas);
 }
 
+// Próxima pergunta ainda sem resposta (procura "pra frente", dando a volta).
+// Retorna -1 quando todas já foram respondidas.
+function proximaSemResposta(
+  perguntas: Pergunta[],
+  respostas: Record<string, Valor>,
+  aPartirDe: number,
+): number {
+  for (let k = 1; k <= perguntas.length; k++) {
+    const i = (aPartirDe + k) % perguntas.length;
+    if (respostas[perguntas[i].id] === undefined) return i;
+  }
+  return -1;
+}
+
 // -----------------------------------------------------------------------------
 // BLOBS DE FUNDO
 // -----------------------------------------------------------------------------
@@ -412,6 +457,48 @@ function Blobs({ tint }: { tint?: string | null }) {
 }
 
 // -----------------------------------------------------------------------------
+// MODAL GENÉRICO (overlay + caixa branca, fecha com Esc ou clique fora)
+// -----------------------------------------------------------------------------
+interface ModalProps {
+  onClose: () => void;
+  maxW?: string;
+  labelledBy?: string;
+  children: ReactNode;
+}
+
+function Modal({
+  onClose,
+  maxW = 'max-w-[520px]',
+  labelledBy,
+  children,
+}: ModalProps) {
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      if (e.key === 'Escape') onClose();
+    }
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [onClose]);
+
+  return (
+    <div
+      className="fixed inset-0 z-[2000] flex items-center justify-center bg-[#0f0c3c]/70 backdrop-blur-sm px-4 py-6"
+      onClick={onClose}
+    >
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={labelledBy}
+        className={`relative bg-white rounded-[28px] w-full ${maxW} max-h-[90dvh] flex flex-col overflow-hidden shadow-[0_30px_60px_rgba(15,12,60,0.45)]`}
+        onClick={(e) => e.stopPropagation()}
+      >
+        {children}
+      </div>
+    </div>
+  );
+}
+
+// -----------------------------------------------------------------------------
 // TELA DE STATUS — carregando / erro / login necessário
 // -----------------------------------------------------------------------------
 function StatusScreen({
@@ -501,6 +588,107 @@ function IntroScreen({ onStart }: IntroScreenProps) {
 }
 
 // -----------------------------------------------------------------------------
+// MODAL DE REVISÃO — aparece depois da última pergunta
+// -----------------------------------------------------------------------------
+interface ReviewModalProps {
+  perguntas: Pergunta[];
+  respostas: Record<string, Valor>;
+  onEdit: (index: number) => void;
+  onBack: () => void;
+  onConfirm: () => void;
+}
+
+function ReviewModal({
+  perguntas,
+  respostas,
+  onEdit,
+  onBack,
+  onConfirm,
+}: ReviewModalProps) {
+  const contagem = { '1': 0, '0': 0, '-1': 0 } as Record<string, number>;
+  perguntas.forEach((p) => {
+    const v = respostas[p.id];
+    if (v !== undefined) contagem[String(v)]++;
+  });
+
+  return (
+    <Modal onClose={onBack} maxW="max-w-[600px]" labelledBy="revisao-titulo">
+      <div className="p-6 pb-4 border-b border-[#ECEAFB]">
+        <h2
+          id="revisao-titulo"
+          className="[font-family:'Sora',sans-serif] font-extrabold text-[20px] text-[#1B1B3A]"
+        >
+          Confira suas respostas
+        </h2>
+        <p className="text-[13px] text-[#5b5776] mt-1">
+          Está tudo certo? Se alguma resposta não for o que você pensa, toque em
+          “Editar” para trocar.
+        </p>
+        <div className="flex flex-wrap gap-2 mt-3">
+          {([1, 0, -1] as Valor[]).map((v) => (
+            <span
+              key={v}
+              className={`text-[11px] font-bold px-3 py-1.5 rounded-full ${VALOR_INFO[v].chip}`}
+            >
+              {contagem[String(v)]} {VALOR_INFO[v].label.toLowerCase()}
+            </span>
+          ))}
+        </div>
+      </div>
+
+      <ol className="flex-1 overflow-y-auto px-6 py-2 m-0 list-none">
+        {perguntas.map((p, i) => {
+          const v = respostas[p.id];
+          return (
+            <li
+              key={p.id}
+              className="flex items-start gap-3 py-3 border-b border-[#F1EFFB] last:border-b-0"
+            >
+              <span className="shrink-0 w-7 h-7 rounded-full bg-[#F4F3FA] text-[#6F68C9] text-[12px] font-extrabold flex items-center justify-center mt-0.5">
+                {i + 1}
+              </span>
+              <div className="flex-1 min-w-0">
+                <p className="text-[13px] text-[#2E2A47] leading-[1.4] m-0 mb-1.5">
+                  {p.texto}
+                </p>
+                {v !== undefined && (
+                  <span
+                    className={`inline-block text-[11px] font-bold px-2.5 py-1 rounded-full ${VALOR_INFO[v].chip}`}
+                  >
+                    {VALOR_INFO[v].label}
+                  </span>
+                )}
+              </div>
+              <button
+                onClick={() => onEdit(i)}
+                className="shrink-0 flex items-center gap-1 text-[12px] font-semibold text-[#6F68C9] hover:underline mt-0.5"
+              >
+                <FiEdit2 size={13} /> Editar
+              </button>
+            </li>
+          );
+        })}
+      </ol>
+
+      <div className="p-5 border-t border-[#ECEAFB] flex flex-col-reverse sm:flex-row gap-3 sm:justify-end">
+        <button
+          onClick={onBack}
+          className="[font-family:'Sora',sans-serif] font-bold text-[13px] text-[#2E2A47] px-5 py-3 rounded-full bg-[#F4F3FA] hover:bg-[#ECEAFB] transition-colors"
+        >
+          Voltar ao quiz
+        </button>
+        <button
+          onClick={onConfirm}
+          className="[font-family:'Sora',sans-serif] font-bold text-[13px] text-white px-6 py-3 rounded-full bg-[#2E2A47] shadow-[0_4px_0_#16142a] transition-transform hover:-translate-y-0.5 active:translate-y-1 active:shadow-[0_1px_0_#16142a]"
+        >
+          Confirmar e ver resultado
+        </button>
+      </div>
+    </Modal>
+  );
+}
+
+// -----------------------------------------------------------------------------
 // TELA 1 — QUIZ
 // -----------------------------------------------------------------------------
 interface QuizScreenProps {
@@ -511,7 +699,9 @@ interface QuizScreenProps {
 
 function QuizScreen({ perguntas, onAnswer, onFinish }: QuizScreenProps) {
   const [index, setIndex] = useState(0);
-  const [respostas, setRespostas] = useState<Resposta[]>([]);
+  // Respostas indexadas pelo id da pergunta, pra dar pra voltar e trocar.
+  const [respostas, setRespostas] = useState<Record<string, Valor>>({});
+  const [revisando, setRevisando] = useState(false);
   const [dragX, setDragX] = useState(0);
   const [dragging, setDragging] = useState(false);
   const [exit, setExit] = useState<'like' | 'dislike' | 'neutral' | null>(null);
@@ -522,21 +712,46 @@ function QuizScreen({ perguntas, onAnswer, onFinish }: QuizScreenProps) {
   const question = perguntas[index];
   const next1 = perguntas[index + 1];
   const next2 = perguntas[index + 2];
-  const progress = total > 0 ? Math.round((index / total) * 100) : 0;
+  const respondidas = perguntas.filter(
+    (p) => respostas[p.id] !== undefined,
+  ).length;
+  const progress = total > 0 ? Math.round((respondidas / total) * 100) : 0;
+  const respostaAtual = question ? respostas[question.id] : undefined;
+  const tudoRespondido = total > 0 && respondidas === total;
 
-  function commit(valor: Valor, mood: Mood) {
+  function commit(valor: Valor, novoMood: Mood) {
     if (exit || !question) return;
-    setMood(mood);
+    setMood(novoMood);
     setExit(valor === 1 ? 'like' : valor === -1 ? 'dislike' : 'neutral');
-    onAnswer(question.id, valor); // salva no backend, sem travar a navegação local
+    // Salva no backend (de novo, se for uma troca de resposta).
+    onAnswer(question.id, valor);
+
+    const atualizadas = { ...respostas, [question.id]: valor };
     setTimeout(() => {
-      const novas: Resposta[] = [...respostas, { tags: question.tags, valor }];
-      setRespostas(novas);
+      setRespostas(atualizadas);
       setExit(null);
       setDragX(0);
-      if (index + 1 >= total) onFinish(novas);
-      else setIndex(index + 1);
+
+      // Vai pra próxima sem resposta; se acabou, abre a revisão.
+      const proxima = proximaSemResposta(perguntas, atualizadas, index);
+      if (proxima === -1) setRevisando(true);
+      else setIndex(proxima);
     }, 240);
+  }
+
+  function irPara(i: number) {
+    if (exit || i < 0 || i >= total) return;
+    setDragX(0);
+    setMood('neutral');
+    setIndex(i);
+  }
+
+  function confirmar() {
+    const lista: Resposta[] = perguntas.map((p) => ({
+      tags: p.tags,
+      valor: respostas[p.id] ?? 0,
+    }));
+    onFinish(lista);
   }
 
   function onPointerDown(e: ReactPointerEvent<HTMLDivElement>) {
@@ -593,6 +808,55 @@ function QuizScreen({ perguntas, onAnswer, onFinish }: QuizScreenProps) {
     <div className="relative w-full h-full min-h-[640px] bg-[#2E2A6B] overflow-hidden flex items-center justify-center px-4 py-8">
       <Blobs tint={tint} />
       <div className="relative z-10 bg-white rounded-[28px] p-7 min-h-[394px] w-full max-w-[620px] shadow-[0_30px_60px_rgba(15,12,60,0.35)]">
+        <nav
+          aria-label="Perguntas do quiz"
+          className="flex items-center justify-center flex-wrap gap-1 mb-5"
+        >
+          <button
+            onClick={() => irPara(index - 1)}
+            disabled={index === 0}
+            aria-label="Pergunta anterior"
+            className="w-6 h-6 rounded-full flex items-center justify-center text-[#6F68C9] hover:bg-[#F4F3FA] disabled:opacity-30 disabled:hover:bg-transparent"
+          >
+            <FiChevronLeft size={14} />
+          </button>
+          {perguntas.map((p, i) => {
+            const v = respostas[p.id];
+            const atual = i === index;
+            return (
+              <button
+                key={p.id}
+                onClick={() => irPara(i)}
+                aria-label={`Pergunta ${i + 1}${
+                  v !== undefined
+                    ? `, respondida: ${VALOR_INFO[v].label}`
+                    : ', sem resposta'
+                }`}
+                aria-current={atual ? 'step' : undefined}
+                className={`w-6 h-6 rounded-full text-[10px] font-extrabold transition-transform focus-visible:outline-2 focus-visible:outline-[#FF9F1C] ${
+                  v !== undefined
+                    ? VALOR_INFO[v].dot
+                    : 'bg-[#ECEAFB] text-[#8B84D6]'
+                } ${
+                  atual
+                    ? 'ring-2 ring-[#FF9F1C] ring-offset-1 scale-110'
+                    : 'hover:scale-105'
+                }`}
+              >
+                {i + 1}
+              </button>
+            );
+          })}
+          <button
+            onClick={() => irPara(index + 1)}
+            disabled={index === total - 1}
+            aria-label="Próxima pergunta"
+            className="w-6 h-6 rounded-full flex items-center justify-center text-[#6F68C9] hover:bg-[#F4F3FA] disabled:opacity-30 disabled:hover:bg-transparent"
+          >
+            <FiChevronRight size={14} />
+          </button>
+        </nav>
+
         <div className="flex flex-col sm:flex-row gap-7 items-center sm:items-start flex-wrap">
           <div className="w-[220px] sm:w-[240px]">
             <div className="relative w-[220px] sm:w-[240px] h-[268px]">
@@ -625,7 +889,11 @@ function QuizScreen({ perguntas, onAnswer, onFinish }: QuizScreenProps) {
                   {question.texto}
                 </p>
                 <div className="flex justify-between text-[10px] opacity-80">
-                  <span>arraste ou use os botões</span>
+                  <span>
+                    {respostaAtual !== undefined
+                      ? `sua resposta: ${VALOR_INFO[respostaAtual].label.toLowerCase()}`
+                      : 'arraste ou use os botões'}
+                  </span>
                   <span>
                     {index + 1} / {total}
                   </span>
@@ -678,17 +946,521 @@ function QuizScreen({ perguntas, onAnswer, onFinish }: QuizScreenProps) {
               />
             </div>
             <span className="text-[12px] text-[#8B84D6] font-bold">
-              {progress}%
+              {respondidas} de {total} respondidas
             </span>
-            <h2 className="[font-family:'Sora',sans-serif] text-[16px] text-[#2E2A47] mt-[6px]">
-              Responda e descubra
-              <br />
-              seu representante ideal!
-            </h2>
+            {tudoRespondido ? (
+              <button
+                onClick={() => setRevisando(true)}
+                className="[font-family:'Sora',sans-serif] font-bold text-[12px] text-white bg-[#FF9F1C] px-4 py-2 rounded-full hover:brightness-105 mt-[6px]"
+              >
+                Revisar e finalizar
+              </button>
+            ) : (
+              <h2 className="[font-family:'Sora',sans-serif] text-[16px] text-[#2E2A47] mt-[6px]">
+                Responda e descubra
+                <br />
+                seu representante ideal!
+              </h2>
+            )}
           </div>
         </div>
       </div>
+
+      {revisando && (
+        <ReviewModal
+          perguntas={perguntas}
+          respostas={respostas}
+          onEdit={(i) => {
+            setRevisando(false);
+            irPara(i);
+          }}
+          onBack={() => setRevisando(false)}
+          onConfirm={confirmar}
+        />
+      )}
     </div>
+  );
+}
+
+// -----------------------------------------------------------------------------
+// COMPARTILHAMENTO — gera uma imagem (formato story 1080x1920) com o top 3
+// -----------------------------------------------------------------------------
+const FONTE = "Sora, 'Segoe UI', system-ui, sans-serif";
+const NOME_SITE = 'EPOL';
+
+function carregarImagem(src: string): Promise<HTMLImageElement | null> {
+  return new Promise((resolve) => {
+    const img = new Image();
+    // Sem CORS no servidor da bandeira a imagem falha; aí caímos no
+    // círculo com a sigla (sem "sujar" o canvas).
+    img.crossOrigin = 'anonymous';
+    img.onload = () => resolve(img);
+    img.onerror = () => resolve(null);
+    img.src = src;
+  });
+}
+
+function caminhoArredondado(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  r: number,
+) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.arcTo(x + w, y, x + w, y + h, r);
+  ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r);
+  ctx.arcTo(x, y, x + w, y, r);
+  ctx.closePath();
+}
+
+interface OpcoesTexto {
+  tamanho: number;
+  cor: string;
+  peso?: number;
+  alinhar?: CanvasTextAlign;
+  maxLargura?: number;
+}
+
+function escreverTexto(
+  ctx: CanvasRenderingContext2D,
+  texto: string,
+  x: number,
+  y: number,
+  { tamanho, cor, peso = 800, alinhar = 'center', maxLargura }: OpcoesTexto,
+) {
+  let t = tamanho;
+  ctx.font = `${peso} ${t}px ${FONTE}`;
+  if (maxLargura) {
+    while (ctx.measureText(texto).width > maxLargura && t > 16) {
+      t -= 2;
+      ctx.font = `${peso} ${t}px ${FONTE}`;
+    }
+  }
+  ctx.fillStyle = cor;
+  ctx.textAlign = alinhar;
+  ctx.textBaseline = 'alphabetic';
+  ctx.fillText(texto, x, y);
+}
+
+// Desenha a imagem dentro de uma caixa mantendo a proporção original
+// (sem achatar nem esticar).
+function desenharContido(
+  ctx: CanvasRenderingContext2D,
+  img: HTMLImageElement,
+  cx: number,
+  cy: number,
+  maxW: number,
+  maxH: number,
+) {
+  const w0 = img.naturalWidth || maxW;
+  const h0 = img.naturalHeight || maxH;
+  const esc = Math.min(maxW / w0, maxH / h0);
+  const w = w0 * esc;
+  const h = h0 * esc;
+  ctx.drawImage(img, cx - w / 2, cy - h / 2, w, h);
+}
+
+function desenharLogo(
+  ctx: CanvasRenderingContext2D,
+  img: HTMLImageElement | null,
+  p: Partido,
+  cx: number,
+  cy: number,
+  tamanho: number,
+) {
+  if (img) {
+    desenharContido(ctx, img, cx, cy, tamanho, tamanho);
+    return;
+  }
+  ctx.fillStyle = p.cor;
+  ctx.beginPath();
+  ctx.arc(cx, cy, tamanho / 2, 0, Math.PI * 2);
+  ctx.fill();
+  escreverTexto(ctx, p.sigla, cx, cy + tamanho * 0.11, {
+    tamanho: tamanho * 0.32,
+    cor: '#fff',
+    maxLargura: tamanho * 0.8,
+  });
+}
+
+async function gerarImagemCompartilhamento(
+  ranking: PartidoResultado[],
+): Promise<Blob | null> {
+  const [top, segundo, terceiro] = ranking;
+  if (!top) return null;
+
+  try {
+    await document.fonts?.load(`800 40px Sora`);
+  } catch {
+    /* segue com a fonte de fallback */
+  }
+
+  const [pipo, logoTop, logo2, logo3] = await Promise.all([
+    carregarImagem(PipoCoracao),
+    carregarImagem(top.logoSrc),
+    segundo ? carregarImagem(segundo.logoSrc) : Promise.resolve(null),
+    terceiro ? carregarImagem(terceiro.logoSrc) : Promise.resolve(null),
+  ]);
+
+  const W = 1080;
+  const H = 1920;
+  const canvas = document.createElement('canvas');
+  canvas.width = W;
+  canvas.height = H;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return null;
+
+  // Fundo
+  const fundo = ctx.createLinearGradient(0, 0, W, H);
+  fundo.addColorStop(0, '#3A3589');
+  fundo.addColorStop(1, '#221E58');
+  ctx.fillStyle = fundo;
+  ctx.fillRect(0, 0, W, H);
+
+  // Bolhas decorativas
+  const bolhas: [number, number, number, number][] = [
+    [90, 120, 190, 0.3],
+    [990, 300, 130, 0.25],
+    [120, 1000, 60, 0.2],
+    [1010, 1220, 100, 0.22],
+    [60, 1800, 210, 0.3],
+    [940, 1780, 130, 0.25],
+  ];
+  bolhas.forEach(([x, y, r, a]) => {
+    ctx.fillStyle = `rgba(166,160,232,${a})`;
+    ctx.beginPath();
+    ctx.arc(x, y, r, 0, Math.PI * 2);
+    ctx.fill();
+  });
+
+  // Pipo (mantendo a proporção) + título
+  if (pipo) desenharContido(ctx, pipo, W / 2, 255, 320, 300);
+  escreverTexto(ctx, 'MEU MATCH POLÍTICO', W / 2, 505, {
+    tamanho: 64,
+    cor: '#FFFFFF',
+    maxLargura: 940,
+  });
+
+  // Cartão branco
+  const cardX = 60;
+  const cardY = 580;
+  const cardW = W - 120;
+  const cardH = 1010;
+  ctx.save();
+  ctx.shadowColor = 'rgba(10,8,50,0.45)';
+  ctx.shadowBlur = 50;
+  ctx.shadowOffsetY = 24;
+  ctx.fillStyle = '#FFFFFF';
+  caminhoArredondado(ctx, cardX, cardY, cardW, cardH, 56);
+  ctx.fill();
+  ctx.restore();
+
+  // Partido #1 — logo, sigla, nome e porcentagem (tamanhos moderados)
+  const lado = 240;
+  const lx = (W - lado) / 2;
+  const ly = cardY + 50;
+  ctx.fillStyle = '#F4F3FA';
+  caminhoArredondado(ctx, lx, ly, lado, lado, 44);
+  ctx.fill();
+  ctx.lineWidth = 8;
+  ctx.strokeStyle = top.cor;
+  caminhoArredondado(ctx, lx, ly, lado, lado, 44);
+  ctx.stroke();
+  desenharLogo(ctx, logoTop, top, W / 2, ly + lado / 2, 160);
+
+  escreverTexto(ctx, top.sigla, W / 2, ly + lado + 80, {
+    tamanho: 64,
+    cor: '#1B1B3A',
+    maxLargura: 840,
+  });
+  escreverTexto(ctx, top.nome, W / 2, ly + lado + 126, {
+    tamanho: 28,
+    cor: '#5b5776',
+    peso: 600,
+    maxLargura: 840,
+  });
+  escreverTexto(ctx, `${Math.round(top.pct)}%`, W / 2, ly + lado + 255, {
+    tamanho: 120,
+    cor: '#FF9F1C',
+  });
+  escreverTexto(ctx, 'de compatibilidade', W / 2, ly + lado + 305, {
+    tamanho: 30,
+    cor: '#5b5776',
+    peso: 600,
+  });
+
+  // Divisor + legenda
+  const divY = ly + lado + 345;
+  ctx.fillStyle = '#ECEAFB';
+  ctx.fillRect(cardX + 80, divY, cardW - 160, 3);
+  escreverTexto(ctx, 'TAMBÉM COMBINA COM', W / 2, divY + 50, {
+    tamanho: 24,
+    cor: '#8B84D6',
+  });
+
+  // 2º e 3º lugar — linhas empilhadas
+  const linhas: [
+    PartidoResultado | undefined,
+    HTMLImageElement | null,
+    number,
+  ][] = [
+    [segundo, logo2, 2],
+    [terceiro, logo3, 3],
+  ];
+  const rx = cardX + 60;
+  const rw = cardW - 120;
+  const rh = 130;
+  linhas.forEach(([p, img, posicao], i) => {
+    if (!p) return;
+    const ry = divY + 80 + i * (rh + 20);
+    const mid = ry + rh / 2;
+
+    ctx.fillStyle = '#F4F3FA';
+    caminhoArredondado(ctx, rx, ry, rw, rh, 32);
+    ctx.fill();
+
+    // Número da posição
+    ctx.fillStyle = p.cor;
+    ctx.beginPath();
+    ctx.arc(rx + 64, mid, 32, 0, Math.PI * 2);
+    ctx.fill();
+    escreverTexto(ctx, String(posicao), rx + 64, mid + 13, {
+      tamanho: 36,
+      cor: '#FFFFFF',
+    });
+
+    // Logo, sigla e nome
+    desenharLogo(ctx, img, p, rx + 170, mid, 84);
+    escreverTexto(ctx, p.sigla, rx + 240, mid - 2, {
+      tamanho: 38,
+      cor: '#1B1B3A',
+      alinhar: 'left',
+      maxLargura: 360,
+    });
+    escreverTexto(ctx, p.nome, rx + 240, mid + 34, {
+      tamanho: 22,
+      cor: '#5b5776',
+      peso: 600,
+      alinhar: 'left',
+      maxLargura: 360,
+    });
+
+    // Porcentagem à direita
+    escreverTexto(ctx, `${Math.round(p.pct)}%`, rx + rw - 40, mid + 20, {
+      tamanho: 56,
+      cor: p.cor,
+      alinhar: 'right',
+    });
+  });
+
+  // Rodapé
+  escreverTexto(ctx, `Descubra o seu no ${NOME_SITE}`, W / 2, 1728, {
+    tamanho: 54,
+    cor: '#FFFFFF',
+    maxLargura: 940,
+  });
+  escreverTexto(
+    ctx,
+    'Faça o quiz e veja com qual partido você combina',
+    W / 2,
+    1788,
+    {
+      tamanho: 30,
+      cor: '#CFCBF5',
+      peso: 600,
+      maxLargura: 940,
+    },
+  );
+
+  return new Promise((resolve) =>
+    canvas.toBlob((b) => resolve(b), 'image/png'),
+  );
+}
+
+// -----------------------------------------------------------------------------
+// MODAL DE COMPARTILHAR
+// -----------------------------------------------------------------------------
+function montarTextoCompartilhar(ranking: PartidoResultado[]) {
+  const [top] = ranking;
+  return `Meu match político deu ${Math.round(top.pct)}% com ${top.nome} (${top.sigla})! 🗳️\nDescubra o seu no ${NOME_SITE}.`;
+}
+
+function ShareModal({
+  ranking,
+  onClose,
+}: {
+  ranking: PartidoResultado[];
+  onClose: () => void;
+}) {
+  const [blob, setBlob] = useState<Blob | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [erroImagem, setErroImagem] = useState(false);
+  const [aviso, setAviso] = useState<string | null>(null);
+
+  const texto = montarTextoCompartilhar(ranking);
+
+  useEffect(() => {
+    let cancelado = false;
+    let url: string | null = null;
+    gerarImagemCompartilhamento(ranking)
+      .then((b) => {
+        if (cancelado) return;
+        if (!b) {
+          setErroImagem(true);
+          return;
+        }
+        url = URL.createObjectURL(b);
+        setBlob(b);
+        setPreviewUrl(url);
+      })
+      .catch(() => !cancelado && setErroImagem(true));
+    return () => {
+      cancelado = true;
+      if (url) URL.revokeObjectURL(url);
+    };
+  }, [ranking]);
+
+  function baixar() {
+    if (!previewUrl) return;
+    const a = document.createElement('a');
+    a.href = previewUrl;
+    a.download = 'meu-match-politico.png';
+    a.click();
+  }
+
+  // Abre a folha de compartilhamento do sistema COM a imagem anexada
+  // (celulares e alguns navegadores). Retorna false se não for possível.
+  async function compartilharArquivo(): Promise<boolean> {
+    if (!blob) return false;
+    const file = new File([blob], 'meu-match-politico.png', {
+      type: 'image/png',
+    });
+    if (!navigator.canShare?.({ files: [file] })) return false;
+    try {
+      await navigator.share({ files: [file], text: texto });
+    } catch (err) {
+      // AbortError = a pessoa fechou a folha. Não é erro.
+      if (!(err instanceof DOMException && err.name === 'AbortError')) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  async function compartilhar() {
+    setAviso(null);
+    if (!(await compartilharArquivo())) {
+      baixar();
+      setAviso(
+        'Seu navegador não abre o compartilhamento direto. Baixamos a imagem pra você!',
+      );
+    }
+  }
+
+  async function whatsapp() {
+    setAviso(null);
+    // Celular: abre o compartilhamento com a imagem (é só escolher o WhatsApp).
+    if (await compartilharArquivo()) return;
+
+    // Computador: copia a imagem e abre o WhatsApp; é só colar (Ctrl+V).
+    try {
+      if (!blob) throw new Error('sem imagem');
+      await navigator.clipboard.write([
+        new ClipboardItem({ 'image/png': blob }),
+      ]);
+      setAviso('Imagem copiada! Cole (Ctrl+V) na conversa do WhatsApp.');
+    } catch {
+      baixar();
+      setAviso('Baixamos a imagem. Anexe ela na conversa do WhatsApp.');
+    }
+    window.open(
+      `https://wa.me/?text=${encodeURIComponent(texto)}`,
+      '_blank',
+      'noopener,noreferrer',
+    );
+  }
+
+  const botao =
+    "flex items-center justify-center gap-2 [font-family:'Sora',sans-serif] font-bold text-[13px] px-4 py-3 rounded-full transition disabled:opacity-40";
+
+  return (
+    <Modal onClose={onClose} maxW="max-w-[760px]" labelledBy="share-titulo">
+      <button
+        onClick={onClose}
+        aria-label="Fechar"
+        className="absolute top-4 right-4 z-10 w-9 h-9 rounded-full bg-[#F4F3FA] text-[#2E2A47] flex items-center justify-center hover:bg-[#ECEAFB]"
+      >
+        <FiX size={18} />
+      </button>
+
+      <div className="overflow-y-auto p-6 sm:p-8">
+        <h2
+          id="share-titulo"
+          className="[font-family:'Sora',sans-serif] font-extrabold text-[20px] text-[#1B1B3A] mb-1 pr-10"
+        >
+          Mostre seu match pra galera
+        </h2>
+        <p className="text-[13px] text-[#5b5776] mb-5">
+          Compartilhe o resultado do seu match político!
+        </p>
+
+        <div className="flex flex-col sm:flex-row gap-6 items-center sm:items-start">
+          <div className="w-[200px] shrink-0 aspect-[9/16] rounded-2xl overflow-hidden bg-[#F4F3FA] flex items-center justify-center shadow-[0_12px_30px_rgba(46,42,107,0.25)]">
+            {previewUrl ? (
+              <img
+                src={previewUrl}
+                alt="Prévia da imagem de compartilhamento com seu top 3"
+                className="w-full h-full object-cover"
+              />
+            ) : erroImagem ? (
+              <span className="text-[12px] text-[#5b5776] text-center px-4">
+                Não deu pra gerar a imagem. Tente de novo mais tarde.
+              </span>
+            ) : (
+              <span className="text-[12px] text-[#8B84D6] font-bold">
+                Gerando imagem...
+              </span>
+            )}
+          </div>
+
+          <div className="flex-1 w-full flex flex-col gap-3">
+            <button
+              onClick={compartilhar}
+              disabled={!blob}
+              className={`${botao} bg-[#2E2A47] text-white shadow-[0_4px_0_#16142a] active:translate-y-1 active:shadow-[0_1px_0_#16142a]`}
+            >
+              <FiShare2 size={16} /> Compartilhar
+            </button>
+            <button
+              onClick={whatsapp}
+              disabled={!blob}
+              className={`${botao} bg-[#25D366] text-white hover:brightness-105`}
+            >
+              <FaWhatsapp size={18} /> WhatsApp
+            </button>
+            <button
+              onClick={baixar}
+              disabled={!blob}
+              className={`${botao} bg-[#F4F3FA] text-[#2E2A47] hover:bg-[#ECEAFB]`}
+            >
+              <FiDownload size={16} /> Baixar imagem
+            </button>
+            {aviso && (
+              <p
+                role="status"
+                className="text-[12px] text-[#6F68C9] font-semibold leading-[1.4] bg-[#F7F5FF] rounded-2xl px-4 py-3 m-0"
+              >
+                {aviso}
+              </p>
+            )}
+          </div>
+        </div>
+      </div>
+    </Modal>
   );
 }
 
@@ -705,6 +1477,7 @@ function ResultScreen({ ranking, respostas, onRestart }: ResultScreenProps) {
   const [top, second, third] = ranking;
   const [reveal, setReveal] = useState(false);
   const [count, setCount] = useState(0);
+  const [compartilhando, setCompartilhando] = useState(false);
 
   const interesses = useMemo(() => {
     if (!top) return [];
@@ -753,12 +1526,20 @@ function ResultScreen({ ranking, respostas, onRestart }: ResultScreenProps) {
           reveal ? 'scale-100 opacity-100' : 'scale-[0.92] opacity-40'
         }`}
       >
-        <button
-          className="bg-transparent border-none text-[#8B84D6] text-[12px] font-semibold flex items-center gap-0.5 cursor-pointer mb-[10px] p-0 hover:underline"
-          onClick={onRestart}
-        >
-          <FiChevronLeft size={16} /> refazer
-        </button>
+        <div className="flex items-center justify-between mb-[10px]">
+          <button
+            className="bg-transparent border-none text-[#8B84D6] text-[12px] font-semibold flex items-center gap-0.5 cursor-pointer p-0 hover:underline"
+            onClick={onRestart}
+          >
+            <FiChevronLeft size={16} /> refazer
+          </button>
+          <button
+            onClick={() => setCompartilhando(true)}
+            className="flex items-center gap-1.5 bg-[#FF9F1C] text-white [font-family:'Sora',sans-serif] font-bold text-[12px] px-4 py-2 rounded-full shadow-[0_3px_0_#c97a0a] transition-transform hover:-translate-y-0.5 active:translate-y-0.5 active:shadow-[0_1px_0_#c97a0a]"
+          >
+            <FiShare2 size={14} /> Compartilhar
+          </button>
+        </div>
         <div className="flex flex-col sm:flex-row gap-7 items-center sm:items-start flex-wrap">
           <div className="flex-[1.3_1_0%] min-w-[260px]">
             <h2 className="[font-family:'Sora',sans-serif] text-[22px] tracking-[0.02em] mb-[14px] text-[#1B1B3A]">
@@ -825,6 +1606,13 @@ function ResultScreen({ ranking, respostas, onRestart }: ResultScreenProps) {
           </div>
         </div>
       </div>
+
+      {compartilhando && (
+        <ShareModal
+          ranking={ranking}
+          onClose={() => setCompartilhando(false)}
+        />
+      )}
     </div>
   );
 }
@@ -895,6 +1683,9 @@ export default function MatchPolitico() {
     }
   }
 
+  // Chamado a cada resposta, inclusive quando a pessoa troca uma resposta
+  // anterior. O backend precisa SUBSTITUIR a resposta da mesma pergunta
+  // (upsert) em vez de criar uma segunda.
   function handleAnswer(perguntaId: string, valor: Valor) {
     if (!token) return;
     salvarResposta(token, perguntaId, valor).catch((err) => {
