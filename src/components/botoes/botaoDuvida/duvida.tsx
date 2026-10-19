@@ -63,7 +63,7 @@ export default function BotaoDuvida({
               type="button"
               onClick={() => setAberto(false)}
               aria-label="Fechar ajuda"
-              className="text-lg leading-none text-[#5A5A70] hover:text-[#2a2a72]"
+              className="text-xl leading-none text-[#5A5A70] hover:text-[#2a2a72]"
             >
               ×
             </button>

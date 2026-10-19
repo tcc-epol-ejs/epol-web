@@ -165,7 +165,7 @@ const CANDIDATOS_EXEMPLO: CandidatoUrna[] = [
   },
   {
     cargo: 'deputado-estadual',
-    numero: '4444',
+    numero: '44444',
     nome: 'Dep. Estadual Pipo Gui',
     partido: 'BBB',
     foto: PipoGui,
@@ -259,7 +259,38 @@ function Stepper({ atual }: { atual: number }) {
 }
 
 // ---------- Card de cenário ----------
+// ---------- Card de cargo ----------
 
+function CardCargo({
+  cargo,
+  qtdCandidatos,
+  selecionado,
+  onSelecionar,
+}: {
+  cargo: Cargo;
+  qtdCandidatos: number;
+  selecionado: boolean;
+  onSelecionar: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onSelecionar}
+      aria-pressed={selecionado}
+      className={`flex flex-col items-start gap-1 rounded-xl p-4 text-left transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#FFA400] ${
+        selecionado
+          ? 'bg-[#eef0fb] ring-4 ring-[#2a2a72]'
+          : 'bg-white hover:bg-[#f4f4fd]'
+      }`}
+    >
+      <h3 className="text-lg font-bold text-[#1f2a52]">{cargo.nome}</h3>
+      <p className="text-sm text-[#5A5A70]">{cargo.digitos} dígitos</p>
+      <p className="text-xs font-semibold text-[#6a6a99]">
+        {qtdCandidatos} candidatos
+      </p>
+    </button>
+  );
+}
 function CardCenario({
   cenario,
   selecionado,
@@ -338,8 +369,14 @@ function SimuladorEtapa1({
             <BotaoDuvida
               alinhamento="direita"
               titulo="Passo 1: Escolha a eleição"
-              texto="Escreva aqui a explicação do passo 1."
-            />
+            >
+              <p>
+                De dois em dois anos tem eleição, e elas se alternam: entre as{' '}
+                <strong>gerais</strong> (presidente, governador, senador e
+                deputados), e as <strong>municipais</strong> (prefeito e
+                vereador). Por aqui, só temos as gerais!
+              </p>
+            </BotaoDuvida>
           </div>
 
           <div className="rounded-xl bg-[#8888D3] p-6">
@@ -361,7 +398,7 @@ function SimuladorEtapa1({
               onClick={() => onAvancar(selecionado)}
               className="rounded-full bg-[#FFA400] px-8 py-2.5 text-sm font-bold text-white transition-all hover:brightness-110 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2a2a72]"
             >
-              avançar
+              Avançar
             </button>
           </div>
         </div>
@@ -381,6 +418,15 @@ function SimuladorEtapa2({
   onVoltar: () => void;
   onAvancar: () => void;
 }) {
+  const [cargoSelecionado, setCargoSelecionado] = useState<CargoId>(
+    cenario.cargos[0],
+  );
+
+  const cargo = CARGOS[cargoSelecionado];
+  const candidatos = CANDIDATOS_EXEMPLO.filter(
+    (c) => c.cargo === cargoSelecionado,
+  );
+
   return (
     <section className="relative z-10 mx-auto w-full max-w-5xl px-4 py-8">
       <Cabecalho cenario={cenario} />
@@ -391,60 +437,82 @@ function SimuladorEtapa2({
         <div className="px-6 py-8 sm:px-12">
           <div className="mb-5 flex items-start justify-between gap-4">
             <p className="text-base text-[#1f2a52]">
-              Conheça os candidatos e anote os números para a hora de votar.
+              Escolha um cargo para conhecer os candidatos e anote os números
+              para a hora de votar.
             </p>
             <BotaoDuvida
               alinhamento="direita"
               titulo="Passo 2: Faça sua colinha"
-              texto="Escreva aqui a explicação do passo 2."
-            />
+            >
+              <div className="space-y-2">
+                <p>
+                  Antes do dia da votação, vale se preparar! Você pode decorar
+                  os números dos seus candidatos, anotar tudo num papelzinho ou
+                  pegar a <strong>colinha eleitoral</strong> no cartório
+                  eleitoral mais perto de você e preencher por lá.
+                </p>
+                <p>
+                  Isso é importante porque{' '}
+                  <strong>não pode usar celular</strong> (nem qualquer outro
+                  aparelho eletrônico) dentro da cabine de votação. Então,
+                  chegue com tudo anotado!
+                </p>
+              </div>
+            </BotaoDuvida>
           </div>
 
-          <div className="flex flex-col gap-6">
-            {cenario.cargos.map((cargoId) => {
-              const cargo = CARGOS[cargoId];
-              const candidatos = CANDIDATOS_EXEMPLO.filter(
-                (c) => c.cargo === cargoId,
-              );
+          {/* Escolha do cargo */}
+          <div className="rounded-xl bg-[#8888D3] p-6">
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
+              {cenario.cargos.map((id) => (
+                <CardCargo
+                  key={id}
+                  cargo={CARGOS[id]}
+                  qtdCandidatos={
+                    CANDIDATOS_EXEMPLO.filter((c) => c.cargo === id).length
+                  }
+                  selecionado={id === cargoSelecionado}
+                  onSelecionar={() => setCargoSelecionado(id)}
+                />
+              ))}
+            </div>
+          </div>
 
-              return (
-                <div key={cargoId} className="rounded-xl bg-[#8888D3] p-6">
-                  <h2 className="mb-4 text-xl font-bold text-white">
-                    {cargo.nome}{' '}
-                    <span className="text-sm font-semibold opacity-80">
-                      ({cargo.digitos} dígitos)
-                    </span>
-                  </h2>
+          {/* Candidatos do cargo escolhido */}
+          <div className="mt-6 rounded-xl bg-[#8888D3] p-6">
+            <h2 className="mb-4 text-xl font-bold text-white">
+              {cargo.nome}{' '}
+              <span className="text-sm font-semibold opacity-80">
+                ({cargo.digitos} dígitos)
+              </span>
+            </h2>
 
-                  <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                    {candidatos.map((c) => (
-                      <article
-                        key={c.numero}
-                        className="flex items-center gap-4 rounded-xl bg-white p-5"
-                      >
-                        <img
-                          src={c.foto}
-                          alt={`Foto de ${c.nome}`}
-                          className="h-28 w-24 flex-shrink-0 rounded-md border border-[#c9c9ee] object-cover"
-                        />
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              {candidatos.map((c) => (
+                <article
+                  key={c.numero}
+                  className="flex items-center gap-4 rounded-xl bg-white p-5"
+                >
+                  <img
+                    src={c.foto}
+                    alt={`Foto de ${c.nome}`}
+                    className="h-28 w-24 flex-shrink-0 rounded-md border border-[#c9c9ee] object-cover"
+                  />
 
-                        <div className="min-w-0">
-                          <p className="text-4xl font-bold text-[#2a2a72]">
-                            {c.numero}
-                          </p>
-                          <h3 className="text-lg font-bold text-[#1f2a52]">
-                            {c.nome}
-                          </h3>
-                          <p className="text-sm text-[#5A5A70]">
-                            Partido: {c.partido}
-                          </p>
-                        </div>
-                      </article>
-                    ))}
+                  <div className="min-w-0">
+                    <p className="text-4xl font-bold text-[#2a2a72]">
+                      {c.numero}
+                    </p>
+                    <h3 className="text-lg font-bold text-[#1f2a52]">
+                      {c.nome}
+                    </h3>
+                    <p className="text-sm text-[#5A5A70]">
+                      Partido: {c.partido}
+                    </p>
                   </div>
-                </div>
-              );
-            })}
+                </article>
+              ))}
+            </div>
           </div>
 
           <div className="mt-6 flex justify-between">
@@ -573,8 +641,26 @@ function SimuladorEtapa3({
             <BotaoDuvida
               alinhamento="direita"
               titulo="Passo 3: Simule a votação"
-              texto="Escreva aqui a explicação do passo 3."
-            />
+            >
+              <div className="space-y-2">
+                <p>
+                  Digite o número do candidato na urna virtual ou no teclado do
+                  seu computador. No teclado, <strong>Enter</strong> confirma,{' '}
+                  <strong>Backspace</strong> corrige e <strong>espaço</strong> é
+                  voto em branco.
+                </p>
+                <p>
+                  O voto normal usa o número completo do candidato. Nos cargos
+                  proporcionais (os deputados), dá pra votar só na legenda,
+                  digitando os 2 dígitos do partido.
+                </p>
+                <p>
+                  Quer votar em branco? Aperta <strong>BRANCO</strong> e depois{' '}
+                  <strong>CONFIRMA</strong>. Quer votar nulo? Digita um número
+                  que não existe e confirma.
+                </p>
+              </div>
+            </BotaoDuvida>
           </div>
 
           <div className="mx-auto w-full max-w-[520px] rounded-2xl bg-[#ecece4] p-4 shadow-lg ring-1 ring-black/10">
@@ -742,7 +828,7 @@ function SimuladorEtapa3({
               onClick={onVoltar}
               className="rounded-full bg-[#8888D3] px-8 py-2.5 text-sm font-bold text-white transition-all hover:brightness-110 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2a2a72]"
             >
-              voltar
+              Voltar
             </button>
           </div>
         </div>
