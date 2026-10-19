@@ -138,7 +138,7 @@ const paletasPorSigla: Record<string, PaletaPartido> = {
     borda: '#7191a1',
     corFundoTela: '#f5fafd',
     corFundoCabecalho: '#7191a1',
-    corTextoCabecalho: '#2A2A72',
+    corTextoCabecalho: '#ffffff',
     corTextoBotaoVoltar: '#7191a1',
   },
   PRD: {
@@ -242,7 +242,7 @@ const paletasPorSigla: Record<string, PaletaPartido> = {
     borda: '#ae8a04',
     corFundoTela: '#fffaea',
     corFundoCabecalho: '#ae8a04',
-    corTextoCabecalho: '#2A2A72',
+    corTextoCabecalho: '#ffffff',
     corTextoBotaoVoltar: '#ae8a04',
   },
   UP: {
