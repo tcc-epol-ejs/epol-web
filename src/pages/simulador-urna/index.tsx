@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import type { ReactNode } from 'react';
 import Footer from '../../components/footer/footer';
-import Header from '../../components//header';
+import Header from '../../components/header';
 import pipo_fechado from '../../assets/Imagens/pipo_fechado.png';
 import pipoFeliz from '../../assets/Imagens/pipoFeliz.png';
+
+// ---------- Fundo decorativo ----------
 
 const bolasConfig = [
   { size: 280, top: '-40px', left: '-30px', opacity: 1 },
@@ -49,22 +51,65 @@ function Bolas() {
   );
 }
 
+// ---------- Cargos ----------
+
+type CargoId =
+  | 'deputado-federal'
+  | 'deputado-estadual'
+  | 'senador'
+  | 'governador'
+  | 'presidente';
+
+interface Cargo {
+  id: CargoId;
+  nome: string;
+  digitos: number;
+}
+
+const CARGOS: Record<CargoId, Cargo> = {
+  'deputado-federal': {
+    id: 'deputado-federal',
+    nome: 'Deputado Federal',
+    digitos: 4,
+  },
+  'deputado-estadual': {
+    id: 'deputado-estadual',
+    nome: 'Deputado Estadual',
+    digitos: 5,
+  },
+  senador: { id: 'senador', nome: 'Senador', digitos: 3 },
+  governador: { id: 'governador', nome: 'Governador', digitos: 2 },
+  presidente: { id: 'presidente', nome: 'Presidente', digitos: 2 },
+};
+
+// ---------- Cenários ----------
+// A ordem de "cargos" é a ordem em que a urna vai pedindo os votos.
+
 interface Cenario {
   id: string;
   titulo: string;
   descricao: string;
+  cargos: CargoId[];
 }
 
 const CENARIOS: Cenario[] = [
   {
     id: 'gerais-1',
     titulo: 'Eleições Gerais - 1º turno',
-    descricao: 'Cenário de treinamento para Eleições Gerais.',
+    descricao: 'Deputados, Senador, Governador e Presidente.',
+    cargos: [
+      'deputado-federal',
+      'deputado-estadual',
+      'senador',
+      'governador',
+      'presidente',
+    ],
   },
   {
     id: 'gerais-2',
     titulo: 'Eleições Gerais - 2º turno',
-    descricao: 'Cenário de treinamento para Eleições Gerais.',
+    descricao: 'Governador e Presidente.',
+    cargos: ['governador', 'presidente'],
   },
 ];
 
@@ -74,8 +119,11 @@ const ETAPAS = [
   'Simule a votação',
 ];
 
-// Candidatos fictícios (pipos)
+// ---------- Candidatos ----------
+// Fictícios (pipos). O número precisa ter a quantidade de dígitos do cargo.
+
 interface CandidatoUrna {
+  cargo: CargoId;
   numero: string;
   nome: string;
   partido: string;
@@ -83,19 +131,84 @@ interface CandidatoUrna {
 }
 
 const CANDIDATOS_EXEMPLO: CandidatoUrna[] = [
+  // Deputado Federal (4 dígitos)
   {
+    cargo: 'deputado-federal',
+    numero: '1111',
+    nome: 'Dep. Federal Exemplo A',
+    partido: 'AAA',
+    foto: pipoFeliz,
+  },
+  {
+    cargo: 'deputado-federal',
+    numero: '2222',
+    nome: 'Dep. Federal Exemplo B',
+    partido: 'BBB',
+    foto: pipo_fechado,
+  },
+  // Deputado Estadual (5 dígitos)
+  {
+    cargo: 'deputado-estadual',
+    numero: '11111',
+    nome: 'Dep. Estadual Exemplo A',
+    partido: 'AAA',
+    foto: pipoFeliz,
+  },
+  {
+    cargo: 'deputado-estadual',
+    numero: '22222',
+    nome: 'Dep. Estadual Exemplo B',
+    partido: 'BBB',
+    foto: pipo_fechado,
+  },
+  // Senador (3 dígitos)
+  {
+    cargo: 'senador',
+    numero: '111',
+    nome: 'Senador Exemplo A',
+    partido: 'AAA',
+    foto: pipoFeliz,
+  },
+  {
+    cargo: 'senador',
+    numero: '222',
+    nome: 'Senadora Exemplo B',
+    partido: 'BBB',
+    foto: pipo_fechado,
+  },
+  // Governador (2 dígitos)
+  {
+    cargo: 'governador',
+    numero: '33',
+    nome: 'Governador Exemplo A',
+    partido: 'AAA',
+    foto: pipoFeliz,
+  },
+  {
+    cargo: 'governador',
+    numero: '44',
+    nome: 'Governadora Exemplo B',
+    partido: 'BBB',
+    foto: pipo_fechado,
+  },
+  // Presidente (2 dígitos)
+  {
+    cargo: 'presidente',
     numero: '11',
     nome: 'Candidato Exemplo A',
     partido: 'AAA',
     foto: pipoFeliz,
   },
   {
-    numero: '12',
-    nome: 'Candidato Exemplo B',
+    cargo: 'presidente',
+    numero: '22',
+    nome: 'Candidata Exemplo B',
     partido: 'BBB',
     foto: pipo_fechado,
   },
 ];
+
+// ---------- Stepper ----------
 
 function Stepper({ atual }: { atual: number }) {
   return (
@@ -136,6 +249,8 @@ function Stepper({ atual }: { atual: number }) {
   );
 }
 
+// ---------- Card de cenário ----------
+
 function CardCenario({
   cenario,
   selecionado,
@@ -167,6 +282,8 @@ function CardCenario({
     </button>
   );
 }
+
+// ---------- Cabeçalho ----------
 
 function Cabecalho({ cenario }: { cenario: Cenario }) {
   return (
@@ -236,6 +353,7 @@ function SimuladorEtapa1({
     </section>
   );
 }
+
 // ---------- Etapa 2 (candidatos / colinha) ----------
 
 function SimuladorEtapa2({
@@ -259,33 +377,51 @@ function SimuladorEtapa2({
             Conheça os candidatos e anote os números para a hora de votar.
           </p>
 
-          <div className="rounded-xl bg-[#8888D3] p-6">
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-              {CANDIDATOS_EXEMPLO.map((c) => (
-                <article
-                  key={c.numero}
-                  className="flex items-center gap-4 rounded-xl bg-white p-5"
-                >
-                  <img
-                    src={c.foto}
-                    alt={`Foto de ${c.nome}`}
-                    className="h-28 w-24 flex-shrink-0 rounded-md border border-[#c9c9ee] object-cover"
-                  />
+          <div className="flex flex-col gap-6">
+            {cenario.cargos.map((cargoId) => {
+              const cargo = CARGOS[cargoId];
+              const candidatos = CANDIDATOS_EXEMPLO.filter(
+                (c) => c.cargo === cargoId,
+              );
 
-                  <div className="min-w-0">
-                    <p className="text-4xl font-bold text-[#2a2a72]">
-                      {c.numero}
-                    </p>
-                    <h3 className="text-lg font-bold text-[#1f2a52]">
-                      {c.nome}
-                    </h3>
-                    <p className="text-sm text-[#5A5A70]">
-                      Partido: {c.partido}
-                    </p>
+              return (
+                <div key={cargoId} className="rounded-xl bg-[#8888D3] p-6">
+                  <h2 className="mb-4 text-xl font-bold text-white">
+                    {cargo.nome}{' '}
+                    <span className="text-sm font-semibold opacity-80">
+                      ({cargo.digitos} dígitos)
+                    </span>
+                  </h2>
+
+                  <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                    {candidatos.map((c) => (
+                      <article
+                        key={c.numero}
+                        className="flex items-center gap-4 rounded-xl bg-white p-5"
+                      >
+                        <img
+                          src={c.foto}
+                          alt={`Foto de ${c.nome}`}
+                          className="h-28 w-24 flex-shrink-0 rounded-md border border-[#c9c9ee] object-cover"
+                        />
+
+                        <div className="min-w-0">
+                          <p className="text-4xl font-bold text-[#2a2a72]">
+                            {c.numero}
+                          </p>
+                          <h3 className="text-lg font-bold text-[#1f2a52]">
+                            {c.nome}
+                          </h3>
+                          <p className="text-sm text-[#5A5A70]">
+                            Partido: {c.partido}
+                          </p>
+                        </div>
+                      </article>
+                    ))}
                   </div>
-                </article>
-              ))}
-            </div>
+                </div>
+              );
+            })}
           </div>
 
           <div className="mt-6 flex justify-between">
@@ -310,6 +446,7 @@ function SimuladorEtapa2({
     </section>
   );
 }
+
 // ---------- Tecla da urna ----------
 
 function Tecla({
@@ -335,7 +472,7 @@ function Tecla({
   );
 }
 
-// ---------- Etapa 3 (visor + teclado) ----------
+// ---------- Etapa 3 (urna: visor + teclado) ----------
 
 type Fase = 'digitando' | 'branco' | 'fim';
 
@@ -346,42 +483,58 @@ function SimuladorEtapa3({
   cenario: Cenario;
   onVoltar: () => void;
 }) {
-  const cargo = 'Presidente';
-  const digitos = 2;
-
+  const [cargoIndex, setCargoIndex] = useState(0);
   const [numero, setNumero] = useState('');
   const [fase, setFase] = useState<Fase>('digitando');
 
+  const totalCargos = cenario.cargos.length;
+  const cargo = CARGOS[cenario.cargos[cargoIndex]];
+  const digitos = cargo.digitos;
+
   const completo = numero.length === digitos;
   const candidato = completo
-    ? CANDIDATOS_EXEMPLO.find((c) => c.numero === numero)
+    ? CANDIDATOS_EXEMPLO.find(
+        (c) => c.cargo === cargo.id && c.numero === numero,
+      )
     : undefined;
 
-  function reiniciar() {
+  function limparVoto() {
     setNumero('');
     setFase('digitando');
   }
 
+  function recomecarTudo() {
+    setCargoIndex(0);
+    limparVoto();
+  }
+
   function digitar(d: string) {
-    if (fase === 'fim') return reiniciar();
+    if (fase === 'fim') return recomecarTudo();
     if (fase !== 'digitando' || completo) return;
     setNumero((n) => n + d);
   }
 
   function branco() {
-    if (fase === 'fim') return reiniciar();
+    if (fase === 'fim') return recomecarTudo();
     if (fase === 'digitando' && numero === '') setFase('branco');
   }
 
   function corrige() {
-    reiniciar();
+    if (fase === 'fim') return recomecarTudo();
+    limparVoto();
   }
 
   function confirma() {
-    if (fase === 'fim') return reiniciar();
-    if (fase === 'branco' || completo) {
+    if (fase === 'fim') return recomecarTudo();
+    if (fase !== 'branco' && !completo) return;
+
+    // TODO: registrar o voto deste cargo (branco, nulo ou candidato)
+
+    if (cargoIndex < totalCargos - 1) {
+      setCargoIndex((i) => i + 1);
+      limparVoto();
+    } else {
       setFase('fim');
-      // TODO: registrar o voto aqui (branco, nulo ou candidato)
     }
   }
 
@@ -413,7 +566,7 @@ function SimuladorEtapa3({
                 {fase === 'branco' && (
                   <div className="flex flex-1 flex-col">
                     <p className="text-sm">SEU VOTO PARA</p>
-                    <p className="text-xl font-bold uppercase">{cargo}</p>
+                    <p className="text-xl font-bold uppercase">{cargo.nome}</p>
                     <p className="flex flex-1 items-center justify-center text-3xl font-bold">
                       VOTO EM BRANCO
                     </p>
@@ -422,8 +575,17 @@ function SimuladorEtapa3({
 
                 {fase === 'digitando' && (
                   <div className="flex flex-1 flex-col">
-                    <p className="text-sm">SEU VOTO PARA</p>
-                    <p className="text-xl font-bold uppercase">{cargo}</p>
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <p className="text-sm">SEU VOTO PARA</p>
+                        <p className="text-xl font-bold uppercase">
+                          {cargo.nome}
+                        </p>
+                      </div>
+                      <span className="text-xs text-gray-500">
+                        {cargoIndex + 1}/{totalCargos}
+                      </span>
+                    </div>
 
                     <div className="mt-4 flex items-center gap-2">
                       <span className="mr-2 text-sm">Número:</span>
