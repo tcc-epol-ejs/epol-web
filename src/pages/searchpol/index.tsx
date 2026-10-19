@@ -634,7 +634,7 @@ function SearchPol() {
 
             <div
               ref={resultadosRef}
-              className="flex min-h-0 flex-1 flex-col gap-4 lg:-mr-12 lg:overflow-x-hidden lg:overflow-y-auto lg:pr-20 lg:[scrollbar-color:#2A2A72_#dbeafe] lg:[scrollbar-width:thin] lg:[&::-webkit-scrollbar]:w-2 lg:[&::-webkit-scrollbar-track]:bg-[#dbeafe] lg:[&::-webkit-scrollbar-thumb]:rounded-full lg:[&::-webkit-scrollbar-thumb]:bg-[#2A2A72]/60"
+              className="flex min-h-0 flex-1 flex-col gap-4 lg:-mr-14 lg:overflow-x-hidden lg:overflow-y-auto lg:pr-20 lg:[scrollbar-color:#2A2A72_#dbeafe] lg:[scrollbar-width:thin] lg:[&::-webkit-scrollbar]:w-2 lg:[&::-webkit-scrollbar-track]:bg-[#dbeafe] lg:[&::-webkit-scrollbar-thumb]:rounded-full lg:[&::-webkit-scrollbar-thumb]:bg-[#2A2A72]/60"
             >
               {filtroSelecionado !== 'candidatos' &&
                 !filtroCandidatoAtivo &&
@@ -692,11 +692,27 @@ function SearchPol() {
                           backgroundColor: paleta.cor,
                         }}
                       >
-                        <div className="flex h-28 w-full shrink-0 items-center justify-center rounded-xl bg-white/40 p-3">
+                        <div className="flex h-28 w-full shrink-0 items-center justify-center overflow-hidden rounded-xl bg-white/45 p-3">
                           <img
                             src={party.foto}
                             alt={`Logo de ${party.nome}`}
-                            className="h-full w-full object-contain"
+                            className={`h-full w-full object-contain ${
+                              party.sigla === 'AVANTE'
+                                ? 'scale-[1.25]'
+                                : party.sigla === 'CIDADANIA'
+                                  ? 'scale-[1.25]'
+                                  : party.sigla === 'DEMOCRATA'
+                                    ? 'scale-[1.60]'
+                                    : party.sigla === 'PCB'
+                                      ? 'scale-[1.30]'
+                                      : party.sigla === 'PL'
+                                        ? 'scale-[1.30]'
+                                        : party.sigla === 'PSOL'
+                                          ? 'scale-[1.25]'
+                                          : party.sigla === 'REPUBLICANOS'
+                                            ? 'scale-[2.05]'
+                                            : ''
+                            }`}
                           />
                         </div>
 
