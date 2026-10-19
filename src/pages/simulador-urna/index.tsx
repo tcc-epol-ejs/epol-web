@@ -3,16 +3,16 @@ import type { ReactNode } from 'react';
 import Footer from '../../components/footer/footer';
 import Header from '../../components/header';
 import BotaoDuvida from '../../components/botoes/botaoDuvida/duvida';
-import pipo_fechado from '../../assets/Imagens/pipo_fechado.png';
+import PipoVermelho from '../../assets/Imagens/Pipos/PipoVermelho.png';
 import pipoFeliz from '../../assets/Imagens/pipoFeliz.png';
 import pipoDuvida from '../../assets/Imagens/pipoDuvida.png';
-import PipoDiogo from '../../assets/Imagens/Pipos/Pipo_Diogo_NB.png';
-import PipoEmanu from '../../assets/Imagens/Pipos/Pipo_Emanuela_NB.png';
-import PipoGui from '../../assets/Imagens/Pipos/Pipo_Guilherme_NB.png';
-import PipoMika from '../../assets/Imagens/Pipos/Pipo_Mikaela_NB.png';
-import PipoNico from '../../assets/Imagens/Pipos/Pipo_Nicolas_NB.png';
-import PipoRicardo from '../../assets/Imagens/Pipos/Pipo_Ricardo_NB.png';
-import PipoSabrina from '../../assets/Imagens/Pipos/Pipo_Sabrina_NB.png';
+import PipoRosa from '../../assets/Imagens/Pipos/PipoRosa.png';
+import PipoRoxo from '../../assets/Imagens/Pipos/PipoRoxo.png';
+import PipoVerde from '../../assets/Imagens/Pipos/PipoVerde.png';
+import PipoAzul from '../../assets/Imagens/Pipos/PipoAzul.png';
+import PipoCiano from '../../assets/Imagens/Pipos/PipoCiano.png';
+import PipoAmarelo from '../../assets/Imagens/Pipos/PipoAmarelo.png';
+import PipoLaranja from '../../assets/Imagens/Pipos/PipoLaranja.png';
 
 // ---------- Fundo decorativo ----------
 
@@ -144,76 +144,76 @@ const CANDIDATOS_EXEMPLO: CandidatoUrna[] = [
   {
     cargo: 'deputado-federal',
     numero: '1111',
-    nome: 'Dep. Federal Pipo Emanu',
-    partido: 'AAA',
-    foto: PipoEmanu,
+    nome: 'Dep. Federal Pipo Roxo',
+    partido: 'Partido dos 1',
+    foto: PipoRoxo,
   },
   {
     cargo: 'deputado-federal',
-    numero: '2222',
-    nome: 'Dep. Federal Pipo Diogo',
-    partido: 'BBB',
-    foto: PipoDiogo,
+    numero: '4444',
+    nome: 'Dep. Federal Pipo Rosa',
+    partido: 'Partido dos 4',
+    foto: PipoRosa,
   },
   // Deputado Estadual (5 dígitos)
   {
     cargo: 'deputado-estadual',
     numero: '11111',
-    nome: 'Dep. Estadual Pipo Mika',
-    partido: 'AAA',
-    foto: PipoMika,
+    nome: 'Dep. Estadual Pipo Azul',
+    partido: 'Partido dos 1',
+    foto: PipoAzul,
   },
   {
     cargo: 'deputado-estadual',
     numero: '44444',
-    nome: 'Dep. Estadual Pipo Gui',
-    partido: 'BBB',
-    foto: PipoGui,
+    nome: 'Dep. Estadual Pipo Verde',
+    partido: 'Partido dos 4',
+    foto: PipoVerde,
   },
   // Senador (3 dígitos)
   {
     cargo: 'senador',
     numero: '111',
-    nome: 'Senadora Pipo Sabrina',
-    partido: 'AAA',
-    foto: PipoSabrina,
+    nome: 'Senador Pipo Amarelo',
+    partido: 'Partido dos 1',
+    foto: PipoAmarelo,
   },
   {
     cargo: 'senador',
     numero: '444',
-    nome: 'Senador Pipo Nico',
-    partido: 'BBB',
-    foto: PipoNico,
+    nome: 'Senador Pipo Ciano',
+    partido: 'Partido dos 4',
+    foto: PipoCiano,
   },
   // Governador (2 dígitos)
   {
     cargo: 'governador',
-    numero: '33',
-    nome: 'Governador Pipo Ricardo',
-    partido: 'AAA',
-    foto: PipoRicardo,
+    numero: '11',
+    nome: 'Governador Pipo Laranja',
+    partido: 'Partido dos 1',
+    foto: PipoLaranja,
   },
   {
     cargo: 'governador',
     numero: '44',
-    nome: 'Governador Pipo em duvida',
-    partido: 'BBB',
-    foto: pipoDuvida,
+    nome: 'Governador Pipo Vermelho',
+    partido: 'Partido dos 4',
+    foto: PipoVermelho,
   },
   // Presidente (2 dígitos)
   {
     cargo: 'presidente',
     numero: '11',
-    nome: 'Candidato Exemplo A',
-    partido: 'AAA',
+    nome: 'Candidato Pipo feliz',
+    partido: 'Partido dos 1',
     foto: pipoFeliz,
   },
   {
     cargo: 'presidente',
-    numero: '24',
-    nome: 'Candidata Exemplo B',
-    partido: 'BBB',
-    foto: pipo_fechado,
+    numero: '44',
+    nome: 'Candidato Pipo em duvida',
+    partido: 'Partido dos 4',
+    foto: pipoDuvida,
   },
 ];
 
@@ -521,7 +521,7 @@ function SimuladorEtapa2({
               onClick={onVoltar}
               className="rounded-full bg-[#8888D3] px-8 py-2.5 text-sm font-bold text-white transition-all hover:brightness-110 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2a2a72]"
             >
-              voltar
+              Voltar
             </button>
 
             <button
@@ -529,7 +529,7 @@ function SimuladorEtapa2({
               onClick={onAvancar}
               className="rounded-full bg-[#FFA400] px-8 py-2.5 text-sm font-bold text-white transition-all hover:brightness-110 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2a2a72]"
             >
-              avançar
+              Avançar
             </button>
           </div>
         </div>
@@ -644,10 +644,8 @@ function SimuladorEtapa3({
             >
               <div className="space-y-2">
                 <p>
-                  Digite o número do candidato na urna virtual ou no teclado do
-                  seu computador. No teclado, <strong>Enter</strong> confirma,{' '}
-                  <strong>Backspace</strong> corrige e <strong>espaço</strong> é
-                  voto em branco.
+                  Digite o número do candidato na urna virtual e pressione{' '}
+                  <strong>CONFIRMA</strong>
                 </p>
                 <p>
                   O voto normal usa o número completo do candidato. Nos cargos
@@ -667,7 +665,7 @@ function SimuladorEtapa3({
             {/* Visor */}
             <div className="rounded-sm bg-black p-3">
               <div
-                className="flex min-h-[260px] flex-col bg-white p-4 text-black"
+                className="flex h-[340px] flex-col overflow-hidden bg-white p-4 text-black"
                 aria-live="polite"
               >
                 {fase === 'fim' && (
@@ -727,11 +725,13 @@ function SimuladorEtapa3({
                           </p>
                         </div>
 
-                        <img
-                          src={candidato.foto}
-                          alt={`Foto de ${candidato.nome}`}
-                          className="h-24 w-20 flex-shrink-0 border border-black object-cover"
-                        />
+                        <div className="h-24 w-20 flex-shrink-0 overflow-hidden border border-black">
+                          <img
+                            src={candidato.foto}
+                            alt={`Foto de ${candidato.nome}`}
+                            className="h-24 w-20 flex-shrink-0 border border-black object-cover"
+                          />
+                        </div>
                       </div>
                     )}
 
