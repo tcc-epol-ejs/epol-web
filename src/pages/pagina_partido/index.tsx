@@ -156,9 +156,6 @@ function PaginaPartido() {
     partido?.sigla ?? '',
     partido?.nome_completo ?? '',
   );
-  const escalaBandeira = partido
-    ? escalasBandeirasPorSigla[partido.sigla.toUpperCase()]
-    : undefined;
   const corBarraRolagem = paleta.corBarraRolagem;
 
   useEffect(() => {
@@ -359,11 +356,6 @@ function PaginaPartido() {
                         src={partido.bandeira_url}
                         alt={`Bandeira do ${partido.nome_completo}`}
                         className="h-full w-full object-contain"
-                        style={{
-                          transform: escalaBandeira
-                            ? `scale(${escalaBandeira})`
-                            : undefined,
-                        }}
                       />
                     ) : null}
                   </div>
