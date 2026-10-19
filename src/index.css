@@ -48,3 +48,21 @@ body,
   height: 100%;
   width: 100%;
 }
+
+.party-content-scroll {
+  scrollbar-color: var(--party-scrollbar-thumb) var(--party-scrollbar-track);
+  scrollbar-width: thin;
+}
+
+.party-content-scroll::-webkit-scrollbar {
+  width: 8px;
+}
+
+.party-content-scroll::-webkit-scrollbar-track {
+  background: var(--party-scrollbar-track);
+}
+
+.party-content-scroll::-webkit-scrollbar-thumb {
+  border-radius: 9999px;
+  background: var(--party-scrollbar-thumb);
+}
