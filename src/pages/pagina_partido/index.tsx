@@ -20,28 +20,6 @@ function formatarData(data: string | null) {
   return new Intl.DateTimeFormat('pt-BR').format(new Date(ano, mes - 1, dia));
 }
 
-function obterCorDeTexto(hex: string) {
-  const canais = hex.match(/[A-Fa-f0-9]{2}/g);
-  if (!canais || canais.length < 3) return '#ffffff';
-
-  const luminancia = canais
-    .slice(0, 3)
-    .map((canal) => parseInt(canal, 16) / 255)
-    .map((canal) =>
-      canal <= 0.04045 ? canal / 12.92 : ((canal + 0.055) / 1.055) ** 2.4,
-    )
-    .reduce(
-      (total, canal, index) =>
-        total + canal * [0.2126, 0.7152, 0.0722][index],
-      0,
-    );
-  const contraste = (outraLuminancia: number) =>
-    (Math.max(luminancia, outraLuminancia) + 0.05) /
-    (Math.min(luminancia, outraLuminancia) + 0.05);
-
-  return contraste(0.025) > contraste(1) ? '#2A2A72' : '#ffffff';
-}
-
 function Campo({
   titulo,
   children,
@@ -53,10 +31,10 @@ function Campo({
 }) {
   return (
     <div className={`rounded-xl bg-white/70 p-4 ${className}`}>
-      <dt className="text-xs font-extrabold uppercase tracking-[0.12em] text-[#68688e]">
+      <dt className="text-xs font-extrabold uppercase tracking-[0.12em] text-[#666666]">
         {titulo}
       </dt>
-      <dd className="mt-2 break-words text-sm font-semibold leading-relaxed text-[#2A2A72]">
+      <dd className="mt-2 break-words text-sm font-semibold leading-relaxed text-[#333333]">
         {children || 'Não informado'}
       </dd>
     </div>
@@ -73,11 +51,11 @@ function ListaInformacoes({
   primeiroItemMaiusculo?: boolean;
 }) {
   if (!itens?.length) {
-    return <p className="text-sm leading-relaxed text-[#68688e]">{vazio}</p>;
+    return <p className="text-sm leading-relaxed text-[#666666]">{vazio}</p>;
   }
 
   return (
-    <ul className="space-y-2 text-sm leading-relaxed text-[#2A2A72]">
+    <ul className="space-y-2 text-sm leading-relaxed text-[#333333]">
       {itens.map((item, index) => {
         const texto =
           primeiroItemMaiusculo && index === 0
@@ -89,7 +67,7 @@ function ListaInformacoes({
         return (
           <li key={`${item}-${index}`} className="flex gap-2">
             {!(primeiroItemMaiusculo && index === 0) && (
-              <span aria-hidden="true" className="font-black text-[#A36BBE]">
+              <span aria-hidden="true" className="font-black text-[#666666]">
                 •
               </span>
             )}
@@ -142,8 +120,10 @@ function PaginaPartido() {
           (item) => String(item.numero_legenda) === numeroSelecionado,
         )
       : partidos[0];
-  const paleta = obterPaletaPartido(partido?.sigla ?? '');
-  const corTextoCabecalho = obterCorDeTexto(paleta.borda);
+  const paleta = obterPaletaPartido(
+    partido?.sigla ?? '',
+    partido?.nome_completo ?? '',
+  );
 
   useEffect(() => {
     if (!partido) return;
@@ -177,16 +157,115 @@ function PaginaPartido() {
   }, [partido]);
 
   return (
-    <>
-      <div className="w-full">
-        <Header isBgWhite disableScrollHide />
+    <div
+      className="relative isolate flow-root min-h-screen overflow-hidden"
+      style={{ backgroundColor: paleta.corFundoTela }}
+    >
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 z-0 overflow-hidden"
+      >
+        <div
+          className="absolute -left-10 top-8 h-28 w-28 rounded-full"
+          style={{
+            backgroundColor: paleta.corBolhasFundo ?? paleta.cor,
+            opacity: 0.25,
+          }}
+        />
+        <div
+          className="absolute left-8 top-24 h-20 w-20 rounded-full"
+          style={{
+            backgroundColor: paleta.corBolhasFundo ?? paleta.cor,
+            opacity: 0.35,
+          }}
+        />
+        <div
+          className="absolute left-[18%] top-[28%] h-24 w-24 rounded-full"
+          style={{
+            backgroundColor: paleta.corBolhasFundo ?? paleta.cor,
+            opacity: 0.2,
+          }}
+        />
+        <div
+          className="absolute right-16 top-10 h-32 w-32 rounded-full"
+          style={{
+            backgroundColor: paleta.corBolhasFundo ?? paleta.cor,
+            opacity: 0.25,
+          }}
+        />
+        <div
+          className="absolute right-8 top-32 h-24 w-24 rounded-full"
+          style={{
+            backgroundColor: paleta.corBolhasFundo ?? paleta.cor,
+            opacity: 0.35,
+          }}
+        />
+        <div
+          className="absolute right-[-10px] top-[48%] h-20 w-20 rounded-full"
+          style={{
+            backgroundColor: paleta.corBolhasFundo ?? paleta.cor,
+            opacity: 0.25,
+          }}
+        />
+        <div
+          className="absolute bottom-10 left-1/3 h-28 w-28 rounded-full"
+          style={{
+            backgroundColor: paleta.corBolhasFundo ?? paleta.cor,
+            opacity: 0.3,
+          }}
+        />
+        <div
+          className="absolute bottom-0 left-[58%] h-40 w-40 rounded-full"
+          style={{
+            backgroundColor: paleta.corBolhasFundo ?? paleta.cor,
+            opacity: 0.25,
+          }}
+        />
+        <div
+          className="absolute bottom-[-18px] right-12 h-52 w-52 rounded-full"
+          style={{
+            backgroundColor: paleta.corBolhasFundo ?? paleta.cor,
+            opacity: 0.25,
+          }}
+        />
+        <div
+          className="absolute bottom-24 right-[28%] h-20 w-20 rounded-full"
+          style={{
+            backgroundColor: paleta.corBolhasFundo ?? paleta.cor,
+            opacity: 0.35,
+          }}
+        />
+        <div
+          className="absolute bottom-24 left-[-14px] h-24 w-24 rounded-full"
+          style={{
+            backgroundColor: paleta.corBolhasFundo ?? paleta.cor,
+            opacity: 0.25,
+          }}
+        />
+        <div
+          className="absolute left-[44%] top-[-10px] h-16 w-16 rounded-full"
+          style={{
+            backgroundColor: paleta.corBolhasFundo ?? paleta.cor,
+            opacity: 0.25,
+          }}
+        />
       </div>
 
-      <main className="mx-auto w-full max-w-[1500px] px-4 py-6 sm:px-6 lg:py-10">
+      <div className="relative z-10 w-full">
+        <Header
+          isBgWhite
+          disableScrollHide
+          backgroundColor={paleta.corFundoCabecalho}
+          borderColor={paleta.cor}
+        />
+      </div>
+
+      <main className="relative z-10 mx-auto w-full max-w-[1500px] px-4 py-6 sm:px-6 lg:py-10">
         <button
           type="button"
           onClick={() => navigate('/searchpol')}
-          className="mb-5 inline-flex items-center gap-2 rounded-lg px-3 py-2 font-bold text-[#2A2A72] transition-colors hover:bg-[#2A2A72]/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2A2A72]"
+          className="mb-5 inline-flex items-center gap-2 rounded-lg px-3 py-2 font-bold transition-colors hover:bg-[#2A2A72]/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2A2A72]"
+          style={{ color: paleta.corTextoBotaoVoltar }}
         >
           <FiArrowLeft aria-hidden="true" className="text-lg" />
           Voltar
@@ -244,17 +323,17 @@ function PaginaPartido() {
                 <header
                   className="flex flex-col gap-4 border-b-[6px] p-5 sm:flex-row sm:items-center sm:justify-between sm:px-7 sm:py-6"
                   style={{
-                    backgroundColor: paleta.borda,
+                    backgroundColor: paleta.corFundoCabecalho,
                     borderBottomColor: paleta.borda,
-                    color: corTextoCabecalho,
+                    color: paleta.corTextoCabecalho,
                   }}
                 >
                   <div>
-                    <h1 className="text-2xl font-black uppercase leading-tight sm:text-3xl">
+                    <h1 className="text-2xl font-black uppercase leading-tight sm:text-4xl">
                       {partido.nome_completo}
                     </h1>
                     <p className="mt-1 text-sm font-bold uppercase tracking-[0.14em] opacity-70">
-                      {partido.sigla}
+                      SIGLA: {partido.sigla}
                     </p>
                   </div>
                   <div
@@ -294,8 +373,11 @@ function PaginaPartido() {
                       style={{ borderColor: paleta.borda }}
                     >
                       <h2
-                        className="mb-4 border-b pb-3 text-sm font-black uppercase tracking-[0.12em] text-[#2A2A72]"
-                        style={{ borderBottomColor: paleta.cor }}
+                        className="mb-4 border-b pb-3 text-sm font-black uppercase tracking-[0.12em] text-[#000000]"
+                        style={{
+                          borderBottomColor:
+                            paleta.corDivisoriaSecao ?? paleta.cor,
+                        }}
                       >
                         Propostas
                       </h2>
@@ -305,7 +387,7 @@ function PaginaPartido() {
                       />
                       {!!partido.propostas_url?.length && (
                         <div className="mt-5 border-t border-[#2A2A72]/10 pt-4">
-                          <h3 className="mb-2 text-xs font-extrabold uppercase tracking-[0.1em] text-[#68688e]">
+                          <h3 className="mb-2 text-xs font-extrabold uppercase tracking-[0.1em] text-[#666666]">
                             Saiba mais
                           </h3>
                           <ul className="space-y-2">
@@ -315,7 +397,7 @@ function PaginaPartido() {
                                   href={url}
                                   target="_blank"
                                   rel="noreferrer"
-                                  className="break-all text-sm font-semibold text-[#5B3A8A] underline decoration-[#A36BBE] underline-offset-2 hover:text-[#2A2A72]"
+                                  className="break-all text-sm font-semibold text-[#4b5563] underline decoration-[#666666] underline-offset-2 hover:text-[#000000]"
                                 >
                                   Proposta {index + 1}
                                 </a>
@@ -331,8 +413,11 @@ function PaginaPartido() {
                       style={{ borderColor: paleta.borda }}
                     >
                       <h2
-                        className="mb-4 border-b pb-3 text-sm font-black uppercase tracking-[0.12em] text-[#2A2A72]"
-                        style={{ borderBottomColor: paleta.cor }}
+                        className="mb-4 border-b pb-3 text-sm font-black uppercase tracking-[0.12em] text-[#000000]"
+                        style={{
+                          borderBottomColor:
+                            paleta.corDivisoriaSecao ?? paleta.cor,
+                        }}
                       >
                         Ideologia
                       </h2>
@@ -380,7 +465,7 @@ function PaginaPartido() {
                   {candidatos.map((candidato) => (
                     <article
                       key={candidato.id}
-                      className="flex min-h-[240px] flex-col overflow-hidden rounded-2xl border-2 bg-white text-[#2A2A72]"
+                      className="flex min-h-[240px] flex-col overflow-hidden rounded-2xl border-2 bg-white text-[#333333]"
                       style={{ borderColor: paleta.borda }}
                     >
                       <div
@@ -396,7 +481,7 @@ function PaginaPartido() {
                             className="h-full w-full object-cover object-[center_20%]"
                           />
                         ) : (
-                          <span className="text-xs font-bold uppercase tracking-[0.1em] text-[#2A2A72]">
+                          <span className="text-xs font-bold uppercase tracking-[0.1em] text-[#666666]">
                             Sem foto
                           </span>
                         )}
@@ -415,7 +500,7 @@ function PaginaPartido() {
           </>
         )}
       </main>
-    </>
+    </div>
   );
 }
 

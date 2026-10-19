@@ -7,6 +7,8 @@ import { useAuth } from '../../contexts/AuthContext';
 interface HeaderProps {
   isBgWhite?: boolean;
   disableScrollHide?: boolean;
+  backgroundColor?: string;
+  borderColor?: string;
 }
 
 interface NavItem {
@@ -22,7 +24,12 @@ const NAV_ITEMS: NavItem[] = [
   { label: 'Título de Eleitor', path: '/etitulo' },
 ];
 
-export default function Header({ isBgWhite, disableScrollHide }: HeaderProps) {
+export default function Header({
+  isBgWhite,
+  disableScrollHide,
+  backgroundColor,
+  borderColor,
+}: HeaderProps) {
   const [visible, setVisible] = useState(true);
   const lastScrollY = useRef(0);
   const navigate = useNavigate();
@@ -55,6 +62,7 @@ export default function Header({ isBgWhite, disableScrollHide }: HeaderProps) {
         ${disableScrollHide ? '' : 'transition-transform duration-[800ms] ease-in-out'}
         ${disableScrollHide || visible ? 'translate-y-0' : '-translate-y-[200px]'} ${isBgWhite ? 'bg-[#2A2A72]' : 'bg-white'}
       `}
+      style={{ backgroundColor, borderColor }}
     >
       <div className="flex items-center gap-10">
         {isBgWhite ? (
