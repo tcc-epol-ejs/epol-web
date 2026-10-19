@@ -16,6 +16,33 @@ type ScrollbarStyle = CSSProperties & {
   '--party-scrollbar-track': string;
 };
 
+const escalasBandeirasPorSigla: Record<string, number> = {
+  AGIR: 1.15,
+  AVANTE: 1.45,
+  CIDADANIA: 1.2,
+  DC: 1.15,
+  DEMOCRATA: 1.35,
+  MDB: 1.2,
+  MISSÃO: 1.2,
+  NOVO: 1.15,
+  PCB: 1.2,
+  PCDOB: 1.2,
+  PCO: 1.2,
+  PL: 1.3,
+  PODE: 1.15,
+  PP: 1.15,
+  PRD: 1.1,
+  PRTB: 1.15,
+  PSB: 1.15,
+  PSD: 1.15,
+  PSDB: 1.15,
+  PSOL: 1.2,
+  PSTU: 1.2,
+  REPUBLICANOS: 1.5,
+  SOLIDARIEDADE: 1.15,
+  UP: 1.15,
+};
+
 function formatarData(data: string | null) {
   if (!data) return null;
 
@@ -129,6 +156,9 @@ function PaginaPartido() {
     partido?.sigla ?? '',
     partido?.nome_completo ?? '',
   );
+  const escalaBandeira = partido
+    ? escalasBandeirasPorSigla[partido.sigla.toUpperCase()]
+    : undefined;
   const corBarraRolagem = paleta.corBarraRolagem;
 
   useEffect(() => {
@@ -329,6 +359,11 @@ function PaginaPartido() {
                         src={partido.bandeira_url}
                         alt={`Bandeira do ${partido.nome_completo}`}
                         className="h-full w-full object-contain"
+                        style={{
+                          transform: escalaBandeira
+                            ? `scale(${escalaBandeira})`
+                            : undefined,
+                        }}
                       />
                     ) : null}
                   </div>
