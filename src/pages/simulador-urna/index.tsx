@@ -2,8 +2,17 @@ import { useState } from 'react';
 import type { ReactNode } from 'react';
 import Footer from '../../components/footer/footer';
 import Header from '../../components/header';
+import BotaoDuvida from '../../components/botoes/botaoDuvida/duvida';
 import pipo_fechado from '../../assets/Imagens/pipo_fechado.png';
 import pipoFeliz from '../../assets/Imagens/pipoFeliz.png';
+import pipoDuvida from '../../assets/Imagens/pipoDuvida.png';
+import PipoDiogo from '../../assets/Imagens/Pipos/Pipo_Diogo_NB.png';
+import PipoEmanu from '../../assets/Imagens/Pipos/Pipo_Emanuela_NB.png';
+import PipoGui from '../../assets/Imagens/Pipos/Pipo_Guilherme_NB.png';
+import PipoMika from '../../assets/Imagens/Pipos/Pipo_Mikaela_NB.png';
+import PipoNico from '../../assets/Imagens/Pipos/Pipo_Nicolas_NB.png';
+import PipoRicardo from '../../assets/Imagens/Pipos/Pipo_Ricardo_NB.png';
+import PipoSabrina from '../../assets/Imagens/Pipos/Pipo_Sabrina_NB.png';
 
 // ---------- Fundo decorativo ----------
 
@@ -135,61 +144,61 @@ const CANDIDATOS_EXEMPLO: CandidatoUrna[] = [
   {
     cargo: 'deputado-federal',
     numero: '1111',
-    nome: 'Dep. Federal Exemplo A',
+    nome: 'Dep. Federal Pipo Emanu',
     partido: 'AAA',
-    foto: pipoFeliz,
+    foto: PipoEmanu,
   },
   {
     cargo: 'deputado-federal',
     numero: '2222',
-    nome: 'Dep. Federal Exemplo B',
+    nome: 'Dep. Federal Pipo Diogo',
     partido: 'BBB',
-    foto: pipo_fechado,
+    foto: PipoDiogo,
   },
   // Deputado Estadual (5 dígitos)
   {
     cargo: 'deputado-estadual',
     numero: '11111',
-    nome: 'Dep. Estadual Exemplo A',
+    nome: 'Dep. Estadual Pipo Mika',
     partido: 'AAA',
-    foto: pipoFeliz,
+    foto: PipoMika,
   },
   {
     cargo: 'deputado-estadual',
-    numero: '22222',
-    nome: 'Dep. Estadual Exemplo B',
+    numero: '4444',
+    nome: 'Dep. Estadual Pipo Gui',
     partido: 'BBB',
-    foto: pipo_fechado,
+    foto: PipoGui,
   },
   // Senador (3 dígitos)
   {
     cargo: 'senador',
     numero: '111',
-    nome: 'Senador Exemplo A',
+    nome: 'Senadora Pipo Sabrina',
     partido: 'AAA',
-    foto: pipoFeliz,
+    foto: PipoSabrina,
   },
   {
     cargo: 'senador',
-    numero: '222',
-    nome: 'Senadora Exemplo B',
+    numero: '444',
+    nome: 'Senador Pipo Nico',
     partido: 'BBB',
-    foto: pipo_fechado,
+    foto: PipoNico,
   },
   // Governador (2 dígitos)
   {
     cargo: 'governador',
     numero: '33',
-    nome: 'Governador Exemplo A',
+    nome: 'Governador Pipo Ricardo',
     partido: 'AAA',
-    foto: pipoFeliz,
+    foto: PipoRicardo,
   },
   {
     cargo: 'governador',
     numero: '44',
-    nome: 'Governadora Exemplo B',
+    nome: 'Governador Pipo em duvida',
     partido: 'BBB',
-    foto: pipo_fechado,
+    foto: pipoDuvida,
   },
   // Presidente (2 dígitos)
   {
@@ -201,7 +210,7 @@ const CANDIDATOS_EXEMPLO: CandidatoUrna[] = [
   },
   {
     cargo: 'presidente',
-    numero: '22',
+    numero: '24',
     nome: 'Candidata Exemplo B',
     partido: 'BBB',
     foto: pipo_fechado,
@@ -322,9 +331,16 @@ function SimuladorEtapa1({
         <Stepper atual={1} />
 
         <div className="px-6 py-8 sm:px-12">
-          <p className="mb-5 text-base text-[#1f2a52]">
-            Defina o tipo de eleição e o turno que deseja simular.
-          </p>
+          <div className="mb-5 flex items-start justify-between gap-4">
+            <p className="text-base text-[#1f2a52]">
+              Defina o tipo de eleição e o turno que deseja simular.
+            </p>
+            <BotaoDuvida
+              alinhamento="direita"
+              titulo="Passo 1: Escolha a eleição"
+              texto="Escreva aqui a explicação do passo 1."
+            />
+          </div>
 
           <div className="rounded-xl bg-[#8888D3] p-6">
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
@@ -373,9 +389,16 @@ function SimuladorEtapa2({
         <Stepper atual={2} />
 
         <div className="px-6 py-8 sm:px-12">
-          <p className="mb-5 text-base text-[#1f2a52]">
-            Conheça os candidatos e anote os números para a hora de votar.
-          </p>
+          <div className="mb-5 flex items-start justify-between gap-4">
+            <p className="text-base text-[#1f2a52]">
+              Conheça os candidatos e anote os números para a hora de votar.
+            </p>
+            <BotaoDuvida
+              alinhamento="direita"
+              titulo="Passo 2: Faça sua colinha"
+              texto="Escreva aqui a explicação do passo 2."
+            />
+          </div>
 
           <div className="flex flex-col gap-6">
             {cenario.cargos.map((cargoId) => {
@@ -546,6 +569,14 @@ function SimuladorEtapa3({
         <Stepper atual={3} />
 
         <div className="px-6 py-8 sm:px-12">
+          <div className="mb-4 flex justify-end">
+            <BotaoDuvida
+              alinhamento="direita"
+              titulo="Passo 3: Simule a votação"
+              texto="Escreva aqui a explicação do passo 3."
+            />
+          </div>
+
           <div className="mx-auto w-full max-w-[520px] rounded-2xl bg-[#ecece4] p-4 shadow-lg ring-1 ring-black/10">
             {/* Visor */}
             <div className="rounded-sm bg-black p-3">
