@@ -28,7 +28,7 @@ const escalasBandeirasPorSigla: Record<string, number> = {
   PCB: 1.2,
   PCDOB: 1.2,
   PCO: 1.2,
-  PL: 1.3,
+  PL: 1.2,
   PODE: 1.15,
   PP: 1.15,
   PRD: 1.1,
