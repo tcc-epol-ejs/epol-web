@@ -796,7 +796,7 @@ function SearchPol() {
 
                           <div className="flex flex-1 flex-col p-4">
                             <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#2A2A72]/70">
-                              Candidato a{' '}
+                              Candidato(a) a{' '}
                               {candidate.candidatura?.toLowerCase() ||
                                 'cargo não informado'}
                             </p>
