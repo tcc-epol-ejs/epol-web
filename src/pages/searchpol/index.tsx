@@ -448,28 +448,31 @@ function SearchPol() {
   ]);
 
   return (
-    <>
-      <div className="w-full">
+    <div className="relative isolate flow-root min-h-screen overflow-hidden bg-[#eaf6ff] lg:h-dvh lg:min-h-0">
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 z-0 overflow-hidden"
+      >
+        <div className="absolute -left-10 top-8 h-28 w-28 rounded-full bg-[#FFA400]/25" />
+        <div className="absolute left-8 top-24 h-20 w-20 rounded-full bg-[#FFA400]/35" />
+        <div className="absolute left-[18%] top-[28%] h-24 w-24 rounded-full bg-[#FFA400]/20" />
+        <div className="absolute right-16 top-10 h-32 w-32 rounded-full bg-[#FFA400]/25" />
+        <div className="absolute right-8 top-32 h-24 w-24 rounded-full bg-[#FFA400]/35" />
+        <div className="absolute right-[-10px] top-[48%] h-20 w-20 rounded-full bg-[#FFA400]/25" />
+        <div className="absolute bottom-10 left-1/3 h-28 w-28 rounded-full bg-[#FFA400]/30" />
+        <div className="absolute bottom-0 left-[58%] h-40 w-40 rounded-full bg-[#FFA400]/25" />
+        <div className="absolute bottom-[-18px] right-12 h-52 w-52 rounded-full bg-[#FFA400]/25" />
+        <div className="absolute bottom-24 right-[28%] h-20 w-20 rounded-full bg-[#FFA400]/35" />
+        <div className="absolute bottom-24 left-[-14px] h-24 w-24 rounded-full bg-[#FFA400]/25" />
+        <div className="absolute left-[44%] top-[-10px] h-16 w-16 rounded-full bg-[#FFA400]/25" />
+      </div>
+
+      <div className="relative z-10 w-full">
         <Header isBgWhite disableScrollHide />
       </div>
 
-      <section className="relative isolate overflow-clip bg-transparent">
-        <div className="pointer-events-none absolute inset-0 -z-10">
-          <div className="absolute -left-10 top-8 h-28 w-28 rounded-full bg-[#FFA400]/25" />
-          <div className="absolute left-8 top-24 h-20 w-20 rounded-full bg-[#FFA400]/35" />
-          <div className="absolute left-[18%] top-[28%] h-24 w-24 rounded-full bg-[#FFA400]/20" />
-          <div className="absolute right-16 top-10 h-32 w-32 rounded-full bg-[#FFA400]/25" />
-          <div className="absolute right-8 top-32 h-24 w-24 rounded-full bg-[#FFA400]/35" />
-          <div className="absolute right-[-10px] top-[48%] h-20 w-20 rounded-full bg-[#FFA400]/25" />
-          <div className="absolute bottom-10 left-1/3 h-28 w-28 rounded-full bg-[#FFA400]/30" />
-          <div className="absolute bottom-0 left-[58%] h-40 w-40 rounded-full bg-[#FFA400]/25" />
-          <div className="absolute bottom-[-18px] right-12 h-52 w-52 rounded-full bg-[#FFA400]/25" />
-          <div className="absolute bottom-24 right-[28%] h-20 w-20 rounded-full bg-[#FFA400]/35" />
-          <div className="absolute bottom-24 left-[-14px] h-24 w-24 rounded-full bg-[#FFA400]/25" />
-          <div className="absolute left-[44%] top-[-10px] h-16 w-16 rounded-full bg-[#FFA400]/25" />
-        </div>
-
-        <div className="mx-auto flex min-h-[calc(100vh-64px)] w-full max-w-[1200px] flex-col px-6 pt-8 sm:px-10 sm:pt-10 lg:h-[calc(100vh-64px)] lg:flex-row lg:overflow-hidden lg:px-0">
+      <section className="relative z-10 isolate overflow-clip bg-transparent lg:h-[calc(100dvh-122px)]">
+        <div className="mx-auto flex w-full max-w-[1200px] flex-col px-6 pt-8 sm:px-10 sm:pt-10 lg:h-full lg:min-h-0 lg:flex-row lg:overflow-visible lg:px-0">
           <aside className="w-full self-start pb-8 lg:h-fit lg:w-1/4 lg:border-r-2 lg:border-[#2A2A72]/30 lg:pb-0 lg:pl-8 lg:pr-8">
             <h2 className="flex items-center gap-3 text-[18px] font-bold uppercase tracking-[0.12em] text-[#2A2A72]">
               <FiFilter aria-hidden="true" className="text-[22px]" />
@@ -598,7 +601,7 @@ function SearchPol() {
             </div>
           </aside>
 
-          <div className="flex w-full flex-col items-stretch gap-4 lg:min-h-0 lg:overflow-hidden lg:pl-10 lg:pr-4">
+          <div className="flex w-full flex-col items-stretch gap-4 lg:min-h-0 lg:overflow-visible lg:pl-10 lg:pr-4">
             <form
               onSubmit={handleSearch}
               className="flex w-full max-w-[760px] items-center gap-3"
@@ -631,7 +634,7 @@ function SearchPol() {
 
             <div
               ref={resultadosRef}
-              className="flex min-h-0 flex-1 flex-col gap-4 lg:overflow-y-auto lg:[scrollbar-width:none] lg:[&::-webkit-scrollbar]:hidden"
+              className="flex min-h-0 flex-1 flex-col gap-4 lg:-mr-12 lg:overflow-x-hidden lg:overflow-y-auto lg:pr-20 lg:[scrollbar-color:#2A2A72_#dbeafe] lg:[scrollbar-width:thin] lg:[&::-webkit-scrollbar]:w-2 lg:[&::-webkit-scrollbar-track]:bg-[#dbeafe] lg:[&::-webkit-scrollbar-thumb]:rounded-full lg:[&::-webkit-scrollbar-thumb]:bg-[#2A2A72]/60"
             >
               {filtroSelecionado !== 'candidatos' &&
                 !filtroCandidatoAtivo &&
@@ -828,7 +831,7 @@ function SearchPol() {
           </div>
         </div>
       </section>
-    </>
+    </div>
   );
 }
 
