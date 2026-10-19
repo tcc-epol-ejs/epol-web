@@ -20,6 +20,7 @@ const NAV_ITEMS: NavItem[] = [
   { label: 'Visualizador', path: '/visualizador' },
   { label: 'Match', path: '/match' },
   { label: 'Título de Eleitor', path: '/titulo-de-eleitor' },
+  { label: 'Simulador de Urna', path: '/simulador-urna' },
 ];
 
 export default function Header({ isBgWhite, disableScrollHide }: HeaderProps) {
