@@ -356,6 +356,9 @@ function PaginaPartido() {
                         src={partido.bandeira_url}
                         alt={`Bandeira do ${partido.nome_completo}`}
                         className="h-full w-full object-contain"
+                        style={{
+                          transform: `scale(${escalasBandeirasPorSigla[partido.sigla.toUpperCase()] ?? 1})`,
+                        }}
                       />
                     ) : null}
                   </div>
