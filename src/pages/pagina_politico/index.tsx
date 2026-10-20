@@ -1,8 +1,27 @@
 import { useEffect, useState } from 'react';
-import { FiArrowLeft } from 'react-icons/fi';
+import { FiArrowLeft, FiArrowRight } from 'react-icons/fi';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import Header from '../../components/header';
 import { buscarCandidato, type Candidato } from '../../services/api';
+
+function Campo({
+  titulo,
+  valor,
+}: {
+  titulo: string;
+  valor: string | number | null | undefined;
+}) {
+  return (
+    <div className="rounded-xl bg-white/75 p-4">
+      <dt className="text-xs font-extrabold uppercase tracking-[0.12em] text-[#666]">
+        {titulo}
+      </dt>
+      <dd className="mt-2 break-words text-sm font-semibold leading-relaxed text-[#333]">
+        {valor || 'Não informado'}
+      </dd>
+    </div>
+  );
+}
 
 function formatarData(data: string | null | undefined) {
   if (!data) return null;
@@ -20,6 +39,7 @@ function PaginaPolitico() {
   const [candidato, setCandidato] = useState<Candidato | null>(null);
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState('');
+  const [secaoAtiva, setSecaoAtiva] = useState<'sobre' | 'trajetoria'>('sobre');
 
   useEffect(() => {
     if (!idCandidato) {
@@ -153,115 +173,237 @@ function PaginaPolitico() {
               </div>
             </article>
 
-            <section
-              aria-labelledby="sobre-candidato-titulo"
-              className="mx-auto mt-8 w-full max-w-[960px]"
-            >
-              <h2
-                id="sobre-candidato-titulo"
-                className="mb-4 border-b-2 border-[#FFA400] pb-3 text-lg font-black uppercase tracking-[0.1em] text-[#2A2A72]"
-              >
-                Sobre mim
-              </h2>
-              <dl className="grid gap-3 lg:grid-cols-3">
-                <div className="rounded-xl bg-white/75 p-4">
-                  <div>
-                    <dt className="text-xs font-extrabold uppercase tracking-[0.12em] text-[#666]">
-                      Nome completo
-                    </dt>
-                    <dd className="mt-2 break-words text-sm font-semibold leading-relaxed text-[#333]">
-                      {candidato.nome_completo || 'Não informado'}
-                    </dd>
+            <section className="mx-auto mt-8 w-full max-w-[960px]">
+              <div className="mb-4 flex items-center justify-between gap-3 border-b-2 border-[#FFA400] pb-3">
+                <h2
+                  id={
+                    secaoAtiva === 'sobre'
+                      ? 'sobre-candidato-titulo'
+                      : 'trajetoria-candidato-titulo'
+                  }
+                  className="text-lg font-black uppercase tracking-[0.1em] text-[#2A2A72]"
+                >
+                  {secaoAtiva === 'sobre' ? 'Sobre mim' : 'Trajetória'}
+                </h2>
+                <button
+                  type="button"
+                  onClick={() =>
+                    setSecaoAtiva((atual) =>
+                      atual === 'sobre' ? 'trajetoria' : 'sobre',
+                    )
+                  }
+                  className="inline-flex shrink-0 items-center gap-2 rounded-full bg-[#2A2A72] px-4 py-2 text-xs font-bold text-white transition-colors hover:bg-[#202056] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2A2A72] sm:text-sm"
+                  aria-label={
+                    secaoAtiva === 'sobre'
+                      ? 'Ver trajetória'
+                      : 'Voltar para sobre mim'
+                  }
+                >
+                  {secaoAtiva === 'sobre' ? (
+                    <>
+                      Ver trajetória
+                      <FiArrowRight aria-hidden="true" />
+                    </>
+                  ) : (
+                    <>
+                      <FiArrowLeft aria-hidden="true" />
+                      Sobre mim
+                    </>
+                  )}
+                </button>
+              </div>
+              <div className="overflow-hidden">
+                <div
+                  className="flex w-[200%] items-stretch transition-transform duration-700 ease-in-out motion-reduce:transition-none"
+                  style={{
+                    transform:
+                      secaoAtiva === 'sobre'
+                        ? 'translateX(0)'
+                        : 'translateX(-50%)',
+                  }}
+                >
+                  <div
+                    aria-hidden={secaoAtiva !== 'sobre'}
+                    className="w-1/2 shrink-0 px-0.5"
+                  >
+                    <dl className="grid gap-3 lg:grid-cols-3">
+                      <div className="rounded-xl bg-white/75 p-4">
+                        <div>
+                          <dt className="text-xs font-extrabold uppercase tracking-[0.12em] text-[#666]">
+                            Nome completo
+                          </dt>
+                          <dd className="mt-2 break-words text-sm font-semibold leading-relaxed text-[#333]">
+                            {candidato.nome_completo || 'Não informado'}
+                          </dd>
+                        </div>
+                        <div className="mt-4 border-t border-[#2A2A72]/10 pt-3">
+                          <dt className="text-xs font-extrabold uppercase tracking-[0.12em] text-[#666]">
+                            Nome político
+                          </dt>
+                          <dd className="mt-2 break-words text-sm font-semibold leading-relaxed text-[#333]">
+                            {candidato.nome_politico || 'Não informado'}
+                          </dd>
+                        </div>
+                        <div className="mt-4 border-t border-[#2A2A72]/10 pt-3">
+                          <dt className="text-xs font-extrabold uppercase tracking-[0.12em] text-[#666]">
+                            Número da urna
+                          </dt>
+                          <dd className="mt-2 break-words text-sm font-semibold leading-relaxed text-[#333]">
+                            {candidato.numero_urna ?? 'Não informado'}
+                          </dd>
+                        </div>
+                      </div>
+                      <div className="rounded-xl bg-white/75 p-4">
+                        <div>
+                          <dt className="text-xs font-extrabold uppercase tracking-[0.12em] text-[#666]">
+                            Data de nascimento
+                          </dt>
+                          <dd className="mt-2 break-words text-sm font-semibold leading-relaxed text-[#333]">
+                            {formatarData(candidato.data_nascimento) ||
+                              'Não informado'}
+                          </dd>
+                        </div>
+                        <div className="mt-4 border-t border-[#2A2A72]/10 pt-3">
+                          <dt className="text-xs font-extrabold uppercase tracking-[0.12em] text-[#666]">
+                            Naturalidade
+                          </dt>
+                          <dd className="mt-2 break-words text-sm font-semibold leading-relaxed text-[#333]">
+                            {candidato.naturalidade || 'Não informado'}
+                          </dd>
+                        </div>
+                        <div className="mt-4 border-t border-[#2A2A72]/10 pt-3">
+                          <dt className="text-xs font-extrabold uppercase tracking-[0.12em] text-[#666]">
+                            UF de naturalidade
+                          </dt>
+                          <dd className="mt-2 break-words text-sm font-semibold leading-relaxed text-[#333]">
+                            {candidato.uf_naturalidade || 'Não informado'}
+                          </dd>
+                        </div>
+                      </div>
+                      <div className="rounded-xl bg-white/75 p-4">
+                        <div>
+                          <dt className="text-xs font-extrabold uppercase tracking-[0.12em] text-[#666]">
+                            Partido
+                          </dt>
+                          <dd className="mt-2 flex items-center gap-3 text-sm font-semibold text-[#333]">
+                            {candidato.partidos?.bandeira_url ? (
+                              <img
+                                src={candidato.partidos.bandeira_url}
+                                alt=""
+                                className="h-10 w-10 shrink-0 rounded-full border border-[#2A2A72]/20 bg-white object-contain p-1"
+                              />
+                            ) : (
+                              <span
+                                aria-hidden="true"
+                                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#2A2A72] text-[10px] font-black text-white"
+                              >
+                                {candidato.partidos?.sigla?.slice(0, 4) || '?'}
+                              </span>
+                            )}
+                            <span>
+                              {candidato.partidos
+                                ? `${candidato.partidos.nome_completo} (${candidato.partidos.sigla})`
+                                : 'Não informado'}
+                            </span>
+                          </dd>
+                        </div>
+                        <div className="mt-4 border-t border-[#2A2A72]/10 pt-3">
+                          <dt className="text-xs font-extrabold uppercase tracking-[0.12em] text-[#666]">
+                            Cargo atual
+                          </dt>
+                          <dd className="mt-2 break-words text-sm font-semibold leading-relaxed text-[#333]">
+                            {candidato.cargo_atual || 'Não informado'}
+                          </dd>
+                        </div>
+                        <div className="mt-4 border-t border-[#2A2A72]/10 pt-3">
+                          <dt className="text-xs font-extrabold uppercase tracking-[0.12em] text-[#666]">
+                            Vice
+                          </dt>
+                          <dd className="mt-2 break-words text-sm font-semibold leading-relaxed text-[#333]">
+                            {candidato.vice || 'Não informado'}
+                          </dd>
+                        </div>
+                      </div>
+                    </dl>
                   </div>
-                  <div className="mt-4 border-t border-[#2A2A72]/10 pt-3">
-                    <dt className="text-xs font-extrabold uppercase tracking-[0.12em] text-[#666]">
-                      Nome político
-                    </dt>
-                    <dd className="mt-2 break-words text-sm font-semibold leading-relaxed text-[#333]">
-                      {candidato.nome_politico || 'Não informado'}
-                    </dd>
-                  </div>
-                  <div className="mt-4 border-t border-[#2A2A72]/10 pt-3">
-                    <dt className="text-xs font-extrabold uppercase tracking-[0.12em] text-[#666]">
-                      Número da urna
-                    </dt>
-                    <dd className="mt-2 break-words text-sm font-semibold leading-relaxed text-[#333]">
-                      {candidato.numero_urna ?? 'Não informado'}
-                    </dd>
+                  <div
+                    aria-hidden={secaoAtiva !== 'trajetoria'}
+                    className="w-1/2 shrink-0 px-0.5"
+                  >
+                    <div className="grid gap-3 lg:grid-cols-2">
+                      <div className="rounded-xl bg-white/75 p-4">
+                        <dt className="text-xs font-extrabold uppercase tracking-[0.12em] text-[#666]">
+                          Formação acadêmica
+                        </dt>
+                        <dd className="mt-2 text-sm font-semibold leading-relaxed text-[#333]">
+                          {candidato.formacao_academica?.length ? (
+                            <ul className="space-y-3">
+                              {candidato.formacao_academica.map(
+                                (formacao, index) => (
+                                  <li
+                                    key={`${formacao.curso}-${formacao.instituicao}-${index}`}
+                                  >
+                                    <p>
+                                      {formacao.curso || 'Curso não informado'}
+                                    </p>
+                                    <p className="font-medium text-[#666]">
+                                      {formacao.instituicao}
+                                      {formacao.ano_conclusao
+                                        ? ` · ${formacao.ano_conclusao}`
+                                        : ''}
+                                    </p>
+                                  </li>
+                                ),
+                              )}
+                            </ul>
+                          ) : (
+                            'Não informado'
+                          )}
+                        </dd>
+                      </div>
+                      <Campo
+                        titulo="Profissão anterior"
+                        valor={candidato.profissao_anterior}
+                      />
+                      <Campo
+                        titulo="Tempo de atuação"
+                        valor={
+                          candidato.tempo_atuacao_anos != null
+                            ? `${candidato.tempo_atuacao_anos} anos`
+                            : null
+                        }
+                      />
+                      <div className="rounded-xl bg-white/75 p-4">
+                        <dt className="text-xs font-extrabold uppercase tracking-[0.12em] text-[#666]">
+                          Feitos e contribuições
+                        </dt>
+                        <dd className="mt-2 text-sm font-semibold leading-relaxed text-[#333]">
+                          {candidato.feitos_resumo?.length ? (
+                            <ul className="space-y-2">
+                              {candidato.feitos_resumo.map((feito, index) => (
+                                <li
+                                  key={`${feito}-${index}`}
+                                  className="flex gap-2"
+                                >
+                                  <span
+                                    aria-hidden="true"
+                                    className="font-black text-[#FFA400]"
+                                  >
+                                    •
+                                  </span>
+                                  <span>{feito}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          ) : (
+                            'Não informado'
+                          )}
+                        </dd>
+                      </div>
+                    </div>
                   </div>
                 </div>
-                <div className="rounded-xl bg-white/75 p-4">
-                  <div>
-                    <dt className="text-xs font-extrabold uppercase tracking-[0.12em] text-[#666]">
-                      Data de nascimento
-                    </dt>
-                    <dd className="mt-2 break-words text-sm font-semibold leading-relaxed text-[#333]">
-                      {formatarData(candidato.data_nascimento) ||
-                        'Não informado'}
-                    </dd>
-                  </div>
-                  <div className="mt-4 border-t border-[#2A2A72]/10 pt-3">
-                    <dt className="text-xs font-extrabold uppercase tracking-[0.12em] text-[#666]">
-                      Naturalidade
-                    </dt>
-                    <dd className="mt-2 break-words text-sm font-semibold leading-relaxed text-[#333]">
-                      {candidato.naturalidade || 'Não informado'}
-                    </dd>
-                  </div>
-                  <div className="mt-4 border-t border-[#2A2A72]/10 pt-3">
-                    <dt className="text-xs font-extrabold uppercase tracking-[0.12em] text-[#666]">
-                      UF de naturalidade
-                    </dt>
-                    <dd className="mt-2 break-words text-sm font-semibold leading-relaxed text-[#333]">
-                      {candidato.uf_naturalidade || 'Não informado'}
-                    </dd>
-                  </div>
-                </div>
-                <div className="rounded-xl bg-white/75 p-4">
-                  <div>
-                    <dt className="text-xs font-extrabold uppercase tracking-[0.12em] text-[#666]">
-                      Partido
-                    </dt>
-                    <dd className="mt-2 flex items-center gap-3 text-sm font-semibold text-[#333]">
-                      {candidato.partidos?.bandeira_url ? (
-                        <img
-                          src={candidato.partidos.bandeira_url}
-                          alt=""
-                          className="h-10 w-10 shrink-0 rounded-full border border-[#2A2A72]/20 bg-white object-contain p-1"
-                        />
-                      ) : (
-                        <span
-                          aria-hidden="true"
-                          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#2A2A72] text-[10px] font-black text-white"
-                        >
-                          {candidato.partidos?.sigla?.slice(0, 4) || '?'}
-                        </span>
-                      )}
-                      <span>
-                        {candidato.partidos
-                          ? `${candidato.partidos.nome_completo} (${candidato.partidos.sigla})`
-                          : 'Não informado'}
-                      </span>
-                    </dd>
-                  </div>
-                  <div className="mt-4 border-t border-[#2A2A72]/10 pt-3">
-                    <dt className="text-xs font-extrabold uppercase tracking-[0.12em] text-[#666]">
-                      Cargo atual
-                    </dt>
-                    <dd className="mt-2 break-words text-sm font-semibold leading-relaxed text-[#333]">
-                      {candidato.cargo_atual || 'Não informado'}
-                    </dd>
-                  </div>
-                  <div className="mt-4 border-t border-[#2A2A72]/10 pt-3">
-                    <dt className="text-xs font-extrabold uppercase tracking-[0.12em] text-[#666]">
-                      Vice
-                    </dt>
-                    <dd className="mt-2 break-words text-sm font-semibold leading-relaxed text-[#333]">
-                      {candidato.vice || 'Não informado'}
-                    </dd>
-                  </div>
-                </div>
-              </dl>
+              </div>
             </section>
           </>
         )}
