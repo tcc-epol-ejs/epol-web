@@ -790,8 +790,15 @@ function SearchPol() {
                   {!candidatosLoading && !candidatosError && (
                     <div className="grid w-full max-w-[960px] grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                       {candidatosResults.map((candidate) => (
-                        <article
+                        <button
                           key={candidate.id}
+                          type="button"
+                          onClick={() =>
+                            navigate(
+                              `/pagina_politico?id=${encodeURIComponent(candidate.id)}`,
+                            )
+                          }
+                          aria-label={`Ver informações de ${candidate.nome_politico || candidate.nome_completo}`}
                           className="flex min-h-[300px] w-full flex-col overflow-hidden rounded-2xl border-2 border-[#2A2A72] bg-white text-[#2A2A72]"
                         >
                           <div className="flex h-44 w-full shrink-0 items-center justify-center overflow-hidden bg-[#2A2A72]">
@@ -837,7 +844,7 @@ function SearchPol() {
                               </p>
                             </div>
                           </div>
-                        </article>
+                        </button>
                       ))}
                     </div>
                   )}

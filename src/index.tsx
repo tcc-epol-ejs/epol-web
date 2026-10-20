@@ -10,6 +10,7 @@ import Main from './pages/main';
 import Admin from './pages/admin';
 import SearchPol from './pages/searchpol';
 import PaginaPartido from './pages/pagina_partido';
+import PaginaPolitico from './pages/pagina_politico';
 
 function App() {
   return (
@@ -26,6 +27,7 @@ function App() {
         <Route path="/admin" element={<Admin />} />
         <Route path="/searchpol" element={<SearchPol />} />
         <Route path="/pagina_partido" element={<PaginaPartido />} />
+        <Route path="/pagina_politico" element={<PaginaPolitico />} />
       </Routes>
     </BrowserRouter>
   );
