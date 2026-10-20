@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import type { CSSProperties, ReactNode } from 'react';
 import { FiArrowLeft } from 'react-icons/fi';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import Header from '../../components/header';
 import { obterPaletaPartido } from '../../data/partidoPaletas';
 import {
@@ -121,9 +121,19 @@ function ListaInformacoes({
 
 function PaginaPartido() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [searchParams] = useSearchParams();
   const idSelecionado = searchParams.get('id');
   const numeroSelecionado = searchParams.get('numero');
+  const estadoNavegacao = location.state;
+  const voltarPara =
+    estadoNavegacao &&
+    typeof estadoNavegacao === 'object' &&
+    'voltarPara' in estadoNavegacao &&
+    typeof estadoNavegacao.voltarPara === 'string' &&
+    estadoNavegacao.voltarPara.startsWith('/pagina_politico?id=')
+      ? estadoNavegacao.voltarPara
+      : '/searchpol';
   const [partidos, setPartidos] = useState<Partido[]>([]);
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState('');
@@ -296,7 +306,7 @@ function PaginaPartido() {
       <main className="relative z-10 mx-auto flex min-h-0 w-full max-w-[1500px] flex-1 items-stretch gap-3 px-4 py-6 sm:gap-4 sm:px-6 lg:py-10">
         <button
           type="button"
-          onClick={() => navigate('/searchpol')}
+          onClick={() => navigate(voltarPara)}
           className="inline-flex shrink-0 self-start items-center gap-2 rounded-lg px-2 py-2 font-bold transition-colors hover:bg-[#2A2A72]/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2A2A72] sm:px-3"
           style={{ color: paleta.corTextoBotaoVoltar }}
         >

@@ -164,7 +164,27 @@ function PaginaPolitico() {
                     {candidato.candidatura?.toLocaleLowerCase('pt-BR') ||
                       'cargo não informado'}
                   </p>
-                  <div className="flex items-center gap-3 border-t border-[#2A2A72]/15 pt-4">
+                  <button
+                    type="button"
+                    disabled={!candidato.partidos}
+                    onClick={() => {
+                      if (!candidato.partidos || !idCandidato) return;
+                      navigate(
+                        `/pagina_partido?id=${encodeURIComponent(candidato.partidos.id)}`,
+                        {
+                          state: {
+                            voltarPara: `/pagina_politico?id=${encodeURIComponent(idCandidato)}`,
+                          },
+                        },
+                      );
+                    }}
+                    aria-label={
+                      candidato.partidos
+                        ? `Ver informações do partido ${candidato.partidos.nome_completo}`
+                        : 'Partido não informado'
+                    }
+                    className="flex items-center gap-3 border-t border-[#2A2A72]/15 pt-4 text-left transition-opacity enabled:hover:opacity-75 enabled:focus-visible:outline enabled:focus-visible:outline-2 enabled:focus-visible:outline-offset-4 enabled:focus-visible:outline-[#2A2A72] disabled:cursor-default"
+                  >
                     {candidato.partidos?.bandeira_url ? (
                       <img
                         src={candidato.partidos.bandeira_url}
@@ -179,7 +199,7 @@ function PaginaPolitico() {
                         ? ` (${candidato.partidos.sigla})`
                         : ''}
                     </p>
-                  </div>
+                  </button>
                 </div>
               </article>
 
