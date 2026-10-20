@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { FiArrowLeft, FiArrowRight } from 'react-icons/fi';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import Header from '../../components/header';
 import { buscarCandidato, type Candidato } from '../../services/api';
 
@@ -34,8 +34,17 @@ function formatarData(data: string | null | undefined) {
 
 function PaginaPolitico() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [searchParams] = useSearchParams();
   const idCandidato = searchParams.get('id');
+  const estadoNavegacao = location.state;
+  const voltarPara =
+    estadoNavegacao &&
+    typeof estadoNavegacao === 'object' &&
+    'voltarPara' in estadoNavegacao &&
+    typeof estadoNavegacao.voltarPara === 'string'
+      ? estadoNavegacao.voltarPara
+      : '/searchpol';
   const [candidato, setCandidato] = useState<Candidato | null>(null);
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState('');
@@ -98,7 +107,7 @@ function PaginaPolitico() {
       <main className="relative z-10 mx-auto flex w-full max-w-[1500px] items-start justify-center gap-2 px-4 py-6 sm:gap-4 sm:px-6 lg:py-10">
         <button
           type="button"
-          onClick={() => navigate('/searchpol')}
+          onClick={() => navigate(voltarPara)}
           className="sticky top-4 inline-flex w-9 shrink-0 items-center justify-center rounded-lg px-1 py-2 font-bold text-[#2A2A72] transition-colors hover:bg-[#2A2A72]/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2A2A72] sm:w-auto sm:gap-2 sm:px-3"
         >
           <FiArrowLeft aria-hidden="true" className="text-lg" />

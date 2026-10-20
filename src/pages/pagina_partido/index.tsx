@@ -508,9 +508,21 @@ function PaginaPartido() {
                 ) : (
                   <div className="grid w-full max-w-[1400px] grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
                     {candidatos.map((candidato) => (
-                      <article
+                      <button
                         key={candidato.id}
-                        className="flex min-h-[240px] flex-col overflow-hidden rounded-2xl border-2 bg-white text-[#333333]"
+                        type="button"
+                        onClick={() =>
+                          navigate(
+                            `/pagina_politico?id=${encodeURIComponent(candidato.id)}`,
+                            {
+                              state: {
+                                voltarPara: `/pagina_partido?id=${encodeURIComponent(partido.id)}`,
+                              },
+                            },
+                          )
+                        }
+                        aria-label={`Ver informações de ${candidato.nome_politico || candidato.nome_completo}`}
+                        className="flex min-h-[240px] flex-col overflow-hidden rounded-2xl border-2 bg-white text-left text-[#333333] transition-transform hover:-translate-y-1 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-[#2A2A72]"
                         style={{ borderColor: paleta.borda }}
                       >
                         <div
@@ -537,7 +549,7 @@ function PaginaPartido() {
                             {candidato.nome_politico || candidato.nome_completo}
                           </h3>
                         </div>
-                      </article>
+                      </button>
                     ))}
                   </div>
                 )}
