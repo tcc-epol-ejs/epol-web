@@ -665,7 +665,7 @@ function SearchPol() {
               {candidatosOpen && (
                 <>
                   {candidatosLoading && (
-                    <p className="text-[14px] text-[#2A2A72]">
+                    <p className="text-center text-sm text-[#2A2A72]">
                       Carregando candidatos...
                     </p>
                   )}
