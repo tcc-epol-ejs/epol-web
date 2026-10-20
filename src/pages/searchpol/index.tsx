@@ -10,220 +10,62 @@ import { FormEvent, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '../../components/header';
 import { obterPaletaPartido } from '../../data/partidoPaletas';
-import { Candidato, listarCandidatos } from '../../services/api';
+import {
+  type Candidato,
+  listarCandidatos,
+  listarPartidos,
+  type Partido,
+} from '../../services/api';
 
-const partidos = [
-  {
-    keyword: 'agir',
-    nome: 'AGIR',
-    sigla: 'AGIR',
-    numero: '36',
-    foto: '/logos/partidos/agir.svg',
-  },
-  {
-    keyword: 'avante',
-    nome: 'AVANTE',
-    sigla: 'AVANTE',
-    numero: '70',
-    foto: '/logos/partidos/avante.svg',
-  },
-  {
-    keyword: 'cidadania',
-    nome: 'CIDADANIA',
-    sigla: 'CIDADANIA',
-    numero: '23',
-    foto: '/logos/partidos/cidadania.svg',
-  },
-  {
-    keyword: 'democracia crista',
-    nome: 'DEMOCRACIA CRISTÃ',
-    sigla: 'DC',
-    numero: '27',
-    foto: '/logos/partidos/dc.svg',
-  },
-  {
-    keyword: 'democrata',
-    nome: 'DEMOCRATA',
-    sigla: 'DEMOCRATA',
-    numero: '35',
-    foto: '/logos/partidos/democrata.svg',
-  },
-  {
-    keyword: 'mdb',
-    nome: 'MOVIMENTO DEMOCRÁTICO BRASILEIRO',
-    sigla: 'MDB',
-    numero: '15',
-    foto: '/logos/partidos/mdb.svg',
-  },
-  {
-    keyword: 'missao',
-    nome: 'MISSÃO',
-    sigla: 'MISSÃO',
-    numero: '14',
-    foto: '/logos/partidos/missao.svg',
-  },
-  {
-    keyword: 'mobiliza',
-    nome: 'MOBILIZA',
-    sigla: 'MOBILIZA',
-    numero: '33',
-    foto: '/logos/partidos/mobiliza.svg',
-  },
-  {
-    keyword: 'novo',
-    nome: 'NOVO',
-    sigla: 'NOVO',
-    numero: '30',
-    foto: '/logos/partidos/novo.svg',
-  },
-  {
-    keyword: 'pcb',
-    nome: 'PARTIDO COMUNISTA BRASILEIRO',
-    sigla: 'PCB',
-    numero: '21',
-    foto: '/logos/partidos/pcb.svg',
-  },
-  {
-    keyword: 'pcdob',
-    nome: 'PARTIDO COMUNISTA DO BRASIL',
-    sigla: 'PCdoB',
-    numero: '65',
-    foto: '/logos/partidos/pcdob.svg',
-  },
-  {
-    keyword: 'pco',
-    nome: 'PARTIDO DA CAUSA OPERÁRIA',
-    sigla: 'PCO',
-    numero: '29',
-    foto: '/logos/partidos/pco.svg',
-  },
-  {
-    keyword: 'pdt',
-    nome: 'PARTIDO DEMOCRÁTICO TRABALHISTA',
-    sigla: 'PDT',
-    numero: '12',
-    foto: '/logos/partidos/pdt.svg',
-  },
-  {
-    keyword: 'pl',
-    nome: 'PARTIDO LIBERAL',
-    sigla: 'PL',
-    numero: '22',
-    foto: '/logos/partidos/pl.svg',
-  },
-  {
-    keyword: 'pode',
-    nome: 'PODEMOS',
-    sigla: 'PODE',
-    numero: '20',
-    foto: '/logos/partidos/pode.svg',
-  },
-  {
-    keyword: 'pp',
-    nome: 'PROGRESSISTAS',
-    sigla: 'PP',
-    numero: '11',
-    foto: '/logos/partidos/pp.svg',
-  },
-  {
-    keyword: 'prd',
-    nome: 'PARTIDO RENOVAÇÃO DEMOCRÁTICA',
-    sigla: 'PRD',
-    numero: '25',
-    foto: '/logos/partidos/prd.svg',
-  },
-  {
-    keyword: 'prtb',
-    nome: 'PARTIDO RENOVADOR TRABALHISTA BRASILEIRO',
-    sigla: 'PRTB',
-    numero: '28',
-    foto: '/logos/partidos/prtb.svg',
-  },
-  {
-    keyword: 'psb',
-    nome: 'PARTIDO SOCIALISTA BRASILEIRO',
-    sigla: 'PSB',
-    numero: '40',
-    foto: '/logos/partidos/psb.svg',
-  },
-  {
-    keyword: 'psd',
-    nome: 'PARTIDO SOCIAL DEMOCRÁTICO',
-    sigla: 'PSD',
-    numero: '55',
-    foto: '/logos/partidos/psd.svg',
-  },
-  {
-    keyword: 'psdb',
-    nome: 'PARTIDO DA SOCIAL DEMOCRACIA BRASILEIRA',
-    sigla: 'PSDB',
-    numero: '45',
-    foto: '/logos/partidos/psdb.svg',
-  },
-  {
-    keyword: 'psol',
-    nome: 'PARTIDO SOCIALISMO E LIBERDADE',
-    sigla: 'PSOL',
-    numero: '50',
-    foto: '/logos/partidos/psol.svg',
-  },
-  {
-    keyword: 'pstu',
-    nome: 'PARTIDO SOCIALISTA DOS TRABALHADORES UNIFICADO',
-    sigla: 'PSTU',
-    numero: '16',
-    foto: '/logos/partidos/pstu.svg',
-  },
-  {
-    keyword: 'pt',
-    nome: 'PARTIDO DOS TRABALHADORES',
-    sigla: 'PT',
-    numero: '13',
-    foto: '/logos/partidos/pt.svg',
-  },
-  {
-    keyword: 'pv',
-    nome: 'PARTIDO VERDE',
-    sigla: 'PV',
-    numero: '43',
-    foto: '/logos/partidos/pv.svg',
-  },
-  {
-    keyword: 'rede',
-    nome: 'REDE SUSTENTABILIDADE',
-    sigla: 'REDE',
-    numero: '18',
-    foto: '/logos/partidos/rede.svg',
-  },
-  {
-    keyword: 'republicanos',
-    nome: 'REPUBLICANOS',
-    sigla: 'REPUBLICANOS',
-    numero: '10',
-    foto: '/logos/partidos/republicanos.svg',
-  },
-  {
-    keyword: 'solidariedade',
-    nome: 'SOLIDARIEDADE',
-    sigla: 'SOLIDARIEDADE',
-    numero: '77',
-    foto: '/logos/partidos/solidariedade.svg',
-  },
-  {
-    keyword: 'uniao',
-    nome: 'UNIÃO BRASIL',
-    sigla: 'UNIÃO',
-    numero: '44',
-    foto: '/logos/partidos/uniao.svg',
-  },
-  {
-    keyword: 'up',
-    nome: 'UNIDADE POPULAR',
-    sigla: 'UP',
-    numero: '80',
-    foto: '/logos/partidos/up.svg',
-  },
-];
+const logosPartidosPorSigla: Record<string, string> = {
+  AGIR: '/logos/partidos/agir.svg',
+  AVANTE: '/logos/partidos/avante.svg',
+  CIDADANIA: '/logos/partidos/cidadania.svg',
+  DC: '/logos/partidos/dc.svg',
+  DEMOCRATA: '/logos/partidos/democrata.svg',
+  MDB: '/logos/partidos/mdb.svg',
+  MISSAO: '/logos/partidos/missao.svg',
+  MOBILIZA: '/logos/partidos/mobiliza.svg',
+  NOVO: '/logos/partidos/novo.svg',
+  PCB: '/logos/partidos/pcb.svg',
+  PCDOB: '/logos/partidos/pcdob.svg',
+  PCO: '/logos/partidos/pco.svg',
+  PDT: '/logos/partidos/pdt.svg',
+  PL: '/logos/partidos/pl.svg',
+  PODE: '/logos/partidos/pode.svg',
+  PP: '/logos/partidos/pp.svg',
+  PRD: '/logos/partidos/prd.svg',
+  PRTB: '/logos/partidos/prtb.svg',
+  PSB: '/logos/partidos/psb.svg',
+  PSD: '/logos/partidos/psd.svg',
+  PSDB: '/logos/partidos/psdb.svg',
+  PSOL: '/logos/partidos/psol.svg',
+  PSTU: '/logos/partidos/pstu.svg',
+  PT: '/logos/partidos/pt.svg',
+  PV: '/logos/partidos/pv.svg',
+  REDE: '/logos/partidos/rede.svg',
+  REPUBLICANOS: '/logos/partidos/republicanos.svg',
+  SOLIDARIEDADE: '/logos/partidos/solidariedade.svg',
+  UNIAO: '/logos/partidos/uniao.svg',
+  UP: '/logos/partidos/up.svg',
+};
+
+const escalasLogoPartido: Record<string, string> = {
+  AVANTE: 'scale-[1.25]',
+  CIDADANIA: 'scale-[1.25]',
+  DEMOCRATA: 'scale-[1.60]',
+  PCB: 'scale-[1.30]',
+  PL: 'scale-[1.30]',
+  PSOL: 'scale-[1.25]',
+  REPUBLICANOS: 'scale-[2.05]',
+};
+
+function normalizarTexto(texto: string) {
+  return texto
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLocaleLowerCase('pt-BR');
+}
 
 function SearchPol() {
   const navigate = useNavigate();
@@ -243,12 +85,30 @@ function SearchPol() {
   >('asc');
   const [partidosOpen, setPartidosOpen] = useState(true);
   const [candidatosOpen, setCandidatosOpen] = useState(true);
+  const [partidos, setPartidos] = useState<Partido[]>([]);
+  const [partidosLoading, setPartidosLoading] = useState(true);
+  const [partidosError, setPartidosError] = useState('');
   const [candidatos, setCandidatos] = useState<Candidato[]>([]);
   const [candidatosLoading, setCandidatosLoading] = useState(true);
   const [candidatosError, setCandidatosError] = useState('');
 
   useLayoutEffect(() => {
     resultadosRef.current?.scrollTo({ top: 0, behavior: 'auto' });
+  }, []);
+
+  useEffect(() => {
+    const carregarPartidos = async () => {
+      try {
+        setPartidos(await listarPartidos());
+      } catch (error) {
+        console.error('Não foi possível carregar os partidos.', error);
+        setPartidosError('Não foi possível carregar os partidos.');
+      } finally {
+        setPartidosLoading(false);
+      }
+    };
+
+    carregarPartidos();
   }, []);
 
   useEffect(() => {
@@ -267,22 +127,33 @@ function SearchPol() {
 
   const handleSearch = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    setSearchedTerm(search.trim().toLowerCase());
+    setSearchedTerm(normalizarTexto(search.trim()));
   };
 
   const results = [...partidos]
     .filter(
-      (party) =>
-        (searchedTerm === '' ||
-          party.keyword.includes(searchedTerm) ||
-          party.nome.toLowerCase().includes(searchedTerm)) &&
-        (!selectedPartido || party.nome === selectedPartido),
+      (party) => {
+        const nome = normalizarTexto(party.nome_completo);
+        const sigla = normalizarTexto(party.sigla);
+        const numero = String(party.numero_legenda);
+
+        return (
+          (searchedTerm === '' ||
+            nome.includes(searchedTerm) ||
+            sigla.includes(searchedTerm) ||
+            numero.includes(searchedTerm)) &&
+          (!selectedPartido || party.nome_completo === selectedPartido)
+        );
+      },
     )
     .sort((firstParty, secondParty) => {
       const comparison =
         sortBy === 'nome'
-          ? firstParty.nome.localeCompare(secondParty.nome, 'pt-BR')
-          : Number(firstParty.numero) - Number(secondParty.numero);
+          ? firstParty.nome_completo.localeCompare(
+              secondParty.nome_completo,
+              'pt-BR',
+            )
+          : firstParty.numero_legenda - secondParty.numero_legenda;
 
       return sortDirection === 'asc' ? comparison : -comparison;
     });
@@ -327,15 +198,18 @@ function SearchPol() {
   const candidatosResults = [...candidatos]
     .filter((candidate) => {
       const termo = searchedTerm;
-      const nome = (
+      const nome = normalizarTexto(
         candidate.nome_politico || candidate.nome_completo
-      ).toLowerCase();
-      const partido = candidate.partidos?.nome_completo.toLowerCase() || '';
+      );
+      const nomeCompleto = normalizarTexto(candidate.nome_completo);
+      const partido = normalizarTexto(
+        candidate.partidos?.nome_completo || '',
+      );
 
       return (
         (termo === '' ||
           nome.includes(termo) ||
-          candidate.nome_completo.toLowerCase().includes(termo) ||
+          nomeCompleto.includes(termo) ||
           partido.includes(termo)) &&
         (!selectedEstadoCandidato ||
           candidate.uf_candidatura === selectedEstadoCandidato) &&
@@ -615,7 +489,7 @@ function SearchPol() {
                     const nextSearch = event.target.value;
 
                     setSearch(nextSearch);
-                    setSearchedTerm(nextSearch.trim().toLowerCase());
+                    setSearchedTerm(normalizarTexto(nextSearch.trim()));
                   }}
                   placeholder="Digite o nome de um partido ou candidato"
                   className="min-w-0 flex-1 bg-transparent text-[13px] text-[#333] outline-none placeholder:text-[#7b7b91] sm:text-[14px]"
@@ -638,7 +512,10 @@ function SearchPol() {
             >
               {filtroSelecionado !== 'candidatos' &&
                 !filtroCandidatoAtivo &&
-                (searchedTerm.trim() === '' || results.length > 0) && (
+                (searchedTerm === '' ||
+                  results.length > 0 ||
+                  partidosLoading ||
+                  partidosError !== '') && (
                   <div className="relative -ml-4 mr-[-2.5rem] mt-5 w-[calc(100%+5rem)]">
                     <div className="flex w-full items-center gap-4 text-[#2A2A72]">
                       <div className="h-px min-w-0 flex-1 bg-[#2A2A72]/30" />
@@ -672,67 +549,79 @@ function SearchPol() {
                 )}
 
               {partidosOpen && (
-                <div className="grid w-full max-w-[960px] grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                  {results.map((party) => {
-                    const paleta = obterPaletaPartido(party.sigla);
+                <>
+                  {partidosLoading && (
+                    <p className="text-center text-sm text-[#2A2A72]">
+                      Carregando partidos...
+                    </p>
+                  )}
+                  {partidosError && (
+                    <p role="alert" className="text-center text-sm text-red-700">
+                      {partidosError}
+                    </p>
+                  )}
+                  {!partidosLoading && !partidosError && (
+                    <div className="grid w-full max-w-[960px] grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                      {results.map((party) => {
+                        const paleta = obterPaletaPartido(party.sigla);
+                        const siglaNormalizada = normalizarTexto(
+                          party.sigla,
+                        ).toUpperCase();
+                        const logo =
+                          party.bandeira_url ||
+                          logosPartidosPorSigla[siglaNormalizada];
+                        const escalaLogo =
+                          escalasLogoPartido[siglaNormalizada] || '';
 
-                    return (
-                      <button
-                        key={party.keyword}
-                        type="button"
-                        onClick={() =>
-                          navigate(
-                            `/pagina_partido?numero=${encodeURIComponent(party.numero)}`,
-                          )
-                        }
-                        aria-label={`Ver informações do partido ${party.nome}`}
-                        className="flex min-h-[200px] w-full flex-col items-center gap-2 rounded-2xl border-2 p-3 text-center transition-transform hover:-translate-y-1 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-[#2A2A72]"
-                        style={{
-                          borderColor: paleta.borda,
-                          backgroundColor: paleta.cor,
-                        }}
-                      >
-                        <div className="flex h-28 w-full shrink-0 items-center justify-center overflow-hidden rounded-xl bg-white/45 p-3">
-                          <img
-                            src={party.foto}
-                            alt={`Logo de ${party.nome}`}
-                            className={`h-full w-full object-contain ${
-                              party.sigla === 'AVANTE'
-                                ? 'scale-[1.25]'
-                                : party.sigla === 'CIDADANIA'
-                                  ? 'scale-[1.25]'
-                                  : party.sigla === 'DEMOCRATA'
-                                    ? 'scale-[1.60]'
-                                    : party.sigla === 'PCB'
-                                      ? 'scale-[1.30]'
-                                      : party.sigla === 'PL'
-                                        ? 'scale-[1.30]'
-                                        : party.sigla === 'PSOL'
-                                          ? 'scale-[1.25]'
-                                          : party.sigla === 'REPUBLICANOS'
-                                            ? 'scale-[2.05]'
-                                            : ''
-                            }`}
-                          />
-                        </div>
+                        return (
+                          <button
+                            key={party.id}
+                            type="button"
+                            onClick={() =>
+                              navigate(
+                                `/pagina_partido?numero=${encodeURIComponent(String(party.numero_legenda))}`,
+                              )
+                            }
+                            aria-label={`Ver informações do partido ${party.nome_completo}`}
+                            className="flex min-h-[200px] w-full flex-col items-center gap-2 rounded-2xl border-2 p-3 text-center transition-transform hover:-translate-y-1 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-[#2A2A72]"
+                            style={{
+                              borderColor: paleta.borda,
+                              backgroundColor: paleta.cor,
+                            }}
+                          >
+                            <div className="flex h-28 w-full shrink-0 items-center justify-center overflow-hidden rounded-xl bg-white/45 p-3">
+                              {logo ? (
+                                <img
+                                  src={logo}
+                                  alt={`Logo de ${party.nome_completo}`}
+                                  className={`h-full w-full object-contain ${escalaLogo}`}
+                                />
+                              ) : (
+                                <span className="text-2xl font-black text-[#2A2A72]">
+                                  {party.sigla}
+                                </span>
+                              )}
+                            </div>
 
-                        <div className="flex w-full min-w-0 items-end justify-between gap-3 text-left">
-                          <div className="flex min-w-0 max-w-[75%] flex-col items-start">
-                            <h2 className="max-w-full text-[10px] font-bold uppercase opacity-60 tracking-[0.12em]">
-                              PARTIDO
-                            </h2>
-                            <p className="max-w-full break-words text-[15px] font-bold leading-tight tracking-[0.06em]">
-                              {party.nome}
-                            </p>
-                          </div>
-                          <p className="shrink-0 text-[20px] font-black leading-tight opacity-60 tracking-[0.06em]">
-                            {party.numero}
-                          </p>
-                        </div>
-                      </button>
-                    );
-                  })}
-                </div>
+                            <div className="flex w-full min-w-0 items-end justify-between gap-3 text-left">
+                              <div className="flex min-w-0 max-w-[75%] flex-col items-start">
+                                <h2 className="max-w-full text-[10px] font-bold uppercase opacity-60 tracking-[0.12em]">
+                                  PARTIDO
+                                </h2>
+                                <p className="max-w-full break-words text-[15px] font-bold leading-tight tracking-[0.06em]">
+                                  {party.nome_completo}
+                                </p>
+                              </div>
+                              <p className="shrink-0 text-[20px] font-black leading-tight opacity-60 tracking-[0.06em]">
+                                {party.numero_legenda}
+                              </p>
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
+                </>
               )}
 
               {filtroSelecionado !== 'partidos' &&
