@@ -13,7 +13,7 @@ import PipoAzul from '../../assets/Imagens/Pipos/PipoAzul.png';
 import PipoCiano from '../../assets/Imagens/Pipos/PipoCiano.png';
 import PipoAmarelo from '../../assets/Imagens/Pipos/PipoAmarelo.png';
 import PipoLaranja from '../../assets/Imagens/Pipos/PipoLaranja.png';
-
+import SomUrna from '../../assets/Audio/SomUrna.mp3';
 // ---------- Fundo decorativo ----------
 
 const bolasConfig = [
@@ -150,7 +150,7 @@ const CANDIDATOS_EXEMPLO: CandidatoUrna[] = [
   },
   {
     cargo: 'deputado-federal',
-    numero: '4444',
+    numero: '9999',
     nome: 'Dep. Federal Pipo Rosa',
     partido: 'Partido dos 4',
     foto: PipoRosa,
@@ -165,7 +165,7 @@ const CANDIDATOS_EXEMPLO: CandidatoUrna[] = [
   },
   {
     cargo: 'deputado-estadual',
-    numero: '44444',
+    numero: '99999',
     nome: 'Dep. Estadual Pipo Verde',
     partido: 'Partido dos 4',
     foto: PipoVerde,
@@ -180,7 +180,7 @@ const CANDIDATOS_EXEMPLO: CandidatoUrna[] = [
   },
   {
     cargo: 'senador',
-    numero: '444',
+    numero: '999',
     nome: 'Senador Pipo Ciano',
     partido: 'Partido dos 4',
     foto: PipoCiano,
@@ -195,7 +195,7 @@ const CANDIDATOS_EXEMPLO: CandidatoUrna[] = [
   },
   {
     cargo: 'governador',
-    numero: '44',
+    numero: '99',
     nome: 'Governador Pipo Vermelho',
     partido: 'Partido dos 4',
     foto: PipoVermelho,
@@ -210,7 +210,7 @@ const CANDIDATOS_EXEMPLO: CandidatoUrna[] = [
   },
   {
     cargo: 'presidente',
-    numero: '44',
+    numero: '99',
     nome: 'Candidato Pipo em duvida',
     partido: 'Partido dos 4',
     foto: pipoDuvida,
@@ -615,6 +615,13 @@ function SimuladorEtapa3({
     limparVoto();
   }
 
+  function tocarSomFim() {
+    const audio = new Audio(SomUrna);
+    audio.play().catch(() => {
+      // o navegador pode bloquear o som em casos raros; ignorar não quebra nada
+    });
+  }
+
   function confirma() {
     if (fase === 'fim') return recomecarTudo();
     if (fase !== 'branco' && !completo) return;
@@ -626,6 +633,7 @@ function SimuladorEtapa3({
       limparVoto();
     } else {
       setFase('fim');
+      tocarSomFim();
     }
   }
 
