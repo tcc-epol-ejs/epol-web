@@ -87,6 +87,15 @@ const isValidUrl = (urlString: string) => {
   }
 };
 
+const gerarSlug = (texto: string) =>
+  texto
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLocaleLowerCase('pt-BR')
+    .trim()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '');
+
 // Paleta de cores dos campos customizados (DateField / ModalSelectField)
 const CORES_CAMPO = {
   corDestaque: '#FFA400',
@@ -441,6 +450,10 @@ export default function Admin() {
             : null,
           nome_completo: candidatoForm.nome_completo,
           nome_politico: candidatoForm.nome_politico,
+          slug: gerarSlug(
+            candidatoForm.nome_politico || candidatoForm.nome_completo,
+          ),
+          concorrentes: true,
           data_nascimento: candidatoForm.data_nascimento,
           naturalidade: candidatoForm.naturalidade,
           uf_naturalidade: candidatoForm.uf_naturalidade,
@@ -458,6 +471,8 @@ export default function Admin() {
             : null,
           feitos_url: textareaParaArray(candidatoForm.feitos_url),
           feitos_resumo: textareaParaArray(candidatoForm.feitos_resumo),
+          proposta_url: null,
+          proposta_resumo: null,
         };
 
         await cadastrarCandidato(payloadCandidato);

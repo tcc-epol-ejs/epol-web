@@ -76,15 +76,19 @@ function SearchPol() {
   const [selectedEstadoCandidato, setSelectedEstadoCandidato] = useState('');
   const [selectedPartidoCandidato, setSelectedPartidoCandidato] = useState('');
   const [filtroSelecionado, setFiltroSelecionado] = useState<
-    'partidos' | 'candidatos' | null
+    'partidos' | 'candidatos' | 'politicos' | null
   >(null);
   const [sortBy, setSortBy] = useState<'nome' | 'numero'>('nome');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
   const [candidatosSortDirection, setCandidatosSortDirection] = useState<
     'asc' | 'desc'
   >('asc');
+  const [politicosSortDirection, setPoliticosSortDirection] = useState<
+    'asc' | 'desc'
+  >('asc');
   const [partidosOpen, setPartidosOpen] = useState(true);
   const [candidatosOpen, setCandidatosOpen] = useState(true);
+  const [politicosOpen, setPoliticosOpen] = useState(true);
   const [partidos, setPartidos] = useState<Partido[]>([]);
   const [partidosLoading, setPartidosLoading] = useState(true);
   const [partidosError, setPartidosError] = useState('');
@@ -115,7 +119,11 @@ function SearchPol() {
     const carregarCandidatos = async () => {
       try {
         setCandidatos(await listarCandidatos());
-      } catch {
+      } catch (error) {
+        console.error(
+          'Não foi possível carregar candidatos e políticos.',
+          error,
+        );
         setCandidatosError('Não foi possível carregar os candidatos.');
       } finally {
         setCandidatosLoading(false);
@@ -131,21 +139,19 @@ function SearchPol() {
   };
 
   const results = [...partidos]
-    .filter(
-      (party) => {
-        const nome = normalizarTexto(party.nome_completo);
-        const sigla = normalizarTexto(party.sigla);
-        const numero = String(party.numero_legenda);
+    .filter((party) => {
+      const nome = normalizarTexto(party.nome_completo);
+      const sigla = normalizarTexto(party.sigla);
+      const numero = String(party.numero_legenda);
 
-        return (
-          (searchedTerm === '' ||
-            nome.includes(searchedTerm) ||
-            sigla.includes(searchedTerm) ||
-            numero.includes(searchedTerm)) &&
-          (!selectedPartido || party.nome_completo === selectedPartido)
-        );
-      },
-    )
+      return (
+        (searchedTerm === '' ||
+          nome.includes(searchedTerm) ||
+          sigla.includes(searchedTerm) ||
+          numero.includes(searchedTerm)) &&
+        (!selectedPartido || party.nome_completo === selectedPartido)
+      );
+    })
     .sort((firstParty, secondParty) => {
       const comparison =
         sortBy === 'nome'
@@ -185,6 +191,13 @@ function SearchPol() {
     );
   };
 
+  const togglePoliticosSort = () => {
+    setFiltroSelecionado('politicos');
+    setPoliticosSortDirection((currentDirection) =>
+      currentDirection === 'asc' ? 'desc' : 'asc',
+    );
+  };
+
   const limparFiltros = () => {
     setSelectedPartido('');
     setSelectedEstadoCandidato('');
@@ -193,18 +206,18 @@ function SearchPol() {
     setSortBy('nome');
     setSortDirection('asc');
     setCandidatosSortDirection('asc');
+    setPoliticosSortDirection('asc');
   };
 
   const candidatosResults = [...candidatos]
+    .filter((candidate) => candidate.concorrentes === true)
     .filter((candidate) => {
       const termo = searchedTerm;
       const nome = normalizarTexto(
-        candidate.nome_politico || candidate.nome_completo
+        candidate.nome_politico || candidate.nome_completo,
       );
       const nomeCompleto = normalizarTexto(candidate.nome_completo);
-      const partido = normalizarTexto(
-        candidate.partidos?.nome_completo || '',
-      );
+      const partido = normalizarTexto(candidate.partidos?.nome_completo || '');
 
       return (
         (termo === '' ||
@@ -228,9 +241,39 @@ function SearchPol() {
       return candidatosSortDirection === 'asc' ? comparison : -comparison;
     });
 
+  const politicosResults = [...candidatos]
+    .filter((politico) => politico.concorrentes === false)
+    .filter((politico) => {
+      const nome = normalizarTexto(
+        politico.nome_politico || politico.nome_completo,
+      );
+      const nomeCompleto = normalizarTexto(politico.nome_completo);
+      const partido = normalizarTexto(politico.partidos?.nome_completo || '');
+      const cargo = normalizarTexto(politico.cargo_atual || '');
+
+      return (
+        searchedTerm === '' ||
+        nome.includes(searchedTerm) ||
+        nomeCompleto.includes(searchedTerm) ||
+        partido.includes(searchedTerm) ||
+        cargo.includes(searchedTerm)
+      );
+    })
+    .sort((firstPolitico, secondPolitico) => {
+      const comparison = (
+        firstPolitico.nome_politico || firstPolitico.nome_completo
+      ).localeCompare(
+        secondPolitico.nome_politico || secondPolitico.nome_completo,
+        'pt-BR',
+      );
+
+      return politicosSortDirection === 'asc' ? comparison : -comparison;
+    });
+
   const estadosCandidatos = [
     ...new Set(
       candidatos
+        .filter((candidate) => candidate.concorrentes === true)
         .map((candidate) => candidate.uf_candidatura)
         .filter((estado): estado is string => Boolean(estado)),
     ),
@@ -239,6 +282,7 @@ function SearchPol() {
   );
 
   const partidosCandidatos = candidatos
+    .filter((candidate) => candidate.concorrentes === true)
     .filter((candidate) => candidate.partidos)
     .map(
       (candidate) => candidate.partidos as NonNullable<Candidato['partidos']>,
@@ -262,60 +306,85 @@ function SearchPol() {
     if (filtroSelecionado === 'partidos') {
       setPartidosOpen(true);
       setCandidatosOpen(false);
+      setPoliticosOpen(false);
       return;
     }
 
     if (filtroSelecionado === 'candidatos') {
       setPartidosOpen(false);
       setCandidatosOpen(true);
+      setPoliticosOpen(false);
+      return;
+    }
+
+    if (filtroSelecionado === 'politicos') {
+      setPartidosOpen(false);
+      setCandidatosOpen(false);
+      setPoliticosOpen(true);
       return;
     }
 
     if (filtroPartidoAtivo && !filtroCandidatoAtivo) {
       setPartidosOpen(true);
       setCandidatosOpen(false);
+      setPoliticosOpen(false);
       return;
     }
 
     if (filtroCandidatoAtivo && !filtroPartidoAtivo) {
       setPartidosOpen(false);
       setCandidatosOpen(true);
+      setPoliticosOpen(false);
       return;
     }
 
     if (searchedTerm.trim() === '') {
       setPartidosOpen(true);
       setCandidatosOpen(true);
+      setPoliticosOpen(true);
       return;
     }
 
     const temPartidos = results.length > 0;
     const temCandidatos = candidatosResults.length > 0;
+    const temPoliticos = politicosResults.length > 0;
 
-    if (temPartidos && !temCandidatos) {
+    if (temPartidos && !temCandidatos && !temPoliticos) {
       setPartidosOpen(true);
       setCandidatosOpen(false);
+      setPoliticosOpen(false);
       return;
     }
 
-    if (!temPartidos && temCandidatos) {
+    if (!temPartidos && temCandidatos && !temPoliticos) {
       setPartidosOpen(false);
       setCandidatosOpen(true);
+      setPoliticosOpen(false);
       return;
     }
 
-    if (temPartidos && temCandidatos) {
-      setPartidosOpen(true);
-      setCandidatosOpen(true);
+    if (!temPartidos && !temCandidatos && temPoliticos) {
+      setPartidosOpen(false);
+      setCandidatosOpen(false);
+      setPoliticosOpen(true);
+      return;
+    }
+
+    if (temPartidos || temCandidatos || temPoliticos) {
+      setPartidosOpen(temPartidos);
+      setCandidatosOpen(temCandidatos);
+      setPoliticosOpen(temPoliticos);
       return;
     }
 
     setPartidosOpen(false);
     setCandidatosOpen(false);
+    setPoliticosOpen(false);
   }, [
     searchedTerm,
     results.length,
     candidatosResults.length,
+    politicosResults.length,
     filtroPartidoAtivo,
     filtroCandidatoAtivo,
     filtroSelecionado,
@@ -464,6 +533,31 @@ function SearchPol() {
                   </button>
                 </div>
 
+                <div className="flex flex-col gap-4 border-t border-[#2A2A72]/20 pt-6">
+                  <h3 className="text-[14px] font-black uppercase tracking-[0.12em] text-[#2A2A72]">
+                    Outros Políticos
+                  </h3>
+
+                  <div className="flex flex-col gap-2 text-[12px] font-bold uppercase tracking-[0.08em] text-[#2A2A72]">
+                    Por ordem:
+                    <button
+                      type="button"
+                      onClick={togglePoliticosSort}
+                      className="flex h-10 w-full items-center justify-between rounded-lg border border-[#2A2A72] bg-[#2A2A72] px-3 text-left text-[11px] text-white transition-colors"
+                      aria-label={`Ordenar políticos alfabeticamente em ordem ${politicosSortDirection === 'desc' ? 'decrescente' : 'crescente'}`}
+                    >
+                      Alfabética
+                      <span className="text-[16px]">
+                        {politicosSortDirection === 'asc' ? (
+                          <FiArrowUp aria-hidden="true" />
+                        ) : (
+                          <FiArrowDown aria-hidden="true" />
+                        )}
+                      </span>
+                    </button>
+                  </div>
+                </div>
+
                 <button
                   type="button"
                   onClick={limparFiltros}
@@ -491,7 +585,7 @@ function SearchPol() {
                     setSearch(nextSearch);
                     setSearchedTerm(normalizarTexto(nextSearch.trim()));
                   }}
-                  placeholder="Digite o nome de um partido ou candidato"
+                  placeholder="Digite o nome de um partido, candidato ou político"
                   className="min-w-0 flex-1 bg-transparent text-[13px] text-[#333] outline-none placeholder:text-[#7b7b91] sm:text-[14px]"
                 />
               </div>
@@ -556,7 +650,10 @@ function SearchPol() {
                     </p>
                   )}
                   {partidosError && (
-                    <p role="alert" className="text-center text-sm text-red-700">
+                    <p
+                      role="alert"
+                      className="text-center text-sm text-red-700"
+                    >
                       {partidosError}
                     </p>
                   )}
@@ -625,6 +722,7 @@ function SearchPol() {
               )}
 
               {filtroSelecionado !== 'partidos' &&
+                filtroSelecionado !== 'politicos' &&
                 !filtroPartidoAtivo &&
                 (searchedTerm.trim() === '' ||
                   candidatosResults.length > 0) && (
@@ -672,7 +770,7 @@ function SearchPol() {
 
                   {!candidatosLoading && candidatosError && (
                     <p className="text-[14px] text-[#A72B2B]">
-                      {candidatosError}
+                      Não foi possível carregar candidatos e políticos.
                     </p>
                   )}
 
@@ -739,6 +837,119 @@ function SearchPol() {
                   )}
                 </>
               )}
+
+              {filtroSelecionado !== 'partidos' &&
+                filtroSelecionado !== 'candidatos' &&
+                !filtroPartidoAtivo &&
+                !filtroCandidatoAtivo &&
+                (searchedTerm.trim() === '' || politicosResults.length > 0) && (
+                  <div className="relative -ml-4 mr-[-2.5rem] my-2 w-[calc(100%+5rem)]">
+                    <div className="flex w-full items-center gap-4 text-[#2A2A72]">
+                      <div className="h-px min-w-0 flex-1 bg-[#2A2A72]/30" />
+                      <h2 className="shrink-0 text-[18px] font-bold uppercase tracking-[0.12em]">
+                        Outros Políticos
+                      </h2>
+                      <div className="h-px min-w-0 flex-1 bg-[#2A2A72]/30" />
+                      <button
+                        type="button"
+                        onClick={() => setPoliticosOpen((current) => !current)}
+                        className="ml-auto flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-[#2A2A72]/30 bg-white text-[#2A2A72] transition-colors hover:bg-[#2A2A72] hover:text-white"
+                        aria-expanded={politicosOpen}
+                        aria-label={
+                          politicosOpen
+                            ? 'Ocultar políticos'
+                            : 'Mostrar políticos'
+                        }
+                      >
+                        {politicosOpen ? (
+                          <FiChevronUp
+                            aria-hidden="true"
+                            className="text-[18px]"
+                          />
+                        ) : (
+                          <FiChevronDown
+                            aria-hidden="true"
+                            className="text-[18px]"
+                          />
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+              {politicosOpen &&
+                filtroSelecionado !== 'partidos' &&
+                filtroSelecionado !== 'candidatos' &&
+                !filtroPartidoAtivo &&
+                !filtroCandidatoAtivo && (
+                  <>
+                    {candidatosLoading && (
+                      <p className="text-center text-sm text-[#2A2A72]">
+                        Carregando políticos...
+                      </p>
+                    )}
+
+                    {!candidatosLoading && candidatosError && (
+                      <p className="text-[14px] text-[#A72B2B]">
+                        Não foi possível carregar candidatos e políticos.
+                      </p>
+                    )}
+
+                    {!candidatosLoading && !candidatosError && (
+                      <div className="grid w-full max-w-[960px] grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                        {politicosResults.map((politico) => (
+                          <button
+                            key={politico.id}
+                            type="button"
+                            onClick={() =>
+                              navigate(
+                                `/pagina_politico?id=${encodeURIComponent(politico.id)}`,
+                              )
+                            }
+                            aria-label={`Ver informações de ${politico.nome_politico || politico.nome_completo}`}
+                            className="flex min-h-[300px] w-full flex-col overflow-hidden rounded-2xl border-2 border-[#2A2A72] bg-white text-[#2A2A72]"
+                          >
+                            <div className="flex h-44 w-full shrink-0 items-center justify-center overflow-hidden bg-[#2A2A72]">
+                              {politico.foto_url ? (
+                                <img
+                                  src={politico.foto_url}
+                                  alt={`Foto de ${politico.nome_politico || politico.nome_completo}`}
+                                  loading="lazy"
+                                  decoding="async"
+                                  className="h-full w-full object-cover object-[center_20%]"
+                                />
+                              ) : (
+                                <span className="text-[12px] font-bold uppercase tracking-[0.1em] text-white/70">
+                                  Sem foto
+                                </span>
+                              )}
+                            </div>
+
+                            <div className="flex flex-1 flex-col p-4">
+                              <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#2A2A72]/70">
+                                Político(a)
+                              </p>
+                              <h3 className="mt-1 break-words text-[20px] font-bold uppercase leading-tight">
+                                {politico.nome_politico ||
+                                  politico.nome_completo}
+                              </h3>
+                              <p className="mt-2 text-[14px] font-semibold text-[#333]">
+                                {politico.cargo_atual || 'Cargo não informado'}
+                              </p>
+                              <div className="mt-auto flex items-end justify-between gap-3 pt-4">
+                                <p className="text-[13px] font-semibold uppercase tracking-[0.08em] text-[#333]">
+                                  {politico.partidos?.sigla ||
+                                    politico.partidos?.nome_completo ||
+                                    'Partido não informado'}
+                                </p>
+                              </div>
+                            </div>
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </>
+                )}
             </div>
           </div>
         </div>

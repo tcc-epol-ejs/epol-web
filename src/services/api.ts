@@ -52,6 +52,8 @@ export interface Candidato {
   numero_urna: number | null;
   nome_completo: string;
   nome_politico: string;
+  slug: string; // novo
+  concorrentes: boolean; // novo
   data_nascimento: string;
   naturalidade: string;
   uf_naturalidade: string;
@@ -65,6 +67,8 @@ export interface Candidato {
   tempo_atuacao_anos: number | null;
   feitos_url: string[] | null;
   feitos_resumo: string[] | null;
+  proposta_url: string[] | null; // novo
+  proposta_resumo: string[] | null; // novo
   created_at: string;
   updated_at: string;
   partidos: PartidoResumo | null;

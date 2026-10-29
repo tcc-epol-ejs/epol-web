@@ -68,9 +68,9 @@ function PaginaPolitico() {
       })
       .catch((error: unknown) => {
         if (!ativo) return;
-        console.error('Erro ao carregar os dados do candidato:', error);
+        console.error('Erro ao carregar os dados da pessoa política:', error);
         setCandidato(null);
-        setErro('Não foi possível carregar os dados deste candidato.');
+        setErro('Não foi possível carregar os dados desta pessoa política.');
       })
       .finally(() => {
         if (ativo) setCarregando(false);
@@ -118,12 +118,12 @@ function PaginaPolitico() {
           {carregando ? (
             <div
               role="status"
-              aria-label="Carregando informações do candidato"
+              aria-label="Carregando informações da pessoa política"
               className="flex min-h-[240px] items-center justify-center"
             >
               <span className="h-12 w-12 animate-spin rounded-full border-4 border-[#2A2A72]/20 border-t-[#2A2A72]" />
               <span className="sr-only">
-                Carregando informações do candidato...
+                Carregando informações da pessoa política...
               </span>
             </div>
           ) : erro ? (
@@ -136,8 +136,8 @@ function PaginaPolitico() {
           ) : !candidato ? (
             <p className="rounded-2xl border border-[#2A2A72]/15 bg-white p-6 text-center font-semibold text-[#2A2A72]">
               {idCandidato
-                ? 'Não encontramos um candidato com esse identificador.'
-                : 'Selecione um candidato no SearchPol para ver os detalhes.'}
+                ? 'Não encontramos uma pessoa política com esse identificador.'
+                : 'Selecione uma pessoa política no SearchPol para ver os detalhes.'}
             </p>
           ) : (
             <>
@@ -160,9 +160,9 @@ function PaginaPolitico() {
                     {candidato.nome_completo}
                   </h1>
                   <p className="text-base font-bold">
-                    Candidato(a) a{' '}
-                    {candidato.candidatura?.toLocaleLowerCase('pt-BR') ||
-                      'cargo não informado'}
+                    {candidato.concorrentes
+                      ? `Candidato(a) a ${candidato.candidatura?.toLocaleLowerCase('pt-BR') || 'cargo não informado'}`
+                      : `Político(a)${candidato.cargo_atual ? ` — ${candidato.cargo_atual}` : ''}`}
                   </p>
                   <button
                     type="button"
@@ -274,14 +274,16 @@ function PaginaPolitico() {
                               {candidato.nome_politico || 'Não informado'}
                             </dd>
                           </div>
-                          <div className="mt-4 border-t border-[#2A2A72]/10 pt-3">
-                            <dt className="text-xs font-extrabold uppercase tracking-[0.12em] text-[#666]">
-                              Número da urna
-                            </dt>
-                            <dd className="mt-2 break-words text-sm font-semibold leading-relaxed text-[#333]">
-                              {candidato.numero_urna ?? 'Não informado'}
-                            </dd>
-                          </div>
+                          {candidato.concorrentes && (
+                            <div className="mt-4 border-t border-[#2A2A72]/10 pt-3">
+                              <dt className="text-xs font-extrabold uppercase tracking-[0.12em] text-[#666]">
+                                Número da urna
+                              </dt>
+                              <dd className="mt-2 break-words text-sm font-semibold leading-relaxed text-[#333]">
+                                {candidato.numero_urna ?? 'Não informado'}
+                              </dd>
+                            </div>
+                          )}
                         </div>
                         <div className="rounded-xl bg-white/75 p-4">
                           <div>
