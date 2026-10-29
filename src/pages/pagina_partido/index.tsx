@@ -500,12 +500,12 @@ function PaginaPartido() {
                   className="mb-5 text-left text-xl font-black uppercase tracking-[0.08em] sm:text-2xl"
                   style={{ color: paleta.borda }}
                 >
-                  Candidatos do partido
+                  Filiados do partido
                 </h2>
 
                 {carregandoCandidatos ? (
                   <p className="text-sm font-medium text-[#68688e]">
-                    Carregando candidatos...
+                    Carregando filiados...
                   </p>
                 ) : erroCandidatos ? (
                   <p role="alert" className="text-sm font-medium text-red-700">
@@ -513,7 +513,7 @@ function PaginaPartido() {
                   </p>
                 ) : candidatos.length === 0 ? (
                   <p className="text-sm font-medium text-[#68688e]">
-                    Não há candidatos associados a este partido.
+                    Não há associados cadastrados para este partido.
                   </p>
                 ) : (
                   <div className="grid w-full max-w-[1400px] grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">

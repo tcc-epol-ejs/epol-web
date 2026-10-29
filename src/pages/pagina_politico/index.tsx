@@ -32,6 +32,19 @@ function formatarData(data: string | null | undefined) {
   return new Intl.DateTimeFormat('pt-BR').format(new Date(ano, mes - 1, dia));
 }
 
+function obterUrlSegura(url: string | undefined) {
+  if (!url?.trim()) return null;
+
+  try {
+    const urlValidada = new URL(url);
+    return urlValidada.protocol === 'http:' || urlValidada.protocol === 'https:'
+      ? urlValidada.href
+      : null;
+  } catch {
+    return null;
+  }
+}
+
 function PaginaPolitico() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -49,6 +62,22 @@ function PaginaPolitico() {
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState('');
   const [secaoAtiva, setSecaoAtiva] = useState<'sobre' | 'trajetoria'>('sobre');
+  const propostas = Array.from({
+    length: Math.max(
+      candidato?.proposta_resumo?.length ?? 0,
+      candidato?.proposta_url?.length ?? 0,
+    ),
+  })
+    .map((_, index) => ({
+      resumo: candidato?.proposta_resumo?.[index]?.trim() ?? '',
+      url: obterUrlSegura(candidato?.proposta_url?.[index]),
+    }))
+    .filter((proposta) => proposta.resumo || proposta.url);
+  const feitos =
+    candidato?.feitos_resumo?.filter((feito) => feito.trim()) ?? [];
+  const feitosUrl = candidato?.feitos_url
+    ?.map(obterUrlSegura)
+    .find((url): url is string => url !== null);
 
   useEffect(() => {
     if (!idCandidato) {
@@ -412,9 +441,9 @@ function PaginaPolitico() {
                             Feitos e contribuições
                           </dt>
                           <dd className="mt-2 text-sm font-semibold leading-relaxed text-[#333]">
-                            {candidato.feitos_resumo?.length ? (
+                            {feitos.length ? (
                               <ul className="space-y-2">
-                                {candidato.feitos_resumo.map((feito, index) => (
+                                {feitos.map((feito, index) => (
                                   <li
                                     key={`${feito}-${index}`}
                                     className="flex gap-2"
@@ -432,12 +461,70 @@ function PaginaPolitico() {
                             ) : (
                               'Não informado'
                             )}
+                            {feitosUrl && (
+                              <a
+                                href={feitosUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="mt-3 inline-block font-bold text-[#2A2A72] underline decoration-[#FFA400] decoration-2 underline-offset-4 hover:text-[#202056] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2A2A72]"
+                              >
+                                Saiba mais...
+                                <span className="sr-only">
+                                  {' '}
+                                  (abre em nova aba)
+                                </span>
+                              </a>
+                            )}
                           </dd>
                         </div>
                       </div>
                     </div>
                   </div>
                 </div>
+              </section>
+
+              <section
+                aria-labelledby="propostas-titulo"
+                className="mx-auto mt-8 w-full max-w-[960px]"
+              >
+                <div className="mb-4 border-b-2 border-[#FFA400] pb-3">
+                  <h2
+                    id="propostas-titulo"
+                    className="text-lg font-black uppercase tracking-[0.1em] text-[#2A2A72]"
+                  >
+                    Propostas
+                  </h2>
+                </div>
+
+                {propostas.length > 0 ? (
+                  <ul className="grid gap-3 sm:grid-cols-2">
+                    {propostas.map((proposta, index) => (
+                      <li
+                        key={`${proposta.resumo}-${proposta.url}-${index}`}
+                        className="rounded-xl border border-[#2A2A72]/10 bg-white/75 p-4"
+                      >
+                        <p className="text-sm font-semibold leading-relaxed text-[#333]">
+                          {proposta.resumo || `Proposta ${index + 1}`}
+                        </p>
+                        {proposta.url && (
+                          <a
+                            href={proposta.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="mt-3 inline-flex font-bold text-[#2A2A72] underline decoration-[#FFA400] decoration-2 underline-offset-4 hover:text-[#202056] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2A2A72]"
+                          >
+                            Acessar proposta
+                            <span className="sr-only"> (abre em nova aba)</span>
+                          </a>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="rounded-xl bg-white/75 p-4 text-sm font-medium text-[#666]">
+                    Nenhuma proposta cadastrada.
+                  </p>
+                )}
               </section>
             </>
           )}
