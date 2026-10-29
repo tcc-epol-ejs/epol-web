@@ -825,9 +825,7 @@ function SearchPol() {
                                   'UF não informada'}
                               </p>
                               <p className="text-[24px] font-black leading-none text-[#FFA400]">
-                                {candidate.numero_candidatura ||
-                                  candidate.numero_urna ||
-                                  'N/A'}
+                                {candidate.numero_urna || 'N/A'}
                               </p>
                             </div>
                           </div>
