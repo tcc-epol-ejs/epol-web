@@ -75,6 +75,7 @@ function SearchPol() {
   const [selectedPartido, setSelectedPartido] = useState('');
   const [selectedEstadoCandidato, setSelectedEstadoCandidato] = useState('');
   const [selectedPartidoCandidato, setSelectedPartidoCandidato] = useState('');
+  const [selectedTipoCandidatura, setSelectedTipoCandidatura] = useState('');
   const [filtroSelecionado, setFiltroSelecionado] = useState<
     'partidos' | 'candidatos' | 'politicos' | null
   >(null);
@@ -202,6 +203,7 @@ function SearchPol() {
     setSelectedPartido('');
     setSelectedEstadoCandidato('');
     setSelectedPartidoCandidato('');
+    setSelectedTipoCandidatura('');
     setFiltroSelecionado(null);
     setSortBy('nome');
     setSortDirection('asc');
@@ -227,7 +229,9 @@ function SearchPol() {
         (!selectedEstadoCandidato ||
           candidate.uf_candidatura === selectedEstadoCandidato) &&
         (!selectedPartidoCandidato ||
-          candidate.partidos?.id === selectedPartidoCandidato)
+          candidate.partidos?.id === selectedPartidoCandidato) &&
+        (!selectedTipoCandidatura ||
+          candidate.candidatura === selectedTipoCandidatura)
       );
     })
     .sort((firstCandidate, secondCandidate) => {
@@ -281,6 +285,17 @@ function SearchPol() {
     firstState.localeCompare(secondState, 'pt-BR'),
   );
 
+  const tiposCandidatura = [
+    ...new Set(
+      candidatos
+        .filter((candidate) => candidate.concorrentes === true)
+        .map((candidate) => candidate.candidatura)
+        .filter((tipo): tipo is Candidato['candidatura'] => Boolean(tipo)),
+    ),
+  ].sort((firstType, secondType) =>
+    firstType.localeCompare(secondType, 'pt-BR'),
+  );
+
   const partidosCandidatos = candidatos
     .filter((candidate) => candidate.concorrentes === true)
     .filter((candidate) => candidate.partidos)
@@ -300,7 +315,9 @@ function SearchPol() {
 
   const filtroPartidoAtivo = selectedPartido !== '';
   const filtroCandidatoAtivo =
-    selectedEstadoCandidato !== '' || selectedPartidoCandidato !== '';
+    selectedEstadoCandidato !== '' ||
+    selectedPartidoCandidato !== '' ||
+    selectedTipoCandidatura !== '';
 
   useEffect(() => {
     if (filtroSelecionado === 'partidos') {
@@ -387,6 +404,7 @@ function SearchPol() {
     politicosResults.length,
     filtroPartidoAtivo,
     filtroCandidatoAtivo,
+    selectedTipoCandidatura,
     filtroSelecionado,
   ]);
 
@@ -479,6 +497,31 @@ function SearchPol() {
                       {estadosCandidatos.map((estado) => (
                         <option key={estado} value={estado}>
                           {estado}
+                        </option>
+                      ))}
+                    </select>
+                    <FiChevronDown
+                      aria-hidden="true"
+                      className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[18px] text-[#2A2A72]"
+                    />
+                  </div>
+                </label>
+
+                <label className="flex flex-col gap-2 text-[12px] font-bold uppercase tracking-[0.08em] text-[#2A2A72]">
+                  Tipo de candidatura
+                  <div className="relative">
+                    <select
+                      value={selectedTipoCandidatura}
+                      onChange={(event) => {
+                        setFiltroSelecionado('candidatos');
+                        setSelectedTipoCandidatura(event.target.value);
+                      }}
+                      className="h-10 w-full appearance-none rounded-lg border border-[#2A2A72]/30 bg-white px-3 pr-10 text-[12px] font-medium normal-case tracking-normal text-[#333] outline-none"
+                    >
+                      <option value="">Todos os tipos</option>
+                      {tiposCandidatura.map((tipo) => (
+                        <option key={tipo} value={tipo}>
+                          {tipo}
                         </option>
                       ))}
                     </select>
@@ -806,9 +849,11 @@ function SearchPol() {
 
                           <div className="flex flex-1 flex-col p-4">
                             <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#2A2A72]/70">
-                              Candidato(a) a{' '}
-                              {candidate.candidatura?.toLowerCase() ||
-                                'cargo não informado'}
+                              {candidate.candidatura === 'Governadora'
+                                ? 'Candidata a governadora'
+                                : candidate.candidatura === 'Presidente'
+                                  ? 'Candidato(a) a presidente'
+                                  : 'Candidato a governador'}
                             </p>
                             <h3 className="mt-1 break-words text-[20px] font-bold uppercase leading-tight">
                               {candidate.nome_politico ||

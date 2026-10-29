@@ -190,7 +190,11 @@ function PaginaPolitico() {
                   </h1>
                   <p className="text-base font-bold">
                     {candidato.concorrentes
-                      ? `Candidato(a) a ${candidato.candidatura?.toLocaleLowerCase('pt-BR') || 'cargo não informado'}`
+                      ? candidato.candidatura === 'Governadora'
+                        ? 'Candidata a governadora'
+                        : candidato.candidatura === 'Presidente'
+                          ? 'Candidato(a) a presidente'
+                          : 'Candidato a governador'
                       : `Político(a)${candidato.cargo_atual ? ` — ${candidato.cargo_atual}` : ''}`}
                   </p>
                   <button

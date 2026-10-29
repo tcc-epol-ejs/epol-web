@@ -47,7 +47,7 @@ export interface FormacaoAcademica {
 
 export interface Candidato {
   id: string;
-  candidatura: 'Presidente' | 'Governador';
+  candidatura: 'Presidente' | 'Governador' | 'Governadora';
   numero_candidatura: string | null;
   numero_urna: number | null;
   nome_completo: string;
