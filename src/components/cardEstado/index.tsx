@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import type { Candidato } from '../../services/api';
+import BandeiraEstado from '../bandeiraEstado';
 
 interface CardEstadoProps {
   nomeEstado: string;
@@ -57,10 +58,7 @@ export default function CardEstado({
     <div className="w-full max-w-[285px] rounded-[14px] bg-white px-4 py-3 shadow-[0_5px_15px_rgba(0,0,0,0.15)]">
       {/* CABEÇALHO */}
       <div className="mb-3 flex items-center gap-2 border-b border-gray-200 pb-2">
-        {/* Placeholder da bandeira do estado */}
-        <div className="flex h-[25px] w-[35px] items-center justify-center rounded-[4px] bg-[#2A2A72] text-[9px] font-black text-white">
-          {sigla}
-        </div>
+        <BandeiraEstado sigla={sigla} className="h-[26px] w-[38px] shrink-0" />
 
         <div className="leading-none">
           <p className="text-[13px] font-black uppercase text-[#2A2A72]">
