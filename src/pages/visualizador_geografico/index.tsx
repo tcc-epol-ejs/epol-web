@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { FiSearch, FiSliders } from 'react-icons/fi';
 import Header from '../../components/header';
 import Footer from '../../components/footer/footer';
@@ -117,11 +117,6 @@ export default function VisualizadorGeografico() {
     listarCandidatos().then(setCandidatos).catch(console.error);
   }, []);
 
-  // A biblioteca avisa aqui quando o usuário clica num estado (ou clica de novo para desmarcar)
-  const aoSelecionarNoMapa = useCallback((nome: string | null) => {
-    setEstadoFixo(nome ? siglaPorNome(nome) : null);
-  }, []);
-
   // Pinta de azul o estado fixado (inclusive quando ele vem da pesquisa)
   const cityColors = useMemo(() => {
     const nome = ESTADOS.find((e) => e.sigla === estadoFixo)?.nome;
@@ -135,12 +130,11 @@ export default function VisualizadorGeografico() {
         type="select-single"
         mapColor={COR_MAPA}
         hoverColor={COR_DESTAQUE}
-        selectColor={COR_DESTAQUE}
         cityColors={cityColors}
-        onSelect={aoSelecionarNoMapa}
+        disableClick
       />
     ),
-    [cityColors, aoSelecionarNoMapa],
+    [cityColors],
   );
 
   // 1) Cria a sigla no centro de cada estado
@@ -238,6 +232,12 @@ export default function VisualizadorGeografico() {
     if (sigla) setEstadoHover(sigla);
   }
 
+  function clicarEstadoNoMapa(event: React.MouseEvent<HTMLDivElement>) {
+    const sigla = obterSiglaDoElemento(event.target);
+    if (!sigla) return;
+    setEstadoFixo((prev) => (prev === sigla ? null : sigla));
+  }
+
   function limparEstado() {
     setEstadoHover(null);
   }
@@ -248,7 +248,7 @@ export default function VisualizadorGeografico() {
         <style>{`
         .epol-map { width: 100%; max-width: 620px; height: auto; display: block; overflow: visible; }
         .epol-map svg { width: 100%; height: auto; }
-        .epol-map svg path { stroke: #B4B4B4; stroke-width: 1.2; transition: fill 0.2s ease; }
+        .epol-map svg path { stroke: #B4B4B4; stroke-width: 1.2; transition: fill 0.2s ease; cursor: pointer !important; }
         .epol-map svg text.epol-sigla { fill: #2A2A72; stroke: none; font-weight: 800; font-family: 'Montserrat', sans-serif; pointer-events: none; user-select: none; transition: fill 0.2s ease; }
         .epol-map svg text.epol-sigla.epol-branca { fill: #FFFFFF; }
       `}</style>
@@ -287,6 +287,7 @@ export default function VisualizadorGeografico() {
                   className="epol-map w-full max-w-[620px]"
                   onMouseOver={obterEstadoDoMapa}
                   onMouseOut={limparEstado}
+                  onClick={clicarEstadoNoMapa}
                 >
                   {mapa}
                 </div>
