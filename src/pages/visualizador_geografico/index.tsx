@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { FiSearch, FiSliders } from 'react-icons/fi';
 import Header from '../../components/header';
+import Footer from '../../components/footer/footer';
 import Brazil from '@react-map/brazil';
 import CardEstado from '../../components/cardEstado/index';
 import CardBrasil from '../../components/cardBrasil/index';
@@ -242,8 +243,9 @@ export default function VisualizadorGeografico() {
   }
 
   return (
-    <main className="min-h-screen w-full bg-[#FFA400] overflow-hidden">
-      <style>{`
+    <>
+      <main className="min-h-screen w-full bg-[#FFA400] overflow-hidden">
+        <style>{`
         .epol-map { width: 100%; max-width: 620px; height: auto; display: block; overflow: visible; }
         .epol-map svg { width: 100%; height: auto; }
         .epol-map svg path { stroke: #B4B4B4; stroke-width: 1.2; transition: fill 0.2s ease; }
@@ -251,112 +253,114 @@ export default function VisualizadorGeografico() {
         .epol-map svg text.epol-sigla.epol-branca { fill: #FFFFFF; }
       `}</style>
 
-      <div className="fixed top-0 left-0 z-[1000] w-full">
-        <Header isBgWhite />
-      </div>
+        <div className="fixed top-0 left-0 z-[1000] w-full">
+          <Header isBgWhite />
+        </div>
 
-      <section className="min-h-screen w-full px-6 pb-10 pt-[155px] md:px-10 lg:px-[65px]">
-        <div className="mx-auto grid min-h-[calc(100vh-155px)] w-full max-w-[1600px] grid-cols-1 gap-8 lg:grid-cols-[280px_minmax(420px,1fr)_300px] items-start pt-8">
-          {/*ESQUERDA*/}
-          <div className="flex flex-col justify-center gap-32">
-            <div className="select-none">
-              <h1 className="font-[Fraunces] text-[43px] font-black italic uppercase leading-[0.95] tracking-[-0.03em] text-[#2A2A72] md:text-[48px]">
-                Visualizador
-              </h1>
-              <h2 className="mt-1 text-[28px] font-black uppercase leading-none tracking-wide text-[#2A2A72]">
-                Geográfico
-              </h2>
-            </div>
-
-            {estadoAtual && (
-              <CardEstado
-                nomeEstado={estadoAtual.nome}
-                sigla={estadoAtual.sigla}
-                candidatos={candidatos}
-              />
-            )}
-          </div>
-
-          {/* MAPA */}
-          <div className="flex items-center justify-center">
-            <div className="w-full max-w-[620px]">
-              <div
-                ref={mapaRef}
-                className="epol-map w-full max-w-[620px]"
-                onMouseOver={obterEstadoDoMapa}
-                onMouseOut={limparEstado}
-              >
-                {mapa}
+        <section className="min-h-screen w-full px-6 pb-10 pt-[155px] md:px-10 lg:px-[65px]">
+          <div className="mx-auto grid min-h-[calc(100vh-155px)] w-full max-w-[1600px] grid-cols-1 gap-8 lg:grid-cols-[280px_minmax(420px,1fr)_300px] items-start pt-8">
+            {/*ESQUERDA*/}
+            <div className="flex flex-col justify-center gap-32">
+              <div className="select-none">
+                <h1 className="font-[Fraunces] text-[43px] font-black italic uppercase leading-[0.95] tracking-[-0.03em] text-[#2A2A72] md:text-[48px]">
+                  Visualizador
+                </h1>
+                <h2 className="mt-1 text-[28px] font-black uppercase leading-none tracking-wide text-[#2A2A72]">
+                  Geográfico
+                </h2>
               </div>
-            </div>
-          </div>
 
-          {/* DIREITA */}
-          <div className="flex flex-col justify-center gap-7">
-            <div className="w-full">
-              <div className="flex h-[48px] items-center gap-3 rounded-full bg-[#FFFBF2] px-4 shadow-[0_8px_20px_rgba(0,0,0,0.12)]">
-                <FiSearch size={20} className="shrink-0 text-[#888]" />
-                <input
-                  type="text"
-                  value={pesquisa}
-                  onChange={(e) => setPesquisa(e.target.value)}
-                  placeholder="Pesquisar..."
-                  className="min-w-0 flex-1 bg-transparent text-[13px] outline-none placeholder:text-[#A0A0A0]"
+              {estadoAtual && (
+                <CardEstado
+                  nomeEstado={estadoAtual.nome}
+                  sigla={estadoAtual.sigla}
+                  candidatos={candidatos}
                 />
-                <FiSliders size={18} className="shrink-0 text-[#FFA400]" />
-                {pesquisa && (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setPesquisa('');
-                      setEstadoHover(null);
-                    }}
-                    className="text-[12px] font-bold text-[#2A2A72]"
-                  >
-                    Limpar
-                  </button>
-                )}
-              </div>
-
-              {pesquisa && (
-                <div className="mt-2 rounded-2xl bg-[#FFFBF2] p-3 shadow-lg">
-                  {estadoEncontrado ? (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setEstadoFixo(estadoEncontrado.sigla);
-                        setPesquisa('');
-                      }}
-                      className="flex w-full items-center justify-between rounded-xl px-3 py-2 text-left transition-colors hover:bg-[#F1F1F1]"
-                    >
-                      <div>
-                        <p className="text-sm font-bold text-[#333]">
-                          {estadoEncontrado.nome}
-                        </p>
-                        <p className="text-xs text-[#777]">
-                          {estadoEncontrado.sigla}
-                        </p>
-                      </div>
-                      <span className="text-xs font-bold text-[#FFA400]">
-                        Ver estado
-                      </span>
-                    </button>
-                  ) : (
-                    <p className="px-3 py-2 text-sm text-[#777]">
-                      Nenhum estado encontrado.
-                    </p>
-                  )}
-                </div>
               )}
             </div>
 
-            {/* mt-16 afasta o card da barra de pesquisa; aumente ou diminua à vontade */}
-            <div className="mt-16">
-              <CardBrasil candidatos={candidatos} />
+            {/* MAPA */}
+            <div className="flex items-center justify-center">
+              <div className="w-full max-w-[620px]">
+                <div
+                  ref={mapaRef}
+                  className="epol-map w-full max-w-[620px]"
+                  onMouseOver={obterEstadoDoMapa}
+                  onMouseOut={limparEstado}
+                >
+                  {mapa}
+                </div>
+              </div>
+            </div>
+
+            {/* DIREITA */}
+            <div className="flex flex-col justify-center gap-7">
+              <div className="w-full">
+                <div className="flex h-[48px] items-center gap-3 rounded-full bg-[#FFFBF2] px-4 shadow-[0_8px_20px_rgba(0,0,0,0.12)]">
+                  <FiSearch size={20} className="shrink-0 text-[#888]" />
+                  <input
+                    type="text"
+                    value={pesquisa}
+                    onChange={(e) => setPesquisa(e.target.value)}
+                    placeholder="Pesquisar..."
+                    className="min-w-0 flex-1 bg-transparent text-[13px] outline-none placeholder:text-[#A0A0A0]"
+                  />
+                  <FiSliders size={18} className="shrink-0 text-[#FFA400]" />
+                  {pesquisa && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setPesquisa('');
+                        setEstadoHover(null);
+                      }}
+                      className="text-[12px] font-bold text-[#2A2A72]"
+                    >
+                      Limpar
+                    </button>
+                  )}
+                </div>
+
+                {pesquisa && (
+                  <div className="mt-2 rounded-2xl bg-[#FFFBF2] p-3 shadow-lg">
+                    {estadoEncontrado ? (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setEstadoFixo(estadoEncontrado.sigla);
+                          setPesquisa('');
+                        }}
+                        className="flex w-full items-center justify-between rounded-xl px-3 py-2 text-left transition-colors hover:bg-[#F1F1F1]"
+                      >
+                        <div>
+                          <p className="text-sm font-bold text-[#333]">
+                            {estadoEncontrado.nome}
+                          </p>
+                          <p className="text-xs text-[#777]">
+                            {estadoEncontrado.sigla}
+                          </p>
+                        </div>
+                        <span className="text-xs font-bold text-[#FFA400]">
+                          Ver estado
+                        </span>
+                      </button>
+                    ) : (
+                      <p className="px-3 py-2 text-sm text-[#777]">
+                        Nenhum estado encontrado.
+                      </p>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {/* mt-16 afasta o card da barra de pesquisa; aumente ou diminua à vontade */}
+              <div className="mt-16">
+                <CardBrasil candidatos={candidatos} />
+              </div>
             </div>
           </div>
-        </div>
-      </section>
-    </main>
+        </section>
+      </main>
+      <Footer />
+    </>
   );
 }

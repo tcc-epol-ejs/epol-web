@@ -7,6 +7,37 @@ interface CardEstadoProps {
   candidatos: Candidato[];
 }
 
+const limpar = (texto?: string | null) =>
+  (texto ?? '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .trim();
+
+// Aceita "Governador" e "Governadora"
+const candidatoAGovernador = (c: Candidato) =>
+  limpar(String(c.candidatura)).startsWith('governador');
+
+// Quem ocupa o governo hoje: "Governador do...", "Governadora de...", "Governador Interino"
+// (não pega "Ex-Governador" nem "Não ocupa cargo")
+const ocupaGoverno = (c: Candidato) =>
+  limpar(c.cargo_atual).startsWith('governador');
+
+// Estados onde o cargo de vice-governador está vago em 2026
+// (o vice assumiu o governo, ou o cargo já estava vago)
+const VICE_VAGO = new Set([
+  'DF',
+  'ES',
+  'GO',
+  'MT',
+  'MG',
+  'PA',
+  'PB',
+  'AC',
+  'RR',
+  'RJ',
+]);
+
 export default function CardEstado({
   nomeEstado,
   sigla,
@@ -14,9 +45,13 @@ export default function CardEstado({
 }: CardEstadoProps) {
   const navigate = useNavigate();
 
-  const governador = candidatos.find(
-    (c) => c.candidatura === 'Governador' && c.uf_candidatura === sigla,
-  );
+  const governador =
+    candidatos.find(
+      (c) =>
+        candidatoAGovernador(c) &&
+        c.uf_candidatura === sigla &&
+        ocupaGoverno(c),
+    ) ?? null;
 
   return (
     <div className="w-full max-w-[285px] rounded-[14px] bg-white px-4 py-3 shadow-[0_5px_15px_rgba(0,0,0,0.15)]">
@@ -57,12 +92,12 @@ export default function CardEstado({
       </div>
 
       {/* GOVERNADOR */}
-      {governador && (
-        <div className="mb-3">
-          <p className="mb-1 text-[8px] font-extrabold uppercase tracking-wide text-[#555]">
-            Governador(a):
-          </p>
+      <div className="mb-3">
+        <p className="mb-1 text-[8px] font-extrabold uppercase tracking-wide text-[#555]">
+          Governador(a):
+        </p>
 
+        {governador ? (
           <button
             type="button"
             onClick={() => navigate(`/candidatos/${governador.id}`)}
@@ -90,23 +125,33 @@ export default function CardEstado({
               )}
             </div>
           </button>
-        </div>
-      )}
+        ) : (
+          <div className="flex items-center justify-end">
+            <p className="text-right text-[9px] font-bold text-gray-400">
+              Informação em breve
+            </p>
+          </div>
+        )}
+      </div>
 
       {/* VICE GOVERNADOR */}
-      {governador?.vice && (
-        <div className="mb-3">
-          <p className="mb-1 text-[8px] font-extrabold uppercase tracking-wide text-[#555]">
-            Vice-Governador(a):
-          </p>
+      <div className="mb-3">
+        <p className="mb-1 text-[8px] font-extrabold uppercase tracking-wide text-[#555]">
+          Vice-Governador(a):
+        </p>
 
-          <div className="flex items-center justify-end">
+        <div className="flex items-center justify-end">
+          {governador?.vice ? (
             <p className="max-w-[190px] text-right text-[9px] font-bold leading-tight text-[#2A2A72]">
               {governador.vice}
             </p>
-          </div>
+          ) : (
+            <p className="text-right text-[9px] font-bold text-gray-400">
+              {VICE_VAGO.has(sigla) ? 'Cargo vago' : 'Informação em breve'}
+            </p>
+          )}
         </div>
-      )}
+      </div>
 
       {/* PREFEITO */}
       <div className="mb-3">
