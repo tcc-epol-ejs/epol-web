@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { FiSearch, FiSliders } from 'react-icons/fi';
+import { FiSearch, FiSliders, FiX } from 'react-icons/fi';
+import { REGIOES, VICE_VAGO, acharGovernador } from '../../utils/governadores';
 import Header from '../../components/header';
 import Footer from '../../components/footer/footer';
 import Brazil from '@react-map/brazil';
@@ -46,6 +47,7 @@ const ESTADOS: Estado[] = [
 
 const COR_MAPA = '#D5D5D5';
 const COR_DESTAQUE = '#2A82D7';
+const COR_FILTRO = '#8EC5F4'; // estados que passam nos filtros
 
 function normalizar(texto: string) {
   return texto
@@ -105,6 +107,11 @@ function centroVisual(path: SVGPathElement): { x: number; y: number } {
   return { x: melhor.x, y: melhor.y };
 }
 
+type FiltroVice = 'todos' | 'com' | 'vago';
+
+const alternar = (lista: string[], valor: string) =>
+  lista.includes(valor) ? lista.filter((v) => v !== valor) : [...lista, valor];
+
 export default function VisualizadorGeografico() {
   const [estadoHover, setEstadoHover] = useState<string | null>(null);
   const [estadoFixo, setEstadoFixo] = useState<string | null>(null);
@@ -112,17 +119,128 @@ export default function VisualizadorGeografico() {
   const [candidatos, setCandidatos] = useState<Candidato[]>([]);
   const [siglasProntas, setSiglasProntas] = useState(false);
   const mapaRef = useRef<HTMLDivElement>(null);
+  const barraRef = useRef<HTMLDivElement>(null);
+  const [filtrosAbertos, setFiltrosAbertos] = useState(false);
+  const [regioesAtivas, setRegioesAtivas] = useState<string[]>([]);
+  const [partidosAtivos, setPartidosAtivos] = useState<string[]>([]);
+  const [viceFiltro, setViceFiltro] = useState<FiltroVice>('todos');
 
   useEffect(() => {
     listarCandidatos().then(setCandidatos).catch(console.error);
   }, []);
 
-  // Pinta de azul o estado fixado (inclusive quando ele vem da pesquisa)
-  const cityColors = useMemo(() => {
-    const nome = ESTADOS.find((e) => e.sigla === estadoFixo)?.nome;
-    return nome ? { [nome]: COR_DESTAQUE } : {};
-  }, [estadoFixo]);
+  useEffect(() => {
+    function aoClicarFora(event: MouseEvent) {
+      if (
+        barraRef.current &&
+        !barraRef.current.contains(event.target as Node)
+      ) {
+        setFiltrosAbertos(false);
+      }
+    }
+    document.addEventListener('mousedown', aoClicarFora);
+    return () => document.removeEventListener('mousedown', aoClicarFora);
+  }, []);
 
+  const governadoresPorUF = useMemo(() => {
+    const mapa: Record<string, Candidato | null> = {};
+    ESTADOS.forEach((e) => {
+      mapa[e.sigla] = acharGovernador(candidatos, e.sigla);
+    });
+    return mapa;
+  }, [candidatos]);
+
+  // Partidos que têm governador hoje (para o filtro)
+  const partidosDosGovernos = useMemo(() => {
+    const siglas = Object.values(governadoresPorUF)
+      .map((g) => g?.partidos?.sigla)
+      .filter((s): s is string => !!s);
+    return [...new Set(siglas)].sort();
+  }, [governadoresPorUF]);
+
+  const qtdFiltros =
+    regioesAtivas.length +
+    partidosAtivos.length +
+    (viceFiltro !== 'todos' ? 1 : 0);
+
+  const estadosFiltrados = useMemo(() => {
+    if (qtdFiltros === 0) return null;
+
+    const ufsDasRegioes = new Set<string>(
+      REGIOES.filter((r) => regioesAtivas.includes(r.id)).flatMap((r) => [
+        ...r.ufs,
+      ]),
+    );
+
+    const resultado = new Set<string>();
+
+    ESTADOS.forEach((e) => {
+      const governador = governadoresPorUF[e.sigla];
+
+      const okRegiao = regioesAtivas.length === 0 || ufsDasRegioes.has(e.sigla);
+      const okPartido =
+        partidosAtivos.length === 0 ||
+        (!!governador?.partidos &&
+          partidosAtivos.includes(governador.partidos.sigla));
+      const okVice =
+        viceFiltro === 'todos' ||
+        (viceFiltro === 'vago' ? VICE_VAGO.has(e.sigla) : !!governador?.vice);
+
+      if (okRegiao && okPartido && okVice) resultado.add(e.sigla);
+    });
+
+    return resultado;
+  }, [
+    qtdFiltros,
+    regioesAtivas,
+    partidosAtivos,
+    viceFiltro,
+    governadoresPorUF,
+  ]);
+
+  function limparFiltros() {
+    setRegioesAtivas([]);
+    setPartidosAtivos([]);
+    setViceFiltro('todos');
+  }
+
+  const rotulosFiltros = [
+    ...regioesAtivas.map((id) => ({
+      chave: `r-${id}`,
+      texto: REGIOES.find((r) => r.id === id)?.nome ?? id,
+      remover: () => setRegioesAtivas((prev) => prev.filter((v) => v !== id)),
+    })),
+    ...partidosAtivos.map((sigla) => ({
+      chave: `p-${sigla}`,
+      texto: sigla,
+      remover: () =>
+        setPartidosAtivos((prev) => prev.filter((v) => v !== sigla)),
+    })),
+    ...(viceFiltro !== 'todos'
+      ? [
+          {
+            chave: 'vice',
+            texto:
+              viceFiltro === 'vago' ? 'Vice: cargo vago' : 'Vice: com vice',
+            remover: () => setViceFiltro('todos'),
+          },
+        ]
+      : []),
+  ];
+
+  const cityColors = useMemo(() => {
+    const cores: Record<string, string> = {};
+
+    estadosFiltrados?.forEach((sigla) => {
+      const nome = ESTADOS.find((e) => e.sigla === sigla)?.nome;
+      if (nome) cores[nome] = COR_FILTRO;
+    });
+
+    const nomeFixo = ESTADOS.find((e) => e.sigla === estadoFixo)?.nome;
+    if (nomeFixo) cores[nomeFixo] = COR_DESTAQUE;
+
+    return cores;
+  }, [estadosFiltrados, estadoFixo]);
   // Memorizado para o mapa não ser re-renderizado a cada hover (isso apagaria as cores)
   const mapa = useMemo(
     () => (
@@ -296,7 +414,7 @@ export default function VisualizadorGeografico() {
 
             {/* DIREITA */}
             <div className="flex flex-col justify-center gap-7">
-              <div className="w-full">
+              <div className="relative w-full" ref={barraRef}>
                 <div className="flex h-[48px] items-center gap-3 rounded-full bg-[#FFFBF2] px-4 shadow-[0_8px_20px_rgba(0,0,0,0.12)]">
                   <FiSearch size={20} className="shrink-0 text-[#888]" />
                   <input
@@ -306,7 +424,20 @@ export default function VisualizadorGeografico() {
                     placeholder="Pesquisar..."
                     className="min-w-0 flex-1 bg-transparent text-[13px] outline-none placeholder:text-[#A0A0A0]"
                   />
-                  <FiSliders size={18} className="shrink-0 text-[#FFA400]" />
+                  <button
+                    type="button"
+                    onClick={() => setFiltrosAbertos((v) => !v)}
+                    aria-label="Filtros"
+                    className="relative shrink-0 text-[#FFA400]"
+                  >
+                    <FiSliders size={20} />
+                    {qtdFiltros > 0 && (
+                      <span className="absolute -right-2 -top-2 flex h-4 w-4 items-center justify-center rounded-full bg-[#2A2A72] text-[9px] font-bold text-white">
+                        {qtdFiltros}
+                      </span>
+                    )}
+                  </button>
+
                   {pesquisa && (
                     <button
                       type="button"
@@ -320,6 +451,123 @@ export default function VisualizadorGeografico() {
                     </button>
                   )}
                 </div>
+
+                {filtrosAbertos && (
+                  <div className="absolute left-0 right-0 top-full z-50 mt-2 rounded-2xl bg-[#FFFBF2] p-4 shadow-xl">
+                    <div className="mb-3 flex items-center justify-between">
+                      <p className="text-sm font-black uppercase tracking-wide text-[#2A2A72]">
+                        Filtros
+                      </p>
+                      {qtdFiltros > 0 && (
+                        <button
+                          type="button"
+                          onClick={limparFiltros}
+                          className="text-xs font-bold text-[#FFA400]"
+                        >
+                          Limpar tudo
+                        </button>
+                      )}
+                    </div>
+
+                    <p className="mb-1.5 text-[10px] font-extrabold uppercase tracking-wider text-[#999]">
+                      Região
+                    </p>
+                    <div className="mb-4 flex flex-wrap gap-1.5">
+                      {REGIOES.map((regiao) => {
+                        const marcado = regioesAtivas.includes(regiao.id);
+                        return (
+                          <button
+                            key={regiao.id}
+                            type="button"
+                            onClick={() =>
+                              setRegioesAtivas((prev) =>
+                                alternar(prev, regiao.id),
+                              )
+                            }
+                            className={`rounded-full px-3 py-1 text-xs font-semibold transition-colors ${
+                              marcado
+                                ? 'bg-[#2A2A72] text-white'
+                                : 'bg-[#EDEDED] text-[#555] hover:bg-[#E0E0E0]'
+                            }`}
+                          >
+                            {regiao.nome}
+                          </button>
+                        );
+                      })}
+                    </div>
+
+                    <p className="mb-1.5 text-[10px] font-extrabold uppercase tracking-wider text-[#999]">
+                      Partido do governador
+                    </p>
+                    <div className="mb-4 flex max-h-28 flex-wrap gap-1.5 overflow-y-auto">
+                      {partidosDosGovernos.length === 0 && (
+                        <span className="text-xs text-[#999]">
+                          Carregando partidos...
+                        </span>
+                      )}
+                      {partidosDosGovernos.map((sigla) => {
+                        const marcado = partidosAtivos.includes(sigla);
+                        return (
+                          <button
+                            key={sigla}
+                            type="button"
+                            onClick={() =>
+                              setPartidosAtivos((prev) => alternar(prev, sigla))
+                            }
+                            className={`rounded-full px-3 py-1 text-xs font-semibold transition-colors ${
+                              marcado
+                                ? 'bg-[#2A2A72] text-white'
+                                : 'bg-[#EDEDED] text-[#555] hover:bg-[#E0E0E0]'
+                            }`}
+                          >
+                            {sigla}
+                          </button>
+                        );
+                      })}
+                    </div>
+
+                    <p className="mb-1.5 text-[10px] font-extrabold uppercase tracking-wider text-[#999]">
+                      Vice-governador
+                    </p>
+                    <div className="mb-4 flex gap-1.5">
+                      {(
+                        [
+                          ['todos', 'Todos'],
+                          ['com', 'Com vice'],
+                          ['vago', 'Cargo vago'],
+                        ] as const
+                      ).map(([valor, texto]) => (
+                        <button
+                          key={valor}
+                          type="button"
+                          onClick={() => setViceFiltro(valor)}
+                          className={`rounded-full px-3 py-1 text-xs font-semibold transition-colors ${
+                            viceFiltro === valor
+                              ? 'bg-[#2A2A72] text-white'
+                              : 'bg-[#EDEDED] text-[#555] hover:bg-[#E0E0E0]'
+                          }`}
+                        >
+                          {texto}
+                        </button>
+                      ))}
+                    </div>
+
+                    <div className="flex items-center justify-between border-t border-gray-200 pt-3">
+                      <span className="text-xs text-[#777]">
+                        {estadosFiltrados
+                          ? `${estadosFiltrados.size} ${estadosFiltrados.size === 1 ? 'estado' : 'estados'} no mapa`
+                          : 'Nenhum filtro ativo'}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => setFiltrosAbertos(false)}
+                        className="rounded-full bg-[#FFA400] px-4 py-1.5 text-xs font-bold text-white"
+                      >
+                        Fechar
+                      </button>
+                    </div>
+                  </div>
+                )}
 
                 {pesquisa && (
                   <div className="mt-2 rounded-2xl bg-[#FFFBF2] p-3 shadow-lg">
@@ -352,6 +600,26 @@ export default function VisualizadorGeografico() {
                   </div>
                 )}
               </div>
+
+              {rotulosFiltros.length > 0 && (
+                <div className="flex flex-wrap items-center gap-1.5">
+                  {rotulosFiltros.map((r) => (
+                    <button
+                      key={r.chave}
+                      type="button"
+                      onClick={r.remover}
+                      className="flex items-center gap-1 rounded-full bg-[#2A2A72] px-3 py-1 text-[11px] font-semibold text-white"
+                    >
+                      {r.texto}
+                      <FiX size={12} />
+                    </button>
+                  ))}
+                  <span className="text-[11px] font-semibold text-[#2A2A72]">
+                    {estadosFiltrados?.size ?? 0}{' '}
+                    {estadosFiltrados?.size === 1 ? 'estado' : 'estados'}
+                  </span>
+                </div>
+              )}
 
               {/* mt-16 afasta o card da barra de pesquisa; aumente ou diminua à vontade */}
               <div className="mt-16">
