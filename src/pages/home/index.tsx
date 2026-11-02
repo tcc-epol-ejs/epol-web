@@ -41,9 +41,6 @@ const LINHA_CTA =
 const TEXTO_CTA =
   'uppercase font-bold text-center text-xs sm:text-[13px] lg:text-start tracking-wider max-[639px]:hidden';
 
-// Tamanho dos cards do carrossel (proporção original 378 x 392).
-// Abaixo de 1024px o card encolhe junto com a tela (mín. 220px, máx. 378px).
-// No desktop fica fixo em 378px, como era antes.
 const CARD_W = 'var(--card-w)';
 const CARD_H = 'calc(var(--card-w) * 392 / 378)';
 
@@ -72,7 +69,6 @@ function Home() {
     const track = trackRef.current;
     if (!track) return;
 
-    // Respeita quem desativou animações no sistema
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
     const originals = Array.from(track.children) as HTMLElement[];
@@ -100,7 +96,6 @@ function Home() {
 
     return () => {
       cancelAnimationFrame(rafRef.current!);
-      // remove os clones (evita duplicar no StrictMode / ao remontar)
       clones.forEach((c) => c.remove());
       track.style.transform = '';
       yRef.current = 0;
@@ -115,11 +110,9 @@ function Home() {
         </div>
 
         {/* PRIMEIRA PARTE SEÇÃO */}
-        {/* O espaço do header fica no bloco (pt) e não no texto, para não acumular padding */}
         <div
           className={`${BLOCO} bg-[#2A2A72] pt-24 pb-12 md:pt-28 md:pb-16 lg:py-0`}
         >
-          {/* Texto: depois do carrossel no mobile/tablet, à esquerda no desktop */}
           <div className={`${COLUNA_TEXTO} px-6 md:px-12 lg:pl-[65px] lg:pr-0`}>
             <div className="w-full flex items-center lg:items-start flex-col gap-[15px]">
               <h1 className={`${TITULO} text-[#CBCBEC]`}>
@@ -143,7 +136,6 @@ function Home() {
             </div>
           </div>
 
-          {/* Carrossel: horizontal e em cima do texto no mobile/tablet, vertical à direita no desktop */}
           <div
             className={
               'order-first lg:order-last relative shrink-0 w-full lg:w-[443px] overflow-hidden ' +
@@ -165,7 +157,6 @@ function Home() {
 
         {/* SEGUNDA PARTE SEÇÃO */}
         <div className={BLOCO}>
-          {/* Cards de funcionalidades (no mobile ficam abaixo do texto) */}
           <div className="order-2 lg:order-1 flex lg:items-center h-auto lg:h-full px-6 pb-16 md:px-12 lg:py-[100px] lg:pl-[65px] lg:pr-0">
             <div className="w-full max-w-[560px] mx-auto lg:mx-0 grid grid-cols-1 sm:grid-cols-[245fr_290fr] gap-3 lg:h-[360px]">
               <div className="sm:row-span-2 min-h-[280px] sm:min-h-0 rounded-[20px] bg-[#FFA400] flex flex-col items-center justify-center gap-4 p-6">
@@ -203,7 +194,6 @@ function Home() {
             </div>
           </div>
 
-          {/* Texto (no mobile vem primeiro) */}
           <div
             className={`order-1 lg:order-2 ${COLUNA_TEXTO} px-6 pt-16 md:px-12 md:pt-20 lg:pt-0 lg:pl-0 lg:pr-[65px]`}
           >
