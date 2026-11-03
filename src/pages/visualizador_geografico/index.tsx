@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { FiSearch, FiSliders, FiX } from 'react-icons/fi';
-import { REGIOES, VICE_VAGO, acharGovernador } from '../../utils/governadores';
+
 import Header from '../../components/header';
 import Footer from '../../components/footer/footer';
 import Brazil from '@react-map/brazil';
@@ -8,6 +8,15 @@ import CardEstado from '../../components/cardEstado/index';
 import CardBrasil from '../../components/cardBrasil/index';
 import { listarCandidatos } from '../../services/api';
 import type { Candidato } from '../../services/api';
+import { useNavigate } from 'react-router-dom';
+import BandeiraEstado from '../../components/bandeiraEstado';
+import {
+  REGIOES,
+  VICE_VAGO,
+  acharGovernador,
+  candidatoAGovernador,
+  ocupaGoverno,
+} from '../../utils/governadores';
 
 interface Estado {
   id: string;
@@ -112,7 +121,62 @@ type FiltroVice = 'todos' | 'com' | 'vago';
 const alternar = (lista: string[], valor: string) =>
   lista.includes(valor) ? lista.filter((v) => v !== valor) : [...lista, valor];
 
+const norm = (texto?: string | null) =>
+  (texto ?? '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/\s+/g, ' ')
+    .trim();
+
+function pontuar(campos: string[], tokens: string[]): number {
+  let total = 0;
+
+  for (const token of tokens) {
+    let melhor = 0;
+
+    for (const campo of campos) {
+      if (!campo) continue;
+      let p = 0;
+      if (campo === token) p = 100;
+      else if (campo.startsWith(token)) p = 60;
+      else if (campo.split(' ').some((palavra) => palavra.startsWith(token)))
+        p = 40;
+      else if (campo.includes(token)) p = 20;
+      if (p > melhor) melhor = p;
+    }
+
+    if (melhor === 0) return 0;
+    total += melhor;
+  }
+
+  return total;
+}
+
+type Item =
+  | { tipo: 'estado'; chave: string; estado: Estado }
+  | {
+      tipo: 'politico';
+      chave: string;
+      candidato: Candidato;
+      estado: Estado | null;
+    }
+  | {
+      tipo: 'partido';
+      chave: string;
+      sigla: string;
+      nome: string;
+      governos: number;
+    };
+
+const TITULO_GRUPO: Record<Item['tipo'], string> = {
+  estado: 'Estados',
+  politico: 'Políticos',
+  partido: 'Partidos',
+};
+
 export default function VisualizadorGeografico() {
+  const navigate = useNavigate();
   const [estadoHover, setEstadoHover] = useState<string | null>(null);
   const [estadoFixo, setEstadoFixo] = useState<string | null>(null);
   const [pesquisa, setPesquisa] = useState('');
@@ -124,6 +188,8 @@ export default function VisualizadorGeografico() {
   const [regioesAtivas, setRegioesAtivas] = useState<string[]>([]);
   const [partidosAtivos, setPartidosAtivos] = useState<string[]>([]);
   const [viceFiltro, setViceFiltro] = useState<FiltroVice>('todos');
+  const [buscaAberta, setBuscaAberta] = useState(false);
+  const [ativo, setAtivo] = useState(0);
 
   useEffect(() => {
     listarCandidatos().then(setCandidatos).catch(console.error);
@@ -135,6 +201,7 @@ export default function VisualizadorGeografico() {
         barraRef.current &&
         !barraRef.current.contains(event.target as Node)
       ) {
+        setBuscaAberta(false);
         setFiltrosAbertos(false);
       }
     }
@@ -327,20 +394,7 @@ export default function VisualizadorGeografico() {
     });
   }, [estadoHover, estadoFixo, siglasProntas]);
 
-  const estadoEncontrado = useMemo(() => {
-    const valor = pesquisa.trim().toLowerCase();
-    if (!valor) return null;
-    return (
-      ESTADOS.find(
-        (e) =>
-          e.nome.toLowerCase().includes(valor) ||
-          e.sigla.toLowerCase() === valor,
-      ) ?? null
-    );
-  }, [pesquisa]);
-
-  const siglaAtual =
-    estadoFixo ?? estadoHover ?? estadoEncontrado?.sigla ?? null;
+  const siglaAtual = estadoFixo ?? estadoHover;
   const estadoAtual = siglaAtual
     ? (ESTADOS.find((e) => e.sigla === siglaAtual) ?? null)
     : null;
@@ -360,6 +414,120 @@ export default function VisualizadorGeografico() {
     setEstadoHover(null);
   }
 
+  // Todos os partidos conhecidos (para a pesquisa)
+  const partidosConhecidos = useMemo(() => {
+    const mapa = new Map<string, { sigla: string; nome: string }>();
+    candidatos.forEach((c) => {
+      if (c.partidos) {
+        mapa.set(c.partidos.sigla, {
+          sigla: c.partidos.sigla,
+          nome: c.partidos.nome_completo,
+        });
+      }
+    });
+    return [...mapa.values()];
+  }, [candidatos]);
+
+  const itens = useMemo<Item[]>(() => {
+    const tokens = norm(pesquisa).split(' ').filter(Boolean);
+    if (tokens.length === 0) return [];
+
+    const estados: Item[] = ESTADOS.map((estado) => ({
+      estado,
+      p: pontuar([norm(estado.nome), norm(estado.sigla)], tokens),
+    }))
+      .filter((x) => x.p > 0)
+      .sort((a, b) => b.p - a.p)
+      .slice(0, 5)
+      .map((x) => ({
+        tipo: 'estado' as const,
+        chave: `e-${x.estado.sigla}`,
+        estado: x.estado,
+      }));
+
+    const politicos: Item[] = candidatos
+      .map((candidato) => ({
+        candidato,
+        p: pontuar(
+          [norm(candidato.nome_politico), norm(candidato.nome_completo)],
+          tokens,
+        ),
+      }))
+      .filter((x) => x.p > 0)
+      .sort((a, b) => b.p - a.p)
+      .slice(0, 6)
+      .map((x) => ({
+        tipo: 'politico' as const,
+        chave: `c-${x.candidato.id}`,
+        candidato: x.candidato,
+        estado:
+          candidatoAGovernador(x.candidato) && ocupaGoverno(x.candidato)
+            ? (ESTADOS.find((e) => e.sigla === x.candidato.uf_candidatura) ??
+              null)
+            : null,
+      }));
+
+    const partidos: Item[] = partidosConhecidos
+      .map((partido) => ({
+        partido,
+        p: pontuar([norm(partido.sigla), norm(partido.nome)], tokens),
+      }))
+      .filter((x) => x.p > 0)
+      .sort((a, b) => b.p - a.p)
+      .slice(0, 3)
+      .map((x) => ({
+        tipo: 'partido' as const,
+        chave: `p-${x.partido.sigla}`,
+        sigla: x.partido.sigla,
+        nome: x.partido.nome,
+        governos: Object.values(governadoresPorUF).filter(
+          (g) => g?.partidos?.sigla === x.partido.sigla,
+        ).length,
+      }));
+
+    return [...estados, ...politicos, ...partidos];
+  }, [pesquisa, candidatos, partidosConhecidos, governadoresPorUF]);
+
+  function escolher(item: Item) {
+    if (item.tipo === 'estado') {
+      setEstadoFixo(item.estado.sigla);
+    } else if (item.tipo === 'partido') {
+      setPartidosAtivos((prev) =>
+        prev.includes(item.sigla) ? prev : [...prev, item.sigla],
+      );
+    } else if (item.estado) {
+      setEstadoFixo(item.estado.sigla);
+    } else {
+      navigate(`/candidatos/${item.candidato.id}`);
+    }
+
+    setPesquisa('');
+    setAtivo(0);
+    setBuscaAberta(false);
+  }
+
+  function aoDigitar(valor: string) {
+    setPesquisa(valor);
+    setAtivo(0);
+    setBuscaAberta(true);
+    setFiltrosAbertos(false);
+  }
+
+  function aoPressionarTecla(event: React.KeyboardEvent<HTMLInputElement>) {
+    if (event.key === 'ArrowDown') {
+      event.preventDefault();
+      setAtivo((a) => Math.min(a + 1, itens.length - 1));
+    } else if (event.key === 'ArrowUp') {
+      event.preventDefault();
+      setAtivo((a) => Math.max(a - 1, 0));
+    } else if (event.key === 'Enter') {
+      const item = itens[ativo];
+      if (item) escolher(item);
+    } else if (event.key === 'Escape') {
+      setBuscaAberta(false);
+    }
+  }
+
   return (
     <>
       <main className="min-h-screen w-full bg-[#FFA400] overflow-hidden">
@@ -376,7 +544,7 @@ export default function VisualizadorGeografico() {
         </div>
 
         <section className="min-h-screen w-full px-6 pb-10 pt-[155px] md:px-10 lg:px-[65px]">
-          <div className="mx-auto grid min-h-[calc(100vh-155px)] w-full max-w-[1600px] grid-cols-1 gap-8 lg:grid-cols-[280px_minmax(420px,1fr)_300px] items-start pt-8">
+          <div className="mx-auto grid min-h-[calc(100vh-155px)] w-full max-w-[1600px] grid-cols-1 gap-8 lg:grid-cols-[280px_minmax(420px,1fr)_360px] items-start pt-8">
             {/*ESQUERDA*/}
             <div className="flex flex-col justify-center gap-32">
               <div className="select-none">
@@ -415,18 +583,41 @@ export default function VisualizadorGeografico() {
             {/* DIREITA */}
             <div className="flex flex-col justify-center gap-7">
               <div className="relative w-full" ref={barraRef}>
-                <div className="flex h-[48px] items-center gap-3 rounded-full bg-[#FFFBF2] px-4 shadow-[0_8px_20px_rgba(0,0,0,0.12)]">
+                <div className="flex h-[52px] items-center gap-3 rounded-full bg-[#FFFBF2] px-5 shadow-[0_8px_20px_rgba(0,0,0,0.12)]">
                   <FiSearch size={20} className="shrink-0 text-[#888]" />
                   <input
                     type="text"
                     value={pesquisa}
-                    onChange={(e) => setPesquisa(e.target.value)}
-                    placeholder="Pesquisar..."
+                    onChange={(e) => aoDigitar(e.target.value)}
+                    onFocus={() => {
+                      setBuscaAberta(true);
+                      setFiltrosAbertos(false);
+                    }}
+                    onKeyDown={aoPressionarTecla}
+                    placeholder="Pesquisar estado, político ou partido..."
                     className="min-w-0 flex-1 bg-transparent text-[13px] outline-none placeholder:text-[#A0A0A0]"
                   />
+
+                  {pesquisa && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setPesquisa('');
+                        setAtivo(0);
+                      }}
+                      aria-label="Limpar pesquisa"
+                      className="shrink-0 text-[#888] transition-colors hover:text-[#2A2A72]"
+                    >
+                      <FiX size={18} />
+                    </button>
+                  )}
+
                   <button
                     type="button"
-                    onClick={() => setFiltrosAbertos((v) => !v)}
+                    onClick={() => {
+                      setFiltrosAbertos((v) => !v);
+                      setBuscaAberta(false);
+                    }}
                     aria-label="Filtros"
                     className="relative shrink-0 text-[#FFA400]"
                   >
@@ -437,19 +628,6 @@ export default function VisualizadorGeografico() {
                       </span>
                     )}
                   </button>
-
-                  {pesquisa && (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setPesquisa('');
-                        setEstadoHover(null);
-                      }}
-                      className="text-[12px] font-bold text-[#2A2A72]"
-                    >
-                      Limpar
-                    </button>
-                  )}
                 </div>
 
                 {filtrosAbertos && (
@@ -569,33 +747,91 @@ export default function VisualizadorGeografico() {
                   </div>
                 )}
 
-                {pesquisa && (
-                  <div className="mt-2 rounded-2xl bg-[#FFFBF2] p-3 shadow-lg">
-                    {estadoEncontrado ? (
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setEstadoFixo(estadoEncontrado.sigla);
-                          setPesquisa('');
-                        }}
-                        className="flex w-full items-center justify-between rounded-xl px-3 py-2 text-left transition-colors hover:bg-[#F1F1F1]"
-                      >
-                        <div>
-                          <p className="text-sm font-bold text-[#333]">
-                            {estadoEncontrado.nome}
-                          </p>
-                          <p className="text-xs text-[#777]">
-                            {estadoEncontrado.sigla}
-                          </p>
-                        </div>
-                        <span className="text-xs font-bold text-[#FFA400]">
-                          Ver estado
-                        </span>
-                      </button>
-                    ) : (
-                      <p className="px-3 py-2 text-sm text-[#777]">
-                        Nenhum estado encontrado.
+                {buscaAberta && pesquisa.trim() && !filtrosAbertos && (
+                  <div className="absolute left-0 right-0 top-full z-50 mt-2 max-h-[420px] overflow-y-auto rounded-2xl bg-[#FFFBF2] p-2 shadow-xl">
+                    {itens.length === 0 ? (
+                      <p className="px-3 py-3 text-sm text-[#777]">
+                        Nenhum resultado para “{pesquisa.trim()}”.
                       </p>
+                    ) : (
+                      itens.map((item, i) => (
+                        <div key={item.chave}>
+                          {(i === 0 || itens[i - 1].tipo !== item.tipo) && (
+                            <p className="px-3 pb-1 pt-2 text-[10px] font-extrabold uppercase tracking-wider text-[#999]">
+                              {TITULO_GRUPO[item.tipo]}
+                            </p>
+                          )}
+
+                          <button
+                            type="button"
+                            onClick={() => escolher(item)}
+                            onMouseEnter={() => setAtivo(i)}
+                            className={`flex w-full items-center gap-3 rounded-xl px-3 py-2 text-left transition-colors ${
+                              i === ativo ? 'bg-[#F1F1F1]' : ''
+                            }`}
+                          >
+                            {item.tipo === 'estado' && (
+                              <>
+                                <BandeiraEstado
+                                  sigla={item.estado.sigla}
+                                  className="h-[22px] w-[32px] shrink-0"
+                                />
+                                <div className="min-w-0 flex-1">
+                                  <p className="truncate text-sm font-bold text-[#333]">
+                                    {item.estado.nome}
+                                  </p>
+                                  <p className="text-xs text-[#777]">
+                                    {item.estado.sigla}
+                                  </p>
+                                </div>
+                                <span className="text-xs font-bold text-[#FFA400]">
+                                  Ver estado
+                                </span>
+                              </>
+                            )}
+
+                            {item.tipo === 'politico' && (
+                              <>
+                                <div className="min-w-0 flex-1">
+                                  <p className="truncate text-sm font-bold text-[#333]">
+                                    {item.candidato.nome_politico}
+                                  </p>
+                                  <p className="truncate text-xs text-[#777]">
+                                    {item.candidato.cargo_atual}
+                                    {item.candidato.partidos
+                                      ? ` · ${item.candidato.partidos.sigla}`
+                                      : ''}
+                                  </p>
+                                </div>
+                                <span className="shrink-0 text-xs font-bold text-[#FFA400]">
+                                  {item.estado
+                                    ? `Ver ${item.estado.sigla}`
+                                    : 'Ver perfil'}
+                                </span>
+                              </>
+                            )}
+
+                            {item.tipo === 'partido' && (
+                              <>
+                                <div className="min-w-0 flex-1">
+                                  <p className="truncate text-sm font-bold text-[#333]">
+                                    {item.sigla}
+                                  </p>
+                                  <p className="truncate text-xs text-[#777]">
+                                    {item.nome}
+                                    {item.governos > 0
+                                      ? ` · ${item.governos} ${item.governos === 1 ? 'governo' : 'governos'}`
+                                      : ''}
+                                  </p>
+                                </div>
+                                <span className="shrink-0 text-xs font-bold text-[#FFA400]">
+                                  Filtrar
+                                </span>
+                              </>
+                            )}
+                          </button>
+                        </div>
+                      ))
                     )}
                   </div>
                 )}
