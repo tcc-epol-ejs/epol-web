@@ -848,6 +848,10 @@ function SearchPol() {
         </div>
       </section>
     </div>
+
+        <Footer />
+      </section>
+    </>
   );
 }
 

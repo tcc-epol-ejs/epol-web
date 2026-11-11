@@ -10,6 +10,7 @@ import PipoTituloEleitor from '../../assets/Imagens/pipoTituloEleitor.png';
 import { GiStarFlag } from 'react-icons/gi';
 import { FaArrowRightLong, FaPeopleGroup } from 'react-icons/fa6';
 import { useNavigate } from 'react-router-dom';
+import Footer from '../../components/footer/footer';
 
 const cards = [
   {
@@ -288,6 +289,8 @@ export default function Main() {
             </div>
           </div>
         </div>
+
+        <Footer />
       </section>
     </>
   );
