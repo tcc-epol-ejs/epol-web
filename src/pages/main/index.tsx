@@ -26,6 +26,7 @@ const cards = [
   },
   {
     asset: SimuladorUrna,
+    path: '/simulador-urna',
     title: 'simulador de urna',
     text: 'Treine seu voto em uma simulação da urna eletrônica.',
   },
