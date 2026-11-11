@@ -7,12 +7,10 @@ import {
   FiSearch,
 } from 'react-icons/fi';
 import { FormEvent, useEffect, useLayoutEffect, useRef, useState } from 'react';
-import Header from '../../components/header';
-import { Candidato, listarCandidatos } from '../../services/api';
-import Footer from '../../components/footer/footer';
-import { IoMdAdd } from 'react-icons/io';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../contexts/AuthContext';
+import Header from '../../components/header';
+import { obterPaletaPartido } from '../../data/partidoPaletas';
+import { Candidato, listarCandidatos } from '../../services/api';
 
 const partidos = [
   {
@@ -21,8 +19,6 @@ const partidos = [
     sigla: 'AGIR',
     numero: '36',
     foto: '/logos/partidos/agir.svg',
-    cor: '#6a9dde',
-    borda: '#456691',
   },
   {
     keyword: 'avante',
@@ -30,8 +26,6 @@ const partidos = [
     sigla: 'AVANTE',
     numero: '70',
     foto: '/logos/partidos/avante.svg',
-    cor: '#f3854c',
-    borda: '#a65b34',
   },
   {
     keyword: 'cidadania',
@@ -39,8 +33,6 @@ const partidos = [
     sigla: 'CIDADANIA',
     numero: '23',
     foto: '/logos/partidos/cidadania.svg',
-    cor: '#ed0277',
-    borda: '#a00150',
   },
   {
     keyword: 'democracia crista',
@@ -48,17 +40,13 @@ const partidos = [
     sigla: 'DC',
     numero: '27',
     foto: '/logos/partidos/dc.svg',
-    cor: '#6161c0',
-    borda: '#3a3a73',
   },
   {
     keyword: 'democrata',
-    nome: 'DEMOCRATAS',
+    nome: 'DEMOCRATA',
     sigla: 'DEMOCRATA',
-    numero: '20',
+    numero: '35',
     foto: '/logos/partidos/democrata.svg',
-    cor: '#ddffad',
-    borda: '#9ab279',
   },
   {
     keyword: 'mdb',
@@ -66,8 +54,6 @@ const partidos = [
     sigla: 'MDB',
     numero: '15',
     foto: '/logos/partidos/mdb.svg',
-    cor: '#6bcf9b',
-    borda: '#438261',
   },
   {
     keyword: 'missao',
@@ -75,8 +61,6 @@ const partidos = [
     sigla: 'MISSÃO',
     numero: '14',
     foto: '/logos/partidos/missao.svg',
-    cor: '#fbc84b',
-    borda: '#ae8b34',
   },
   {
     keyword: 'mobiliza',
@@ -84,8 +68,6 @@ const partidos = [
     sigla: 'MOBILIZA',
     numero: '33',
     foto: '/logos/partidos/mobiliza.svg',
-    cor: '#ffffff',
-    borda: '#b2b2b2',
   },
   {
     keyword: 'novo',
@@ -93,8 +75,6 @@ const partidos = [
     sigla: 'NOVO',
     numero: '30',
     foto: '/logos/partidos/novo.svg',
-    cor: '#f1f1f1',
-    borda: '#a5a5a5',
   },
   {
     keyword: 'pcb',
@@ -102,8 +82,6 @@ const partidos = [
     sigla: 'PCB',
     numero: '21',
     foto: '/logos/partidos/pcb.svg',
-    cor: '#ff3434',
-    borda: '#b22424',
   },
   {
     keyword: 'pcdob',
@@ -111,8 +89,6 @@ const partidos = [
     sigla: 'PCdoB',
     numero: '65',
     foto: '/logos/partidos/pcdob.svg',
-    cor: '#da251c',
-    borda: '#8d1812',
   },
   {
     keyword: 'pco',
@@ -120,8 +96,6 @@ const partidos = [
     sigla: 'PCO',
     numero: '29',
     foto: '/logos/partidos/pco.svg',
-    cor: '#c90b1c',
-    borda: '#7c0611',
   },
   {
     keyword: 'pdt',
@@ -129,8 +103,6 @@ const partidos = [
     sigla: 'PDT',
     numero: '12',
     foto: '/logos/partidos/pdt.svg',
-    cor: '#27AE60',
-    borda: '#156135',
   },
   {
     keyword: 'pl',
@@ -138,8 +110,6 @@ const partidos = [
     sigla: 'PL',
     numero: '22',
     foto: '/logos/partidos/pl.svg',
-    cor: '#0075eb',
-    borda: '#004e9e',
   },
   {
     keyword: 'pode',
@@ -147,8 +117,6 @@ const partidos = [
     sigla: 'PODE',
     numero: '20',
     foto: '/logos/partidos/pode.svg',
-    cor: '#6fd571',
-    borda: '#478848',
   },
   {
     keyword: 'pp',
@@ -156,8 +124,6 @@ const partidos = [
     sigla: 'PP',
     numero: '11',
     foto: '/logos/partidos/pp.svg',
-    cor: '#a8d6ee',
-    borda: '#7191a1',
   },
   {
     keyword: 'prd',
@@ -165,8 +131,6 @@ const partidos = [
     sigla: 'PRD',
     numero: '25',
     foto: '/logos/partidos/prd.svg',
-    cor: '#d8c35a',
-    borda: '#8b7d3a',
   },
   {
     keyword: 'prtb',
@@ -174,8 +138,6 @@ const partidos = [
     sigla: 'PRTB',
     numero: '28',
     foto: '/logos/partidos/prtb.svg',
-    cor: '#7ebe6c',
-    borda: '#4b7140',
   },
   {
     keyword: 'psb',
@@ -183,8 +145,6 @@ const partidos = [
     sigla: 'PSB',
     numero: '40',
     foto: '/logos/partidos/psb.svg',
-    cor: '#e34450',
-    borda: '#962d35',
   },
   {
     keyword: 'psd',
@@ -192,8 +152,6 @@ const partidos = [
     sigla: 'PSD',
     numero: '55',
     foto: '/logos/partidos/psd.svg',
-    cor: '#386edc',
-    borda: '#24478f',
   },
   {
     keyword: 'psdb',
@@ -201,8 +159,6 @@ const partidos = [
     sigla: 'PSDB',
     numero: '45',
     foto: '/logos/partidos/psdb.svg',
-    cor: '#f3bb34',
-    borda: '#a68023',
   },
   {
     keyword: 'psol',
@@ -210,8 +166,6 @@ const partidos = [
     sigla: 'PSOL',
     numero: '50',
     foto: '/logos/partidos/psol.svg',
-    cor: '#953fb5',
-    borda: '#562468',
   },
   {
     keyword: 'pstu',
@@ -219,8 +173,6 @@ const partidos = [
     sigla: 'PSTU',
     numero: '16',
     foto: '/logos/partidos/pstu.svg',
-    cor: '#ff7979',
-    borda: '#b25454',
   },
   {
     keyword: 'pt',
@@ -228,8 +180,6 @@ const partidos = [
     sigla: 'PT',
     numero: '13',
     foto: '/logos/partidos/pt.svg',
-    cor: '#e4142c',
-    borda: '#970d1d',
   },
   {
     keyword: 'pv',
@@ -237,8 +187,6 @@ const partidos = [
     sigla: 'PV',
     numero: '43',
     foto: '/logos/partidos/pv.svg',
-    cor: '#299329',
-    borda: '#134613',
   },
   {
     keyword: 'rede',
@@ -246,8 +194,6 @@ const partidos = [
     sigla: 'REDE',
     numero: '18',
     foto: '/logos/partidos/rede.svg',
-    cor: '#63b9c2',
-    borda: '#3b7075',
   },
   {
     keyword: 'republicanos',
@@ -255,8 +201,6 @@ const partidos = [
     sigla: 'REPUBLICANOS',
     numero: '10',
     foto: '/logos/partidos/republicanos.svg',
-    cor: '#2D9CDB',
-    borda: '#17628D',
   },
   {
     keyword: 'solidariedade',
@@ -264,8 +208,6 @@ const partidos = [
     sigla: 'SOLIDARIEDADE',
     numero: '77',
     foto: '/logos/partidos/solidariedade.svg',
-    cor: '#f39963',
-    borda: '#a66843',
   },
   {
     keyword: 'uniao',
@@ -273,8 +215,6 @@ const partidos = [
     sigla: 'UNIÃO',
     numero: '44',
     foto: '/logos/partidos/uniao.svg',
-    cor: '#fbd64f',
-    borda: '#ae9436',
   },
   {
     keyword: 'up',
@@ -282,12 +222,11 @@ const partidos = [
     sigla: 'UP',
     numero: '80',
     foto: '/logos/partidos/up.svg',
-    cor: '#8a8a8a',
-    borda: '#494949',
   },
 ];
 
 function SearchPol() {
+  const navigate = useNavigate();
   const resultadosRef = useRef<HTMLDivElement>(null);
   const [search, setSearch] = useState('');
   const [searchedTerm, setSearchedTerm] = useState('');
@@ -307,8 +246,6 @@ function SearchPol() {
   const [candidatos, setCandidatos] = useState<Candidato[]>([]);
   const [candidatosLoading, setCandidatosLoading] = useState(true);
   const [candidatosError, setCandidatosError] = useState('');
-  const navigate = useNavigate();
-  const { usuario } = useAuth();
 
   useLayoutEffect(() => {
     resultadosRef.current?.scrollTo({ top: 0, behavior: 'auto' });
@@ -511,28 +448,31 @@ function SearchPol() {
   ]);
 
   return (
-    <>
-      <div className="w-full">
+    <div className="relative isolate flow-root min-h-screen overflow-hidden bg-[#eaf6ff] lg:h-dvh lg:min-h-0">
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 z-0 overflow-hidden"
+      >
+        <div className="absolute -left-10 top-8 h-28 w-28 rounded-full bg-[#FFA400]/25" />
+        <div className="absolute left-8 top-24 h-20 w-20 rounded-full bg-[#FFA400]/35" />
+        <div className="absolute left-[18%] top-[28%] h-24 w-24 rounded-full bg-[#FFA400]/20" />
+        <div className="absolute right-16 top-10 h-32 w-32 rounded-full bg-[#FFA400]/25" />
+        <div className="absolute right-8 top-32 h-24 w-24 rounded-full bg-[#FFA400]/35" />
+        <div className="absolute right-[-10px] top-[48%] h-20 w-20 rounded-full bg-[#FFA400]/25" />
+        <div className="absolute bottom-10 left-1/3 h-28 w-28 rounded-full bg-[#FFA400]/30" />
+        <div className="absolute bottom-0 left-[58%] h-40 w-40 rounded-full bg-[#FFA400]/25" />
+        <div className="absolute bottom-[-18px] right-12 h-52 w-52 rounded-full bg-[#FFA400]/25" />
+        <div className="absolute bottom-24 right-[28%] h-20 w-20 rounded-full bg-[#FFA400]/35" />
+        <div className="absolute bottom-24 left-[-14px] h-24 w-24 rounded-full bg-[#FFA400]/25" />
+        <div className="absolute left-[44%] top-[-10px] h-16 w-16 rounded-full bg-[#FFA400]/25" />
+      </div>
+
+      <div className="relative z-10 w-full">
         <Header isBgWhite disableScrollHide />
       </div>
 
-      <section className="relative isolate overflow-clip bg-transparent">
-        <div className="pointer-events-none absolute inset-0 -z-10">
-          <div className="absolute -left-10 top-8 h-28 w-28 rounded-full bg-[#FFA400]/25" />
-          <div className="absolute left-8 top-24 h-20 w-20 rounded-full bg-[#FFA400]/35" />
-          <div className="absolute left-[18%] top-[28%] h-24 w-24 rounded-full bg-[#FFA400]/20" />
-          <div className="absolute right-16 top-10 h-32 w-32 rounded-full bg-[#FFA400]/25" />
-          <div className="absolute right-8 top-32 h-24 w-24 rounded-full bg-[#FFA400]/35" />
-          <div className="absolute right-[-10px] top-[48%] h-20 w-20 rounded-full bg-[#FFA400]/25" />
-          <div className="absolute bottom-10 left-1/3 h-28 w-28 rounded-full bg-[#FFA400]/30" />
-          <div className="absolute bottom-0 left-[58%] h-40 w-40 rounded-full bg-[#FFA400]/25" />
-          <div className="absolute bottom-[-18px] right-12 h-52 w-52 rounded-full bg-[#FFA400]/25" />
-          <div className="absolute bottom-24 right-[28%] h-20 w-20 rounded-full bg-[#FFA400]/35" />
-          <div className="absolute bottom-24 left-[-14px] h-24 w-24 rounded-full bg-[#FFA400]/25" />
-          <div className="absolute left-[44%] top-[-10px] h-16 w-16 rounded-full bg-[#FFA400]/25" />
-        </div>
-
-        <div className="mx-auto flex min-h-[calc(100vh-64px)] w-full max-w-[1200px] flex-col px-6 pt-8 sm:px-10 sm:pt-10 lg:h-[calc(100vh-64px)] lg:flex-row lg:overflow-hidden lg:px-0">
+      <section className="relative z-10 isolate overflow-clip bg-transparent lg:h-[calc(100dvh-122px)]">
+        <div className="mx-auto flex w-full max-w-[1200px] flex-col px-6 pt-8 sm:px-10 sm:pt-10 lg:h-full lg:min-h-0 lg:flex-row lg:overflow-visible lg:px-0">
           <aside className="w-full self-start pb-8 lg:h-fit lg:w-1/4 lg:border-r-2 lg:border-[#2A2A72]/30 lg:pb-0 lg:pl-8 lg:pr-8">
             <h2 className="flex items-center gap-3 text-[18px] font-bold uppercase tracking-[0.12em] text-[#2A2A72]">
               <FiFilter aria-hidden="true" className="text-[22px]" />
@@ -661,7 +601,7 @@ function SearchPol() {
             </div>
           </aside>
 
-          <div className="flex w-full flex-col items-stretch gap-4 lg:min-h-0 lg:overflow-hidden lg:pl-10 lg:pr-4">
+          <div className="flex w-full flex-col items-stretch gap-4 lg:min-h-0 lg:overflow-visible lg:pl-10 lg:pr-4">
             <form
               onSubmit={handleSearch}
               className="flex w-full max-w-[760px] items-center gap-3"
@@ -690,22 +630,11 @@ function SearchPol() {
               >
                 <FiSearch aria-hidden="true" className="text-[22px]" />
               </button>
-
-              {usuario?.adm && (
-                <button
-                  onClick={() => navigate('/admin')}
-                  aria-label="Adicionar"
-                  title="Adicionar"
-                  className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-[#FFA400] text-white transition-transform hover:opacity-85"
-                >
-                  <IoMdAdd aria-hidden="true" className="text-[22px]" />
-                </button>
-              )}
             </form>
 
             <div
               ref={resultadosRef}
-              className="flex min-h-0 flex-1 flex-col gap-4 lg:overflow-y-auto lg:[scrollbar-width:none] lg:[&::-webkit-scrollbar]:hidden"
+              className="flex min-h-0 flex-1 flex-col gap-4 lg:-mr-14 lg:overflow-x-hidden lg:overflow-y-auto lg:pr-20 lg:[scrollbar-color:#2A2A72_#dbeafe] lg:[scrollbar-width:thin] lg:[&::-webkit-scrollbar]:w-2 lg:[&::-webkit-scrollbar-track]:bg-[#dbeafe] lg:[&::-webkit-scrollbar-thumb]:rounded-full lg:[&::-webkit-scrollbar-thumb]:bg-[#2A2A72]/60"
             >
               {filtroSelecionado !== 'candidatos' &&
                 !filtroCandidatoAtivo &&
@@ -744,38 +673,65 @@ function SearchPol() {
 
               {partidosOpen && (
                 <div className="grid w-full max-w-[960px] grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                  {results.map((party) => (
-                    <article
-                      key={party.keyword}
-                      className="flex min-h-[200px] w-full flex-col items-center gap-2 rounded-2xl border-2 p-3 text-center"
-                      style={{
-                        borderColor: party.borda,
-                        backgroundColor: party.cor,
-                      }}
-                    >
-                      <div className="flex h-28 w-full shrink-0 items-center justify-center rounded-xl bg-white/40 p-3">
-                        <img
-                          src={party.foto}
-                          alt={`Logo de ${party.nome}`}
-                          className="h-full w-full object-contain"
-                        />
-                      </div>
+                  {results.map((party) => {
+                    const paleta = obterPaletaPartido(party.sigla);
 
-                      <div className="flex w-full min-w-0 items-end justify-between gap-3 text-left">
-                        <div className="flex min-w-0 max-w-[75%] flex-col items-start">
-                          <h2 className="max-w-full text-[10px] font-bold uppercase opacity-60 tracking-[0.12em]">
-                            PARTIDO
-                          </h2>
-                          <p className="max-w-full break-words text-[15px] font-bold leading-tight tracking-[0.06em]">
-                            {party.nome}
+                    return (
+                      <button
+                        key={party.keyword}
+                        type="button"
+                        onClick={() =>
+                          navigate(
+                            `/pagina_partido?numero=${encodeURIComponent(party.numero)}`,
+                          )
+                        }
+                        aria-label={`Ver informações do partido ${party.nome}`}
+                        className="flex min-h-[200px] w-full flex-col items-center gap-2 rounded-2xl border-2 p-3 text-center transition-transform hover:-translate-y-1 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-[#2A2A72]"
+                        style={{
+                          borderColor: paleta.borda,
+                          backgroundColor: paleta.cor,
+                        }}
+                      >
+                        <div className="flex h-28 w-full shrink-0 items-center justify-center overflow-hidden rounded-xl bg-white/45 p-3">
+                          <img
+                            src={party.foto}
+                            alt={`Logo de ${party.nome}`}
+                            className={`h-full w-full object-contain ${
+                              party.sigla === 'AVANTE'
+                                ? 'scale-[1.25]'
+                                : party.sigla === 'CIDADANIA'
+                                  ? 'scale-[1.25]'
+                                  : party.sigla === 'DEMOCRATA'
+                                    ? 'scale-[1.60]'
+                                    : party.sigla === 'PCB'
+                                      ? 'scale-[1.30]'
+                                      : party.sigla === 'PL'
+                                        ? 'scale-[1.30]'
+                                        : party.sigla === 'PSOL'
+                                          ? 'scale-[1.25]'
+                                          : party.sigla === 'REPUBLICANOS'
+                                            ? 'scale-[2.05]'
+                                            : ''
+                            }`}
+                          />
+                        </div>
+
+                        <div className="flex w-full min-w-0 items-end justify-between gap-3 text-left">
+                          <div className="flex min-w-0 max-w-[75%] flex-col items-start">
+                            <h2 className="max-w-full text-[10px] font-bold uppercase opacity-60 tracking-[0.12em]">
+                              PARTIDO
+                            </h2>
+                            <p className="max-w-full break-words text-[15px] font-bold leading-tight tracking-[0.06em]">
+                              {party.nome}
+                            </p>
+                          </div>
+                          <p className="shrink-0 text-[20px] font-black leading-tight opacity-60 tracking-[0.06em]">
+                            {party.numero}
                           </p>
                         </div>
-                        <p className="shrink-0 text-[20px] font-black leading-tight opacity-60 tracking-[0.06em]">
-                          {party.numero}
-                        </p>
-                      </div>
-                    </article>
-                  ))}
+                      </button>
+                    );
+                  })}
                 </div>
               )}
 
@@ -856,7 +812,7 @@ function SearchPol() {
 
                           <div className="flex flex-1 flex-col p-4">
                             <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#2A2A72]/70">
-                              Candidato a{' '}
+                              Candidato(a) a{' '}
                               {candidate.candidatura?.toLowerCase() ||
                                 'cargo não informado'}
                             </p>
@@ -890,6 +846,8 @@ function SearchPol() {
             </div>
           </div>
         </div>
+      </section>
+    </div>
 
         <Footer />
       </section>

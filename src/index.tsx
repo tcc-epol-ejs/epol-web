@@ -9,6 +9,7 @@ import QuemSomos from './pages/quem_somos';
 import Main from './pages/main';
 import Admin from './pages/admin';
 import SearchPol from './pages/searchpol';
+import PaginaPartido from './pages/pagina_partido';
 
 function App() {
   return (
@@ -19,12 +20,12 @@ function App() {
         <Route path="/cadastro" element={<Cadastro />} />
         <Route path="/recuperar-senha" element={<RecuperarSenha />} />
         <Route path="/etitulo" element={<Etitulo />} />
-        <Route path="/match-politico" element={<MatchPolitico />} />
+        <Route path="/matchPolitico" element={<MatchPolitico />} />
         <Route path="/quem-somos" element={<QuemSomos />} />
         <Route path="/main" element={<Main />} />
         <Route path="/admin" element={<Admin />} />
         <Route path="/searchpol" element={<SearchPol />} />
-        <Route path="/main" element={<Main />} />
+        <Route path="/pagina_partido" element={<PaginaPartido />} />
       </Routes>
     </BrowserRouter>
   );
