@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import type { CSSProperties, ReactNode } from 'react';
 import { FiArrowLeft } from 'react-icons/fi';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import Header from '../../components/header';
 import { obterPaletaPartido } from '../../data/partidoPaletas';
 import {
@@ -121,9 +121,19 @@ function ListaInformacoes({
 
 function PaginaPartido() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [searchParams] = useSearchParams();
   const idSelecionado = searchParams.get('id');
   const numeroSelecionado = searchParams.get('numero');
+  const estadoNavegacao = location.state;
+  const voltarPara =
+    estadoNavegacao &&
+    typeof estadoNavegacao === 'object' &&
+    'voltarPara' in estadoNavegacao &&
+    typeof estadoNavegacao.voltarPara === 'string' &&
+    estadoNavegacao.voltarPara.startsWith('/pagina_politico?id=')
+      ? estadoNavegacao.voltarPara
+      : '/searchpol';
   const [partidos, setPartidos] = useState<Partido[]>([]);
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState('');
@@ -296,7 +306,7 @@ function PaginaPartido() {
       <main className="relative z-10 mx-auto flex min-h-0 w-full max-w-[1500px] flex-1 items-stretch gap-3 px-4 py-6 sm:gap-4 sm:px-6 lg:py-10">
         <button
           type="button"
-          onClick={() => navigate('/searchpol')}
+          onClick={() => navigate(voltarPara)}
           className="inline-flex shrink-0 self-start items-center gap-2 rounded-lg px-2 py-2 font-bold transition-colors hover:bg-[#2A2A72]/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2A2A72] sm:px-3"
           style={{ color: paleta.corTextoBotaoVoltar }}
         >
@@ -490,12 +500,12 @@ function PaginaPartido() {
                   className="mb-5 text-left text-xl font-black uppercase tracking-[0.08em] sm:text-2xl"
                   style={{ color: paleta.borda }}
                 >
-                  Candidatos do partido
+                  Filiados do partido
                 </h2>
 
                 {carregandoCandidatos ? (
                   <p className="text-sm font-medium text-[#68688e]">
-                    Carregando candidatos...
+                    Carregando filiados...
                   </p>
                 ) : erroCandidatos ? (
                   <p role="alert" className="text-sm font-medium text-red-700">
@@ -503,14 +513,26 @@ function PaginaPartido() {
                   </p>
                 ) : candidatos.length === 0 ? (
                   <p className="text-sm font-medium text-[#68688e]">
-                    Não há candidatos associados a este partido.
+                    Não há associados cadastrados para este partido.
                   </p>
                 ) : (
                   <div className="grid w-full max-w-[1400px] grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
                     {candidatos.map((candidato) => (
-                      <article
+                      <button
                         key={candidato.id}
-                        className="flex min-h-[240px] flex-col overflow-hidden rounded-2xl border-2 bg-white text-[#333333]"
+                        type="button"
+                        onClick={() =>
+                          navigate(
+                            `/pagina_politico?id=${encodeURIComponent(candidato.id)}`,
+                            {
+                              state: {
+                                voltarPara: `/pagina_partido?id=${encodeURIComponent(partido.id)}`,
+                              },
+                            },
+                          )
+                        }
+                        aria-label={`Ver informações de ${candidato.nome_politico || candidato.nome_completo}`}
+                        className="flex min-h-[240px] flex-col overflow-hidden rounded-2xl border-2 bg-white text-left text-[#333333] transition-transform hover:-translate-y-1 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-[#2A2A72]"
                         style={{ borderColor: paleta.borda }}
                       >
                         <div
@@ -537,7 +559,7 @@ function PaginaPartido() {
                             {candidato.nome_politico || candidato.nome_completo}
                           </h3>
                         </div>
-                      </article>
+                      </button>
                     ))}
                   </div>
                 )}

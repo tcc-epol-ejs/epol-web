@@ -45,7 +45,7 @@ const paletasPorSigla: Record<string, PaletaPartido> = {
     corFundoTela: '#ececf7',
     corFundoCabecalho: '#6a8faa',
     corTextoCabecalho: '#ffffff',
-    corTextoBotaoVoltar: '#3a3a73',
+    corTextoBotaoVoltar: '#6a8faa',
   },
   DEMOCRATA: {
     cor: '#103d80',
@@ -72,7 +72,7 @@ const paletasPorSigla: Record<string, PaletaPartido> = {
     corFundoTela: '#fff8e9',
     corFundoCabecalho: '#000000',
     corTextoCabecalho: '#ffffff',
-    corTextoBotaoVoltar: '#ae8319',
+    corTextoBotaoVoltar: '#000000',
   },
   MOBILIZA: {
     cor: '#ffffff',
