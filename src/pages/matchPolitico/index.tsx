@@ -511,7 +511,7 @@ function StatusScreen({
   acao?: { label: string; onClick: () => void };
 }) {
   return (
-    <div className="relative w-full h-full min-h-[640px] bg-[#2E2A6B] overflow-hidden flex items-center justify-center px-4 py-8">
+    <div className="relative w-full h-full min-h-[640px] bg-[#2E2A6B] overflow-hidden flex items-center justify-center px-4 pt-28 pb-8">
       <Blobs />
       <div className="relative z-10 bg-white rounded-[28px] p-9 w-full max-w-[420px] shadow-[0_30px_60px_rgba(15,12,60,0.35)] text-center">
         <Pipo mood={acao ? 'sad' : 'neutral'} size={90} />
@@ -543,7 +543,7 @@ interface IntroScreenProps {
 
 function IntroScreen({ onStart }: IntroScreenProps) {
   return (
-    <div className="relative w-full h-full min-h-[640px] bg-[#2E2A6B] overflow-hidden flex items-center justify-center px-4 py-8">
+    <div className="relative w-full h-full min-h-[640px] bg-[#2E2A6B] overflow-hidden flex items-center justify-center px-4 pt-28 pb-8">
       <Blobs />
       <div className="relative z-10 bg-white rounded-[28px] p-7 sm:p-9 w-full max-w-[560px] shadow-[0_30px_60px_rgba(15,12,60,0.35)] text-center">
         <h1 className="[font-family:'Sora',sans-serif] font-extrabold text-[24px] sm:text-[28px] text-[#1B1B3A] mt-4 mb-2">
@@ -805,7 +805,7 @@ function QuizScreen({ perguntas, onAnswer, onFinish }: QuizScreenProps) {
   }
 
   return (
-    <div className="relative w-full h-full min-h-[640px] bg-[#2E2A6B] overflow-hidden flex items-center justify-center px-4 py-8">
+    <div className="relative w-full h-full min-h-[640px] bg-[#2E2A6B] overflow-hidden flex items-center justify-center px-4 pt-28 pb-8">
       <Blobs tint={tint} />
       <div className="relative z-10 bg-white rounded-[28px] p-7 min-h-[394px] w-full max-w-[620px] shadow-[0_30px_60px_rgba(15,12,60,0.35)]">
         <nav
@@ -1519,7 +1519,7 @@ function ResultScreen({ ranking, respostas, onRestart }: ResultScreenProps) {
   }
 
   return (
-    <div className="relative w-full h-full min-h-[640px] bg-[#2E2A6B] overflow-hidden flex items-center justify-center px-4 py-8">
+    <div className="relative w-full h-full min-h-[640px] bg-[#2E2A6B] overflow-hidden flex items-center justify-center px-4 pt-28 pb-8">
       <Blobs />
       <div
         className={`relative z-10 bg-white rounded-[28px] p-7 min-h-[394px] w-full max-w-[680px] shadow-[0_30px_60px_rgba(15,12,60,0.35)] transition-all duration-[400ms] ease-[cubic-bezier(0.2,0.8,0.2,1)] ${

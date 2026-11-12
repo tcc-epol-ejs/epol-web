@@ -19,10 +19,9 @@ interface NavItem {
 const NAV_ITEMS: NavItem[] = [
   { label: 'Página Inicial', path: '/main' },
   { label: 'SearchPol', path: '/searchpol' },
-  { label: 'Visualizador', path: '/visualizador' },
-  { label: 'Match', path: '/match' },
-  { label: 'Título de Eleitor', path: '/titulo-de-eleitor' },
-  { label: 'Simulador de Urna', path: '/simulador-urna' },
+  { label: 'Match Político', path: '/match' },
+  { label: 'Urna', path: '/simulador-urna' },
+  { label: 'Visualizador Geográfico', path: '/visualizador' },
 ];
 
 export default function Header({
