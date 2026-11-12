@@ -22,6 +22,7 @@ const NAV_ITEMS: NavItem[] = [
   { label: 'Match Político', path: '/match' },
   { label: 'Urna', path: '/simulador-urna' },
   { label: 'Visualizador Geográfico', path: '/visualizador' },
+  { label: 'Quem Somos?', path: '/quem-somos' },
 ];
 
 export default function Header({
