@@ -10,6 +10,7 @@ import Main from './pages/main';
 import Admin from './pages/admin';
 import Perfil from './pages/perfil';
 import SearchPol from './pages/searchpol';
+import SimuladorUrna from './pages/simulador-urna';
 import PaginaPartido from './pages/pagina_partido';
 import PaginaPolitico from './pages/pagina_politico';
 
@@ -28,6 +29,8 @@ function App() {
         <Route path="/admin" element={<Admin />} />
         <Route path="/perfil" element={<Perfil />} />
         <Route path="/searchpol" element={<SearchPol />} />
+        <Route path="/main" element={<Main />} />
+        <Route path="/simulador-urna" element={<SimuladorUrna />} />
         <Route path="/pagina_partido" element={<PaginaPartido />} />
         <Route path="/pagina_politico" element={<PaginaPolitico />} />
       </Routes>
