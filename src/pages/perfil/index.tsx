@@ -1,5 +1,14 @@
 import { useEffect, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import {
+  atualizarPerfil,
+  excluirConta,
+  listarFavoritos,
+  desfavoritarPartido,
+  desfavoritarCandidato,
+  type FavoritoPartido,
+  type FavoritoCandidato,
+} from '../../services/api';
 import {
   FiCamera,
   FiChevronLeft,
@@ -13,7 +22,6 @@ import {
 } from 'react-icons/fi';
 import Header from '../../components/header';
 import { useAuth } from '../../contexts/AuthContext';
-import { atualizarPerfil, excluirConta } from '../../services/api';
 import {
   uploadFotoPerfil,
   FOTO_MAX_BYTES,
@@ -210,93 +218,6 @@ function Perfil() {
     return `${dia}/${mes}/${ano}`;
   }
 
-  // Dados de teste — quando a página individual de partidos/candidatos existir,
-  // isso passa a vir da tabela de favoritos do usuário, com foto/bandeira reais.
-  interface PartidoFavorito {
-    id: string;
-    sigla: string;
-    nome: string;
-    cor: string;
-  }
-  interface CandidatoFavorito {
-    id: string;
-    nome: string;
-    cargo: string;
-    partido: string;
-  }
-
-  const PARTIDOS_TESTE: PartidoFavorito[] = [
-    { id: 'p1', sigla: 'REDE', nome: 'Rede Sustentabilidade', cor: '#3FA796' },
-    {
-      id: 'p2',
-      sigla: 'PSOL',
-      nome: 'Partido Socialismo e Liberdade',
-      cor: '#B3282D',
-    },
-    { id: 'p3', sigla: 'NOVO', nome: 'Partido Novo', cor: '#FF6600' },
-  ];
-
-  const CANDIDATOS_TESTE: CandidatoFavorito[] = [
-    {
-      id: 'c1',
-      nome: 'Marina Alcântara',
-      cargo: 'Deputada Federal',
-      partido: 'REDE',
-    },
-    { id: 'c2', nome: 'Thiago Bezerra', cargo: 'Senador', partido: 'PSOL' },
-    {
-      id: 'c3',
-      nome: 'Renata Fontoura',
-      cargo: 'Governadora',
-      partido: 'PSDB',
-    },
-    {
-      id: 'c4',
-      nome: 'Bruno Kowalski',
-      cargo: 'Deputado Estadual',
-      partido: 'NOVO',
-    },
-    { id: 'c5', nome: 'Thiago Bezerra', cargo: 'Senador', partido: 'PSOL' },
-    {
-      id: 'c6',
-      nome: 'Renata Fontoura',
-      cargo: 'Governadora',
-      partido: 'PSDB',
-    },
-    {
-      id: 'c7',
-      nome: 'Bruno Kowalski',
-      cargo: 'Deputado Estadual',
-      partido: 'NOVO',
-    },
-    { id: 'c8', nome: 'Thiago Bezerra', cargo: 'Senador', partido: 'PSOL' },
-    {
-      id: 'c9',
-      nome: 'Renata Fontoura',
-      cargo: 'Governadora',
-      partido: 'PSDB',
-    },
-    {
-      id: 'c10',
-      nome: 'Bruno Kowalski',
-      cargo: 'Deputado Estadual',
-      partido: 'NOVO',
-    },
-    { id: 'c11', nome: 'Thiago Bezerra', cargo: 'Senador', partido: 'PSOL' },
-    {
-      id: 'c12',
-      nome: 'Renata Fontoura',
-      cargo: 'Governadora',
-      partido: 'PSDB',
-    },
-    {
-      id: 'c13',
-      nome: 'Bruno Kowalski',
-      cargo: 'Deputado Estadual',
-      partido: 'NOVO',
-    },
-  ];
-
   // -----------------------------------------------------------------------------
   // ESTADO DA TELA
   // -----------------------------------------------------------------------------
@@ -337,7 +258,6 @@ function Perfil() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [usuario]);
 
-  const [aba, setAba] = useState<'dados' | 'preferencias'>('dados');
   const [editando, setEditando] = useState(false);
   const [rascunho, setRascunho] = useState<PerfilForm>(form);
   const [salvo, setSalvo] = useState(false);
@@ -349,9 +269,45 @@ function Perfil() {
   const [confirmSenhaExclusao, setConfirmSenhaExclusao] = useState('');
   const [erroExclusao, setErroExclusao] = useState<string | null>(null);
   const [enviandoExclusao, setEnviandoExclusao] = useState(false);
+  const [searchParams] = useSearchParams();
+  const [aba, setAba] = useState<'dados' | 'preferencias'>(
+    searchParams.get('aba') === 'preferencias' ? 'preferencias' : 'dados',
+  );
 
-  const [partidos, setPartidos] = useState(PARTIDOS_TESTE);
-  const [candidatos, setCandidatos] = useState(CANDIDATOS_TESTE);
+  const [partidos, setPartidos] = useState<FavoritoPartido[]>([]);
+  const [candidatos, setCandidatos] = useState<FavoritoCandidato[]>([]);
+  const [carregandoFav, setCarregandoFav] = useState(true);
+  const [erroFav, setErroFav] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!token) {
+      setCarregandoFav(false);
+      return;
+    }
+    let ativo = true;
+    setCarregandoFav(true);
+    setErroFav(null);
+
+    listarFavoritos(token)
+      .then((r) => {
+        if (!ativo) return;
+        setPartidos(r.partidos);
+        setCandidatos(r.candidatos);
+      })
+      .catch((err: any) => {
+        if (ativo)
+          setErroFav(
+            err.message || 'Não foi possível carregar seus favoritos.',
+          );
+      })
+      .finally(() => {
+        if (ativo) setCarregandoFav(false);
+      });
+
+    return () => {
+      ativo = false;
+    };
+  }, [token]);
 
   function atualizarCampo<K extends keyof PerfilForm>(
     campo: K,
@@ -383,6 +339,30 @@ function Perfil() {
     setEditando(false);
     setSalvo(true);
     setTimeout(() => setSalvo(false), 2400);
+  }
+
+  async function removerPartido(id: string) {
+    if (!token) return;
+    const anterior = partidos;
+    setPartidos((cur) => cur.filter((x) => x.id !== id));
+    try {
+      await desfavoritarPartido(token, id);
+    } catch (err: any) {
+      setPartidos(anterior);
+      setErroFav(err.message || 'Não foi possível remover o partido.');
+    }
+  }
+
+  async function removerCandidato(id: string) {
+    if (!token) return;
+    const anterior = candidatos;
+    setCandidatos((cur) => cur.filter((x) => x.id !== id));
+    try {
+      await desfavoritarCandidato(token, id);
+    } catch (err: any) {
+      setCandidatos(anterior);
+      setErroFav(err.message || 'Não foi possível remover o candidato.');
+    }
   }
 
   async function enviarFoto(arquivo: File) {
@@ -590,64 +570,68 @@ function Perfil() {
                   </button>
                 </div>
               </div>
-            ) : (
-              <div className="flex flex-col gap-8">
-                <section>
-                  <h2 className="text-sm text-[#B6AEE8] mb-4">
-                    Partido preferido
-                  </h2>
-                  {partidos.length === 0 ? (
-                    <EstadoVazio texto="Você ainda não favoritou nenhum partido." />
-                  ) : (
-                    <CarrosselAvatares
-                      itens={partidos.map((p) => ({
-                        id: p.id,
-                        legenda: p.sigla,
-                        cor: p.cor,
-                        rotulo: p.sigla.slice(0, 3),
-                      }))}
-                      // TODO: confirmar a rota real da página individual do partido.
-                      aoClicar={(id) => navigate(`/partido/${id}`)}
-                      aoRemover={(id) =>
-                        setPartidos((cur) => cur.filter((x) => x.id !== id))
-                      }
-                    />
-                  )}
-                </section>
-
-                <section>
-                  <h2 className="text-sm text-[#B6AEE8] mb-4">
-                    Candidatos favoritos
-                  </h2>
-                  {candidatos.length === 0 ? (
-                    <EstadoVazio texto="Você ainda não favoritou nenhum candidato." />
-                  ) : (
-                    <CarrosselAvatares
-                      itens={candidatos.map((c) => ({
+           ) : (
+            <div className="flex flex-col gap-8">
+              {erroFav && <p className="text-xs text-[#F2A0A0]">{erroFav}</p>}
+          
+              <section>
+                <h2 className="text-sm text-[#B6AEE8] mb-4">Partidos favoritos</h2>
+                {carregandoFav ? (
+                  <p className="text-sm text-[#8A82C4]">Carregando...</p>
+                ) : partidos.length === 0 ? (
+                  <EstadoVazio texto="Você ainda não favoritou nenhum partido." />
+                ) : (
+                  <CarrosselAvatares
+                    itens={partidos.map((p) => ({
+                      id: p.id,
+                      legenda: p.sigla,
+                      rotulo: p.sigla.slice(0, 3),
+                      foto: p.bandeira_url,
+                      cor: '#FFFFFF',
+                      ajuste: 'contain',
+                    }))}
+                    aoClicar={(id) =>
+                      navigate(`/pagina_partido?id=${encodeURIComponent(id)}`, {
+                        state: { voltarPara: '/perfil?aba=preferencias' },
+                      })
+                    }
+                    aoRemover={removerPartido}
+                  />
+                )}
+              </section>
+          
+              <section>
+                <h2 className="text-sm text-[#B6AEE8] mb-4">Candidatos favoritos</h2>
+                {carregandoFav ? (
+                  <p className="text-sm text-[#8A82C4]">Carregando...</p>
+                ) : candidatos.length === 0 ? (
+                  <EstadoVazio texto="Você ainda não favoritou nenhum candidato." />
+                ) : (
+                  <CarrosselAvatares
+                    itens={candidatos.map((c) => {
+                      const nome = c.nome_politico || c.nome_completo;
+                      return {
                         id: c.id,
-                        legenda: c.nome,
-                        rotulo: c.nome
+                        legenda: nome,
+                        rotulo: nome
                           .split(' ')
                           .map((p) => p[0])
                           .slice(0, 2)
                           .join(''),
-                      }))}
-                      // TODO: confirmar a rota real da página individual do candidato.
-                      aoClicar={(id) => navigate(`/candidato/${id}`)}
-                      aoRemover={(id) =>
-                        setCandidatos((cur) => cur.filter((x) => x.id !== id))
-                      }
-                    />
-                  )}
-                </section>
-
-                <p className="text-xs text-[#8A82C4] leading-relaxed">
-                  Esses dados são de teste. Quando os partidos e candidatos
-                  estiverem conectados à API, a foto/bandeira real de cada um
-                  aparece aqui, e o clique leva para a página individual deles.
-                </p>
-              </div>
-            )}
+                        foto: c.foto_url,
+                      };
+                    })}
+                    aoClicar={(id) =>
+                      navigate(`/pagina_politico?id=${encodeURIComponent(id)}`, {
+                        state: { voltarPara: '/perfil?aba=preferencias' },
+                      })
+                    }
+                    aoRemover={removerCandidato}
+                  />
+                )}
+              </section>
+            </div>
+          )}
           </div>
 
           {/* ZONA DE CONFIGURAÇÕES — última opção da página */}
@@ -911,6 +895,7 @@ interface ItemCarrossel {
   rotulo: string;
   cor?: string;
   foto?: string | null;
+  ajuste?: 'cover' | 'contain';
 }
 
 function CarrosselAvatares({
@@ -981,10 +966,14 @@ function CarrosselAvatares({
               >
                 {item.foto ? (
                   <img
-                    src={item.foto}
-                    alt={item.legenda}
-                    className="w-full h-full object-cover"
-                  />
+                  src={item.foto}
+                  alt={item.legenda}
+                  className={
+                    item.ajuste === 'contain'
+                      ? 'w-full h-full object-contain p-1.5'
+                      : 'w-full h-full object-cover object-[center_20%]'
+                  }
+                />
                 ) : (
                   item.rotulo
                 )}

@@ -3,6 +3,8 @@ import { FiArrowLeft, FiArrowRight } from 'react-icons/fi';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import Header from '../../components/header';
 import { buscarCandidato, type Candidato } from '../../services/api';
+import BotaoFavorito from '../../components/botoes/botaoFavorito/index';
+import { useFavorito } from '../../hooks/useFavorito';
 
 function Campo({
   titulo,
@@ -59,6 +61,10 @@ function PaginaPolitico() {
       ? estadoNavegacao.voltarPara
       : '/searchpol';
   const [candidato, setCandidato] = useState<Candidato | null>(null);
+  const { favorito, salvando, alternar } = useFavorito(
+    'candidato',
+    candidato?.id,
+  );
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState('');
   const [secaoAtiva, setSecaoAtiva] = useState<'sobre' | 'trajetoria'>('sobre');
@@ -185,9 +191,17 @@ function PaginaPolitico() {
                   )}
                 </div>
                 <div className="flex min-w-0 flex-1 flex-col justify-center gap-4 border-t-[6px] border-[#FFA400] p-6 sm:border-l-[6px] sm:border-t-0 sm:p-8">
-                  <h1 className="break-words text-3xl font-black uppercase leading-tight sm:text-4xl">
-                    {candidato.nome_completo}
-                  </h1>
+                  <div className="flex items-start justify-between gap-3">
+                    <h1 className="break-words text-3xl font-black uppercase leading-tight sm:text-4xl">
+                      {candidato.nome_completo}
+                    </h1>
+                    <BotaoFavorito
+                      favorito={favorito}
+                      salvando={salvando}
+                      nome={candidato.nome_politico || candidato.nome_completo}
+                      onClick={alternar}
+                    />
+                  </div>
                   <p className="text-base font-bold">
                     {candidato.concorrentes
                       ? candidato.candidatura === 'Governadora'

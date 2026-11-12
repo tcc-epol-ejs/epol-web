@@ -197,6 +197,59 @@ export const excluirCandidato = (id: string) =>
     method: 'DELETE',
   });
 
+// ---------- FAVORITOS ----------
+
+export type FavoritoPartido = Pick<
+  Partido,
+  'id' | 'nome_completo' | 'sigla' | 'bandeira_url'
+>;
+
+export interface FavoritoCandidato {
+  id: string;
+  nome_completo: string;
+  nome_politico: string;
+  foto_url: string | null;
+  cargo_atual: string;
+  partidos: { id: string; sigla: string } | null;
+}
+
+const auth = (token: string) => ({ Authorization: `Bearer ${token}` });
+
+export const listarFavoritos = (token: string) =>
+  request<{ partidos: FavoritoPartido[]; candidatos: FavoritoCandidato[] }>(
+    '/api/favoritos',
+    { headers: auth(token) },
+  );
+
+export const listarIdsFavoritos = (token: string) =>
+  request<{ partidos: string[]; candidatos: string[] }>('/api/favoritos/ids', {
+    headers: auth(token),
+  });
+
+export const favoritarPartido = (token: string, id: string) =>
+  request<{ favorito: boolean }>(`/api/favoritos/partidos/${id}`, {
+    method: 'PUT',
+    headers: auth(token),
+  });
+
+export const desfavoritarPartido = (token: string, id: string) =>
+  request<{ favorito: boolean }>(`/api/favoritos/partidos/${id}`, {
+    method: 'DELETE',
+    headers: auth(token),
+  });
+
+export const favoritarCandidato = (token: string, id: string) =>
+  request<{ favorito: boolean }>(`/api/favoritos/candidatos/${id}`, {
+    method: 'PUT',
+    headers: auth(token),
+  });
+
+export const desfavoritarCandidato = (token: string, id: string) =>
+  request<{ favorito: boolean }>(`/api/favoritos/candidatos/${id}`, {
+    method: 'DELETE',
+    headers: auth(token),
+  });
+
 // ---------- PERGUNTAS ----------
 
 // Por padrão o backend já filtra ativa = true. Passe { todas: true } pra
@@ -261,7 +314,6 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   if (!res.ok) throw new Error(data?.erro || 'Erro na requisição');
   return data as T;
 }
-
 
 export const excluirConta = (token: string, senha: string) =>
   request<{ mensagem: string }>('/api/auth/conta', {
