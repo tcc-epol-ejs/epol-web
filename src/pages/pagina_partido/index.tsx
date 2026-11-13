@@ -4,6 +4,8 @@ import { FiArrowLeft } from 'react-icons/fi';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import Header from '../../components/header';
 import { obterPaletaPartido } from '../../data/partidoPaletas';
+import BotaoFavorito from '../../components/botoes/botaoFavorito/index';
+import { useFavorito } from '../../hooks/useFavorito';
 import {
   listarCandidatos,
   listarPartidos,
@@ -126,12 +128,15 @@ function PaginaPartido() {
   const idSelecionado = searchParams.get('id');
   const numeroSelecionado = searchParams.get('numero');
   const estadoNavegacao = location.state;
+  const ORIGENS_VALIDAS = ['/pagina_politico?id=', '/perfil'];
   const voltarPara =
     estadoNavegacao &&
     typeof estadoNavegacao === 'object' &&
     'voltarPara' in estadoNavegacao &&
     typeof estadoNavegacao.voltarPara === 'string' &&
-    estadoNavegacao.voltarPara.startsWith('/pagina_politico?id=')
+    ORIGENS_VALIDAS.some((origem) =>
+      (estadoNavegacao.voltarPara as string).startsWith(origem),
+    )
       ? estadoNavegacao.voltarPara
       : '/searchpol';
   const [partidos, setPartidos] = useState<Partido[]>([]);
@@ -167,6 +172,7 @@ function PaginaPartido() {
     partido?.nome_completo ?? '',
   );
   const corBarraRolagem = paleta.corBarraRolagem;
+  const { favorito, salvando, alternar } = useFavorito('partido', partido?.id);
 
   useEffect(() => {
     if (!partido) return;
@@ -384,9 +390,17 @@ function PaginaPartido() {
                     }}
                   >
                     <div>
-                      <h1 className="text-2xl font-black uppercase leading-tight sm:text-4xl">
-                        {partido.nome_completo}
-                      </h1>
+                      <div className="flex items-center gap-2">
+                        <h1 className="text-2xl font-black uppercase leading-tight sm:text-4xl">
+                          {partido.nome_completo}
+                        </h1>
+                        <BotaoFavorito
+                          favorito={favorito}
+                          salvando={salvando}
+                          nome={partido.sigla}
+                          onClick={alternar}
+                        />
+                      </div>
                       <p className="mt-1 text-sm font-bold uppercase tracking-[0.14em] opacity-70">
                         SIGLA: {partido.sigla}
                       </p>

@@ -19,10 +19,10 @@ interface NavItem {
 const NAV_ITEMS: NavItem[] = [
   { label: 'Página Inicial', path: '/main' },
   { label: 'SearchPol', path: '/searchpol' },
-  { label: 'Visualizador', path: '/visualizador' },
-  { label: 'Match', path: '/match' },
-  { label: 'Título de Eleitor', path: '/titulo-de-eleitor' },
-  { label: 'Simulador de Urna', path: '/simulador-urna' },
+  { label: 'Match Político', path: '/match' },
+  { label: 'Urna', path: '/simulador-urna' },
+  { label: 'Visualizador Geográfico', path: '/visualizador' },
+  { label: 'Quem Somos?', path: '/quem-somos' },
 ];
 
 export default function Header({
@@ -38,11 +38,6 @@ export default function Header({
   const { usuario, carregando, logout } = useAuth();
 
   const HEADER_REVEAL_THRESHOLD = 20; // distância do topo (em px) pra reaparecer
-
-  function handleSair() {
-    logout();
-    navigate('/');
-  }
 
   useEffect(() => {
     if (disableScrollHide) {
@@ -106,7 +101,7 @@ export default function Header({
         <div className="w-[160px] h-[45px]" />
       ) : usuario ? (
         <button
-          onClick={handleSair}
+          onClick={() => navigate('/perfil')}
           className={`flex items-center gap-2.5 pr-2 pl-1.5 py-1.5 rounded-full ${isBgWhite ? 'hover:bg-[#383899]' : 'hover:bg-[#FFF6E8]'}  transition-colors border-none outline-none`}
         >
           <span
@@ -114,10 +109,18 @@ export default function Header({
           >
             {nomeExibido}
           </span>
-          <div className="w-[40px] h-[40px] rounded-full bg-[#FFA400] flex items-center justify-center shrink-0">
-            <span className="text-white font-bold text-[16px]">
-              {nomeExibido.charAt(0).toUpperCase()}
-            </span>
+          <div className="w-[40px] h-[40px] rounded-full bg-[#FFA400] border-[2px] border-[#FFA400] flex items-center justify-center shrink-0 overflow-hidden">
+            {usuario.foto_perfil_url ? (
+              <img
+                src={usuario.foto_perfil_url}
+                alt="Foto de perfil"
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <span className="text-white font-bold text-[16px]">
+                {nomeExibido.charAt(0).toUpperCase()}
+              </span>
+            )}
           </div>
         </button>
       ) : (
