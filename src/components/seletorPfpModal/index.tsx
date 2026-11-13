@@ -91,75 +91,77 @@ export default function SeletorPfpModal({
         role="dialog"
         aria-modal="true"
         aria-label="Escolher foto de perfil"
-        className="relative w-full max-w-md rounded-[32px] bg-white p-6 sm:p-7 text-[#2d2d6b] shadow-[0_35px_60px_-15px_rgba(0,0,0,0.45)] max-h-[85vh] overflow-y-auto"
+        className="relative w-full max-w-md rounded-[32px] bg-white text-[#2d2d6b] shadow-[0_35px_60px_-15px_rgba(0,0,0,0.45)] overflow-hidden"
       >
         <button
           type="button"
           onClick={onFechar}
           aria-label="Fechar"
-          className="absolute top-5 right-5 text-[#8b87a3] hover:text-[#2d2d6b] transition"
+          className="absolute top-5 right-5 z-10 text-[#8b87a3] hover:text-[#2d2d6b] transition"
         >
           <FiX size={20} />
         </button>
 
-        <h2 className="[font-family:'Montserrat',sans-serif] font-bold text-[19px] mb-1">
-          Escolha sua foto
-        </h2>
-        <p className="text-sm text-[#5b5776] mb-5 leading-relaxed">
-          Selecione uma imagem do Pipo ou envie uma foto sua.
-        </p>
+        <div className="scroll-fino max-h-[85vh] overflow-y-auto p-6 sm:p-7 my-4">
+          <h2 className="[font-family:'Montserrat',sans-serif] font-bold text-[19px] mb-1">
+            Escolha sua foto
+          </h2>
+          <p className="text-sm text-[#5b5776] mb-5 leading-relaxed">
+            Selecione uma imagem do Pipo ou envie uma foto sua.
+          </p>
 
-        {MASCOTES.length === 0 ? (
-          <div className="border border-dashed border-[#E4E0F7] rounded-2xl px-4 py-6 text-sm text-[#8b87a3] text-center">
-            Ainda não há imagens do mascote disponíveis.
+          {MASCOTES.length === 0 ? (
+            <div className="border border-dashed border-[#E4E0F7] rounded-2xl px-4 py-6 text-sm text-[#8b87a3] text-center">
+              Ainda não há imagens do mascote disponíveis.
+            </div>
+          ) : (
+            <div className="grid grid-cols-3 gap-4 justify-items-center">
+              {MASCOTES.map((mascote) => (
+                <button
+                  key={mascote.url}
+                  type="button"
+                  onClick={() => escolherMascote(mascote)}
+                  disabled={carregando !== null}
+                  aria-label={`Usar ${mascote.nome}`}
+                  className={`w-20 h-20 rounded-full overflow-hidden bg-[#F7F5FF] border-2 border-[#E4E0F7] hover:border-[#FFA400] transition disabled:cursor-wait ${
+                    carregando === mascote.url ? 'opacity-50' : ''
+                  }`}
+                >
+                  <img
+                    src={mascote.url}
+                    alt=""
+                    className="w-full h-full object-cover"
+                  />
+                </button>
+              ))}
+            </div>
+          )}
+
+          {erro && <p className="mt-4 text-xs text-[#C0392B]">{erro}</p>}
+
+          <div className="mt-6 pt-5 border-t border-[#E4E0F7] flex flex-col items-center gap-2">
+            <button
+              type="button"
+              onClick={() => inputRef.current?.click()}
+              disabled={carregando !== null}
+              className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#FFA400] text-[#2E2A6B] text-sm font-semibold hover:brightness-105 transition disabled:opacity-60"
+            >
+              <FiUpload size={14} strokeWidth={2.5} />
+              Enviar uma foto minha
+            </button>
+            <span className="text-[11px] text-[#8b87a3]">
+              JPG, PNG ou WEBP, até 2 MB
+            </span>
           </div>
-        ) : (
-          <div className="grid grid-cols-3 gap-4 justify-items-center">
-            {MASCOTES.map((mascote) => (
-              <button
-                key={mascote.url}
-                type="button"
-                onClick={() => escolherMascote(mascote)}
-                disabled={carregando !== null}
-                aria-label={`Usar ${mascote.nome}`}
-                className={`w-20 h-20 rounded-full overflow-hidden bg-[#F7F5FF] border-2 border-[#E4E0F7] hover:border-[#FFA400] transition disabled:cursor-wait ${
-                  carregando === mascote.url ? 'opacity-50' : ''
-                }`}
-              >
-                <img
-                  src={mascote.url}
-                  alt=""
-                  className="w-full h-full object-cover"
-                />
-              </button>
-            ))}
-          </div>
-        )}
 
-        {erro && <p className="mt-4 text-xs text-[#C0392B]">{erro}</p>}
-
-        <div className="mt-6 pt-5 border-t border-[#E4E0F7] flex flex-col items-center gap-2">
-          <button
-            type="button"
-            onClick={() => inputRef.current?.click()}
-            disabled={carregando !== null}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#FFA400] text-[#2E2A6B] text-sm font-semibold hover:brightness-105 transition disabled:opacity-60"
-          >
-            <FiUpload size={14} strokeWidth={2.5} />
-            Enviar uma foto minha
-          </button>
-          <span className="text-[11px] text-[#8b87a3]">
-            JPG, PNG ou WEBP, até 2 MB
-          </span>
+          <input
+            ref={inputRef}
+            type="file"
+            accept="image/png,image/jpeg,image/webp"
+            className="hidden"
+            onChange={aoEscolherArquivo}
+          />
         </div>
-
-        <input
-          ref={inputRef}
-          type="file"
-          accept="image/png,image/jpeg,image/webp"
-          className="hidden"
-          onChange={aoEscolherArquivo}
-        />
       </div>
     </div>
   );
