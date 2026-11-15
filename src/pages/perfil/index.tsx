@@ -216,6 +216,23 @@ function Perfil() {
     return `${dia}/${mes}/${ano}`;
   }
 
+  function semAcento(s: string) {
+    return s
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .trim()
+      .toLowerCase();
+  }
+
+  function normalizarUF(valor?: string | null): string {
+    if (!valor) return '';
+    const v = semAcento(valor);
+    const achado = ESTADOS.find(
+      (e) => semAcento(e.uf) === v || semAcento(e.nome) === v,
+    );
+    return achado?.uf ?? '';
+  }
+
   // -----------------------------------------------------------------------------
   // ESTADO DA TELA
   // -----------------------------------------------------------------------------
@@ -249,7 +266,7 @@ function Perfil() {
       nome: usuario.nome ?? f.nome,
       apelido: usuario.apelido ?? f.apelido,
       email: usuario.email ?? f.email,
-      estado: usuario.estado ?? f.estado,
+      estado: normalizarUF(usuario.estado) || f.estado,
       nascimento: usuario.data_nascimento ?? f.nascimento,
       foto: usuario.foto_perfil_url ?? f.foto,
     }));
