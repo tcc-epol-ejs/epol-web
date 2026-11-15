@@ -132,10 +132,16 @@ export const cadastrar = (dados: {
     body: JSON.stringify(dados),
   });
 
-export const atualizarPerfil = (
-  token: string,
-  dados: { foto_perfil_url: string | null },
-) =>
+export interface AtualizarPerfilDados {
+  nome?: string;
+  apelido?: string | null;
+  email?: string;
+  estado?: string;
+  data_nascimento?: string;
+  foto_perfil_url?: string | null;
+}
+
+export const atualizarPerfil = (token: string, dados: AtualizarPerfilDados) =>
   request<{ usuario: Usuario }>('/api/auth/perfil', {
     method: 'PATCH',
     headers: { Authorization: `Bearer ${token}` },

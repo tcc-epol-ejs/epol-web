@@ -31,8 +31,6 @@ import SeletorPfpModal from '../../components/seletorPfpModal/index';
 
 function Perfil() {
   const navigate = useNavigate();
-  // OBS: assumindo que o AuthContext expõe `logout` — ajusta esse nome se
-  // no seu contexto real for diferente (ex: `sair`, `signOut`).
   const { usuario, carregando, logout, token, salvarSessao } = useAuth();
 
   // -----------------------------------------------------------------------------
@@ -261,6 +259,8 @@ function Perfil() {
   const [editando, setEditando] = useState(false);
   const [rascunho, setRascunho] = useState<PerfilForm>(form);
   const [salvo, setSalvo] = useState(false);
+  const [salvandoEdicao, setSalvandoEdicao] = useState(false);
+  const [erroEdicao, setErroEdicao] = useState<string | null>(null);
   const [modalFoto, setModalFoto] = useState(false);
   const [enviandoFoto, setEnviandoFoto] = useState(false);
   const [erroFoto, setErroFoto] = useState<string | null>(null);
@@ -329,16 +329,39 @@ function Perfil() {
   }
 
   function cancelarEdicao() {
+    setErroEdicao(null);
     setEditando(false);
   }
 
-  function salvarEdicao() {
-    // TODO: services/api.ts ainda não tem uma rota de atualização de perfil
-    // (ex: PUT /api/auth/me). Por enquanto isso só simula o retorno de sucesso.
-    setForm(rascunho);
-    setEditando(false);
-    setSalvo(true);
-    setTimeout(() => setSalvo(false), 2400);
+  async function salvarEdicao() {
+    if (!token) {
+      setErroEdicao('Sua sessão expirou. Entre novamente.');
+      return;
+    }
+
+    setErroEdicao(null);
+    setSalvandoEdicao(true);
+
+    try {
+      const { usuario: atualizado } = await atualizarPerfil(token, {
+        nome: rascunho.nome,
+        apelido: rascunho.apelido,
+        email: rascunho.email,
+        estado: rascunho.estado,
+        data_nascimento: rascunho.nascimento,
+      });
+
+      salvarSessao(atualizado, token);
+
+      setForm(rascunho);
+      setEditando(false);
+      setSalvo(true);
+      setTimeout(() => setSalvo(false), 2400);
+    } catch (err: any) {
+      setErroEdicao(err.message || 'Não foi possível salvar as alterações.');
+    } finally {
+      setSalvandoEdicao(false);
+    }
   }
 
   async function removerPartido(id: string) {
@@ -570,68 +593,78 @@ function Perfil() {
                   </button>
                 </div>
               </div>
-           ) : (
-            <div className="flex flex-col gap-8">
-              {erroFav && <p className="text-xs text-[#F2A0A0]">{erroFav}</p>}
-          
-              <section>
-                <h2 className="text-sm text-[#B6AEE8] mb-4">Partidos favoritos</h2>
-                {carregandoFav ? (
-                  <p className="text-sm text-[#8A82C4]">Carregando...</p>
-                ) : partidos.length === 0 ? (
-                  <EstadoVazio texto="Você ainda não favoritou nenhum partido." />
-                ) : (
-                  <CarrosselAvatares
-                    itens={partidos.map((p) => ({
-                      id: p.id,
-                      legenda: p.sigla,
-                      rotulo: p.sigla.slice(0, 3),
-                      foto: p.bandeira_url,
-                      cor: '#FFFFFF',
-                      ajuste: 'contain',
-                    }))}
-                    aoClicar={(id) =>
-                      navigate(`/pagina_partido?id=${encodeURIComponent(id)}`, {
-                        state: { voltarPara: '/perfil?aba=preferencias' },
-                      })
-                    }
-                    aoRemover={removerPartido}
-                  />
-                )}
-              </section>
-          
-              <section>
-                <h2 className="text-sm text-[#B6AEE8] mb-4">Candidatos favoritos</h2>
-                {carregandoFav ? (
-                  <p className="text-sm text-[#8A82C4]">Carregando...</p>
-                ) : candidatos.length === 0 ? (
-                  <EstadoVazio texto="Você ainda não favoritou nenhum candidato." />
-                ) : (
-                  <CarrosselAvatares
-                    itens={candidatos.map((c) => {
-                      const nome = c.nome_politico || c.nome_completo;
-                      return {
-                        id: c.id,
-                        legenda: nome,
-                        rotulo: nome
-                          .split(' ')
-                          .map((p) => p[0])
-                          .slice(0, 2)
-                          .join(''),
-                        foto: c.foto_url,
-                      };
-                    })}
-                    aoClicar={(id) =>
-                      navigate(`/pagina_politico?id=${encodeURIComponent(id)}`, {
-                        state: { voltarPara: '/perfil?aba=preferencias' },
-                      })
-                    }
-                    aoRemover={removerCandidato}
-                  />
-                )}
-              </section>
-            </div>
-          )}
+            ) : (
+              <div className="flex flex-col gap-8">
+                {erroFav && <p className="text-xs text-[#F2A0A0]">{erroFav}</p>}
+
+                <section>
+                  <h2 className="text-sm text-[#B6AEE8] mb-4">
+                    Partidos favoritos
+                  </h2>
+                  {carregandoFav ? (
+                    <p className="text-sm text-[#8A82C4]">Carregando...</p>
+                  ) : partidos.length === 0 ? (
+                    <EstadoVazio texto="Você ainda não favoritou nenhum partido." />
+                  ) : (
+                    <CarrosselAvatares
+                      itens={partidos.map((p) => ({
+                        id: p.id,
+                        legenda: p.sigla,
+                        rotulo: p.sigla.slice(0, 3),
+                        foto: p.bandeira_url,
+                        cor: '#FFFFFF',
+                        ajuste: 'contain',
+                      }))}
+                      aoClicar={(id) =>
+                        navigate(
+                          `/pagina_partido?id=${encodeURIComponent(id)}`,
+                          {
+                            state: { voltarPara: '/perfil?aba=preferencias' },
+                          },
+                        )
+                      }
+                      aoRemover={removerPartido}
+                    />
+                  )}
+                </section>
+
+                <section>
+                  <h2 className="text-sm text-[#B6AEE8] mb-4">
+                    Candidatos favoritos
+                  </h2>
+                  {carregandoFav ? (
+                    <p className="text-sm text-[#8A82C4]">Carregando...</p>
+                  ) : candidatos.length === 0 ? (
+                    <EstadoVazio texto="Você ainda não favoritou nenhum candidato." />
+                  ) : (
+                    <CarrosselAvatares
+                      itens={candidatos.map((c) => {
+                        const nome = c.nome_politico || c.nome_completo;
+                        return {
+                          id: c.id,
+                          legenda: nome,
+                          rotulo: nome
+                            .split(' ')
+                            .map((p) => p[0])
+                            .slice(0, 2)
+                            .join(''),
+                          foto: c.foto_url,
+                        };
+                      })}
+                      aoClicar={(id) =>
+                        navigate(
+                          `/pagina_politico?id=${encodeURIComponent(id)}`,
+                          {
+                            state: { voltarPara: '/perfil?aba=preferencias' },
+                          },
+                        )
+                      }
+                      aoRemover={removerCandidato}
+                    />
+                  )}
+                </section>
+              </div>
+            )}
           </div>
 
           {/* ZONA DE CONFIGURAÇÕES — última opção da página */}
@@ -731,20 +764,26 @@ function Perfil() {
               </div>
             </div>
 
+            {erroEdicao && (
+              <p className="mt-3 text-xs text-[#C0392B]">{erroEdicao}</p>
+            )}
+
             <div className="flex items-center justify-end gap-3 mt-6">
               <button
                 type="button"
                 onClick={cancelarEdicao}
-                className="px-5 py-2.5 rounded-full text-sm font-semibold text-[#5b5776] hover:bg-[#F4F3FA] transition"
+                disabled={salvandoEdicao}
+                className="px-5 py-2.5 rounded-full text-sm font-semibold text-[#5b5776] hover:bg-[#F4F3FA] transition disabled:opacity-60"
               >
                 Cancelar
               </button>
               <button
                 type="button"
                 onClick={salvarEdicao}
-                className="px-6 py-2.5 rounded-full bg-[#2E2A47] text-white text-sm font-semibold hover:brightness-110 transition"
+                disabled={salvandoEdicao}
+                className="px-6 py-2.5 rounded-full bg-[#2E2A47] text-white text-sm font-semibold hover:brightness-110 transition disabled:opacity-60"
               >
-                Salvar alterações
+                {salvandoEdicao ? 'Salvando...' : 'Salvar alterações'}
               </button>
             </div>
           </div>
@@ -966,14 +1005,14 @@ function CarrosselAvatares({
               >
                 {item.foto ? (
                   <img
-                  src={item.foto}
-                  alt={item.legenda}
-                  className={
-                    item.ajuste === 'contain'
-                      ? 'w-full h-full object-contain p-1.5'
-                      : 'w-full h-full object-cover object-[center_20%]'
-                  }
-                />
+                    src={item.foto}
+                    alt={item.legenda}
+                    className={
+                      item.ajuste === 'contain'
+                        ? 'w-full h-full object-contain p-1.5'
+                        : 'w-full h-full object-cover object-[center_20%]'
+                    }
+                  />
                 ) : (
                   item.rotulo
                 )}
