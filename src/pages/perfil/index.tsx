@@ -630,12 +630,12 @@ function Perfil() {
 
                 <section>
                   <h2 className="text-sm text-[#B6AEE8] mb-4">
-                    Candidatos favoritos
+                    Políticos favoritos
                   </h2>
                   {carregandoFav ? (
                     <p className="text-sm text-[#8A82C4]">Carregando...</p>
                   ) : candidatos.length === 0 ? (
-                    <EstadoVazio texto="Você ainda não favoritou nenhum candidato." />
+                    <EstadoVazio texto="Você ainda não favoritou nenhum político." />
                   ) : (
                     <CarrosselAvatares
                       itens={candidatos.map((c) => {

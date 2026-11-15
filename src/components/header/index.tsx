@@ -19,7 +19,7 @@ interface NavItem {
 const NAV_ITEMS: NavItem[] = [
   { label: 'Página Inicial', path: '/main' },
   { label: 'SearchPol', path: '/searchpol' },
-  { label: 'Match Político', path: '/match' },
+  { label: 'Match Político', path: '/match-politico' },
   { label: 'Urna', path: '/simulador-urna' },
   { label: 'Visualizador Geográfico', path: '/visualizador' },
   { label: 'Quem Somos?', path: '/quem-somos' },

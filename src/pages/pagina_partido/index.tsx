@@ -134,9 +134,8 @@ function PaginaPartido() {
     typeof estadoNavegacao === 'object' &&
     'voltarPara' in estadoNavegacao &&
     typeof estadoNavegacao.voltarPara === 'string' &&
-    ORIGENS_VALIDAS.some((origem) =>
-      (estadoNavegacao.voltarPara as string).startsWith(origem),
-    )
+    estadoNavegacao.voltarPara.startsWith('/') &&
+    !estadoNavegacao.voltarPara.startsWith('//')
       ? estadoNavegacao.voltarPara
       : '/searchpol';
   const [partidos, setPartidos] = useState<Partido[]>([]);
