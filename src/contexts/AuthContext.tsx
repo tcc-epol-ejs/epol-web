@@ -45,6 +45,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUsuario(usuario);
     setToken(token);
     localStorage.setItem(STORAGE_KEY, token);
+
+    // login/perfil podem devolver menos campos que o /me; busca o completo
+    buscarUsuarioLogado(token)
+      .then(({ usuario: completo }) => setUsuario(completo))
+      .catch(() => {});
   }
 
   function logout() {

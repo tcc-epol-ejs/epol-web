@@ -66,3 +66,22 @@ body,
   border-radius: 9999px;
   background: var(--party-scrollbar-thumb);
 }
+
+/* Scrollbar minimalista */
+.scroll-fino {
+  scrollbar-width: thin;                              
+  scrollbar-color: #d9d4f2 transparent;           
+}
+.scroll-fino::-webkit-scrollbar {                  
+  width: 6px;
+}
+.scroll-fino::-webkit-scrollbar-track {
+  background: transparent;
+}
+.scroll-fino::-webkit-scrollbar-thumb {
+  background: #d9d4f2;
+  border-radius: 999px;
+}
+.scroll-fino::-webkit-scrollbar-thumb:hover {
+  background: #b9b2e6;
+}

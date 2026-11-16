@@ -1,6 +1,6 @@
 import { useState, useRef, useMemo, useEffect } from 'react';
 import type { PointerEvent as ReactPointerEvent, ReactNode } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import {
   FiX,
   FiMinus,
@@ -511,7 +511,7 @@ function StatusScreen({
   acao?: { label: string; onClick: () => void };
 }) {
   return (
-    <div className="relative w-full h-full min-h-[640px] bg-[#2E2A6B] overflow-hidden flex items-center justify-center px-4 py-8">
+    <div className="relative w-full h-full min-h-[640px] bg-[#2E2A6B] overflow-hidden flex items-center justify-center px-4 pt-28 pb-8">
       <Blobs />
       <div className="relative z-10 bg-white rounded-[28px] p-9 w-full max-w-[420px] shadow-[0_30px_60px_rgba(15,12,60,0.35)] text-center">
         <Pipo mood={acao ? 'sad' : 'neutral'} size={90} />
@@ -543,7 +543,7 @@ interface IntroScreenProps {
 
 function IntroScreen({ onStart }: IntroScreenProps) {
   return (
-    <div className="relative w-full h-full min-h-[640px] bg-[#2E2A6B] overflow-hidden flex items-center justify-center px-4 py-8">
+    <div className="relative w-full h-full min-h-[640px] bg-[#2E2A6B] overflow-hidden flex items-center justify-center px-4 pt-28 pb-8">
       <Blobs />
       <div className="relative z-10 bg-white rounded-[28px] p-7 sm:p-9 w-full max-w-[560px] shadow-[0_30px_60px_rgba(15,12,60,0.35)] text-center">
         <h1 className="[font-family:'Sora',sans-serif] font-extrabold text-[24px] sm:text-[28px] text-[#1B1B3A] mt-4 mb-2">
@@ -805,7 +805,7 @@ function QuizScreen({ perguntas, onAnswer, onFinish }: QuizScreenProps) {
   }
 
   return (
-    <div className="relative w-full h-full min-h-[640px] bg-[#2E2A6B] overflow-hidden flex items-center justify-center px-4 py-8">
+    <div className="relative w-full h-full min-h-[640px] bg-[#2E2A6B] overflow-hidden flex items-center justify-center px-4 pt-28 pb-8">
       <Blobs tint={tint} />
       <div className="relative z-10 bg-white rounded-[28px] p-7 min-h-[394px] w-full max-w-[620px] shadow-[0_30px_60px_rgba(15,12,60,0.35)]">
         <nav
@@ -1478,6 +1478,14 @@ function ResultScreen({ ranking, respostas, onRestart }: ResultScreenProps) {
   const [reveal, setReveal] = useState(false);
   const [count, setCount] = useState(0);
   const [compartilhando, setCompartilhando] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  function abrirPartido(id: string) {
+    navigate(`/pagina_partido?id=${encodeURIComponent(id)}`, {
+      state: { voltarPara: `${location.pathname}?view=resultado` },
+    });
+  }
 
   const interesses = useMemo(() => {
     if (!top) return [];
@@ -1519,7 +1527,7 @@ function ResultScreen({ ranking, respostas, onRestart }: ResultScreenProps) {
   }
 
   return (
-    <div className="relative w-full h-full min-h-[640px] bg-[#2E2A6B] overflow-hidden flex items-center justify-center px-4 py-8">
+    <div className="relative w-full h-full min-h-[640px] bg-[#2E2A6B] overflow-hidden flex items-center justify-center px-4 pt-28 pb-8">
       <Blobs />
       <div
         className={`relative z-10 bg-white rounded-[28px] p-7 min-h-[394px] w-full max-w-[680px] shadow-[0_30px_60px_rgba(15,12,60,0.35)] transition-all duration-[400ms] ease-[cubic-bezier(0.2,0.8,0.2,1)] ${
@@ -1545,9 +1553,14 @@ function ResultScreen({ ranking, respostas, onRestart }: ResultScreenProps) {
             <h2 className="[font-family:'Sora',sans-serif] text-[22px] tracking-[0.02em] mb-[14px] text-[#1B1B3A]">
               SEU <em className="italic">MATCH</em> POLÍTICO
             </h2>
-            <div className="inline-block bg-[#2E2A47] text-white font-bold text-[12px] tracking-[0.04em] px-[18px] py-[10px] rounded-full mb-5">
+            <button
+              type="button"
+              onClick={() => abrirPartido(top.id)}
+              aria-label={`Ver informações do partido ${top.nome}`}
+              className="inline-block bg-[#2E2A47] text-white font-bold text-[12px] tracking-[0.04em] px-[18px] py-[10px] rounded-full mb-5 transition hover:brightness-125 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#FF9F1C]"
+            >
               {top.nome.toUpperCase()} ({top.sigla})
-            </div>
+            </button>
             <div className="flex items-center gap-3 mb-[22px]">
               <span className="[font-family:'Sora',sans-serif] text-[52px] font-extrabold text-[#FF9F1C] leading-none min-w-[130px]">
                 {count}%
@@ -1580,17 +1593,23 @@ function ResultScreen({ ranking, respostas, onRestart }: ResultScreenProps) {
           </div>
 
           <div className="min-w-[180px] flex flex-col gap-[14px] items-center">
-            <div
-              className="w-[180px] h-[180px] rounded-[22px] flex items-center justify-center p-6 bg-[#F4F3FA] border-[4px]"
+            <button
+              type="button"
+              onClick={() => abrirPartido(top.id)}
+              aria-label={`Ver informações do partido ${top.nome}`}
+              className="w-[180px] h-[180px] rounded-[22px] flex items-center justify-center p-6 bg-[#F4F3FA] border-[4px] transition-transform hover:-translate-y-1 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#FF9F1C]"
               style={{ borderColor: top.cor }}
             >
               <PartidoLogo partido={top} size={110} />
-            </div>
+            </button>
             <div className="flex gap-[10px]">
               {[second, third].filter(Boolean).map((p) => (
-                <div
-                  key={p!.sigla}
-                  className="w-[83px] h-[83px] rounded-2xl flex flex-col items-center justify-center gap-0.5 p-3 pb-1 bg-[#F4F3FA] border-[3px]"
+                <button
+                  type="button"
+                  key={p!.id}
+                  onClick={() => abrirPartido(p!.id)}
+                  aria-label={`Ver informações do partido ${p!.nome}`}
+                  className="w-[83px] h-[83px] rounded-2xl flex flex-col items-center justify-center gap-0.5 p-3 pb-1 bg-[#F4F3FA] border-[3px] transition-transform hover:-translate-y-1 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#FF9F1C]"
                   style={{ borderColor: p!.cor }}
                 >
                   <PartidoLogo partido={p!} size={55} />
@@ -1600,7 +1619,7 @@ function ResultScreen({ ranking, respostas, onRestart }: ResultScreenProps) {
                   >
                     {p!.pct}%
                   </span>
-                </div>
+                </button>
               ))}
             </div>
           </div>
@@ -1621,10 +1640,13 @@ function ResultScreen({ ranking, respostas, onRestart }: ResultScreenProps) {
 // PÁGINA — MatchPolitico
 // -----------------------------------------------------------------------------
 type View = 'intro' | 'quiz' | 'result';
+const CHAVE_RESPOSTAS = 'match_respostas';
 
 export default function MatchPolitico() {
   const navigate = useNavigate();
   const { usuario, token, carregando: carregandoAuth } = useAuth();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const querVerResultado = searchParams.get('view') === 'resultado';
 
   const [view, setView] = useState<View>('intro');
   const [respostas, setRespostas] = useState<Resposta[]>([]);
@@ -1660,6 +1682,39 @@ export default function MatchPolitico() {
   }
 
   useEffect(() => {
+    if (!querVerResultado || view !== 'intro' || !token || !usuario) return;
+
+    let ativo = true;
+    setCarregandoResultado(true);
+
+    buscarCompatibilidade(token)
+      .then((ranking) => {
+        if (!ativo) return;
+        if (ranking.length === 0) return;
+        try {
+          const salvo = sessionStorage.getItem(CHAVE_RESPOSTAS);
+          if (salvo) setRespostas(JSON.parse(salvo));
+        } catch {}
+        setRankingServidor(ranking);
+        setView('result');
+      })
+      .catch((err) => {
+        if (!ativo) return;
+        setErroAcao({
+          titulo: 'Não foi possível carregar seu resultado',
+          mensagem: err instanceof Error ? err.message : 'Tente novamente.',
+        });
+      })
+      .finally(() => {
+        if (ativo) setCarregandoResultado(false);
+      });
+
+    return () => {
+      ativo = false;
+    };
+  }, [querVerResultado, view, token, usuario]);
+
+  useEffect(() => {
     if (usuario) carregarDados();
   }, [usuario]);
 
@@ -1668,6 +1723,8 @@ export default function MatchPolitico() {
     setErroAcao(null);
     try {
       await limparRespostas(token);
+      sessionStorage.removeItem(CHAVE_RESPOSTAS);
+      setSearchParams({}, { replace: true });
       setRespostas([]);
       setPerguntasQuiz(selecionarPerguntas(perguntas, 15));
       setView('quiz');
@@ -1695,6 +1752,9 @@ export default function MatchPolitico() {
 
   async function handleFinish(novas: Resposta[]) {
     setRespostas(novas);
+    try {
+      sessionStorage.setItem(CHAVE_RESPOSTAS, JSON.stringify(novas));
+    } catch {}
     if (!token) return;
     setErroAcao(null);
     setCarregandoResultado(true);
@@ -1702,6 +1762,7 @@ export default function MatchPolitico() {
       const ranking = await buscarCompatibilidade(token);
       setRankingServidor(ranking);
       setView('result');
+      setSearchParams({ view: 'resultado' }, { replace: true });
     } catch (err) {
       setErroAcao({
         titulo: 'Não foi possível calcular seu resultado',
