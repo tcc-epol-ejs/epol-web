@@ -48,3 +48,40 @@ body,
   height: 100%;
   width: 100%;
 }
+
+.party-content-scroll {
+  scrollbar-color: var(--party-scrollbar-thumb) var(--party-scrollbar-track);
+  scrollbar-width: thin;
+}
+
+.party-content-scroll::-webkit-scrollbar {
+  width: 8px;
+}
+
+.party-content-scroll::-webkit-scrollbar-track {
+  background: var(--party-scrollbar-track);
+}
+
+.party-content-scroll::-webkit-scrollbar-thumb {
+  border-radius: 9999px;
+  background: var(--party-scrollbar-thumb);
+}
+
+/* Scrollbar minimalista */
+.scroll-fino {
+  scrollbar-width: thin;                              
+  scrollbar-color: #d9d4f2 transparent;           
+}
+.scroll-fino::-webkit-scrollbar {                  
+  width: 6px;
+}
+.scroll-fino::-webkit-scrollbar-track {
+  background: transparent;
+}
+.scroll-fino::-webkit-scrollbar-thumb {
+  background: #d9d4f2;
+  border-radius: 999px;
+}
+.scroll-fino::-webkit-scrollbar-thumb:hover {
+  background: #b9b2e6;
+}
