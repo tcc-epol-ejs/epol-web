@@ -29,10 +29,10 @@ function App() {
         <Route path="/admin" element={<Admin />} />
         <Route path="/perfil" element={<Perfil />} />
         <Route path="/searchpol" element={<SearchPol />} />
-        <Route path="/main" element={<Main />} />
         <Route path="/simulador-urna" element={<SimuladorUrna />} />
         <Route path="/pagina_partido" element={<PaginaPartido />} />
         <Route path="/pagina_politico" element={<PaginaPolitico />} />
+        <Route path="/linha_do_tempo" element={<PaginaPolitico />} />
       </Routes>
     </BrowserRouter>
   );
