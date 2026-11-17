@@ -23,6 +23,7 @@ const NAV_ITEMS: NavItem[] = [
   { label: 'Urna', path: '/simulador-urna' },
   { label: 'Visualizador Geográfico', path: '/visualizador' },
   { label: 'Quem Somos?', path: '/quem-somos' },
+  { label: 'Linha do Tempo', path: '/linha_do_tempo' },
 ];
 
 export default function Header({
