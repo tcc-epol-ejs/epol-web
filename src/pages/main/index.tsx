@@ -5,8 +5,8 @@ import VisualizadorGeografico from '../../assets/GIFs/visualizadorGeografico.gif
 import MatchPolitico from '../../assets/GIFs/matchPolitico.gif';
 import SimuladorUrna from '../../assets/GIFs/simuladorUrna.gif';
 import PipoDuvida from '../../assets/Imagens/pipoDuvida.png';
-import PipoFeliz from '../../assets/Imagens/pipoFeliz.png';
 import PipoTituloEleitor from '../../assets/Imagens/pipoTituloEleitor.png';
+import SetaLinhaTempo from '../../assets/Imagens/seta_linhatempo.png';
 import { GiStarFlag } from 'react-icons/gi';
 import { FaArrowRightLong, FaPeopleGroup } from 'react-icons/fa6';
 import { useNavigate } from 'react-router-dom';
@@ -263,19 +263,12 @@ export default function Main() {
 
                 <div className="absolute -bottom-6 -left-4 sm:left-6 bg-white rounded-2xl shadow-xl border border-[#2A2A72]/10 px-4 py-3 flex items-center gap-3 max-w-[230px]">
                   <div className="w-9 h-9 rounded-full bg-[#FFA400]/15 text-[#D18800] flex items-center justify-center flex-none">
-                    <svg
-                      className="w-5 h-5"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <rect x="2" y="5" width="20" height="14" rx="2" />
-                      <path d="M6 15h4M14 9h4M14 12h4M14 15h2" />
-                      <circle cx="8" cy="10.5" r="1.6" />
-                    </svg>
+                    <img
+                      src={SetaLinhaTempo}
+                      alt=""
+                      aria-hidden="true"
+                      className="w-5 h-5 object-contain"
+                    />
                   </div>
                   <div>
                     <p className="text-[11px] font-mono tracking-[0.06em] text-[#333]/45 leading-none mb-1">
@@ -287,6 +280,89 @@ export default function Main() {
                   </div>
                 </div>
               </div>
+            </div>
+          </div>
+        </div>
+
+        {/* QUARTA PARTE SEÇÃO */}
+        <div className="relative flex h-full w-full overflow-hidden bg-[#16803C]">
+          <svg
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 z-0 h-full w-full"
+            viewBox="0 0 1400 900"
+            preserveAspectRatio="none"
+            fill="none"
+          >
+            <path
+              d="M 950 -80
+                 C 860 35, 1010 145, 900 260
+                 C 790 375, 690 405, 790 530
+                 C 890 655, 760 760, 690 980
+                 L 1400 980
+                 L 1400 -80 Z"
+              fill="#2A2A72"
+            />
+            <path
+              d="M 950 -80
+                 C 860 35, 1010 145, 900 260
+                 C 790 375, 690 405, 790 530
+                 C 890 655, 760 760, 690 980"
+              stroke="#FFCA28"
+              strokeWidth="7"
+              strokeOpacity="0.95"
+            />
+            <path
+              d="M 0 900 L 717 900"
+              stroke="#FFCA28"
+              strokeWidth="8"
+              strokeLinecap="square"
+            />
+            <path
+              d="M 920 0 L 1400 0"
+              stroke="#FFCA28"
+              strokeWidth="8"
+              strokeLinecap="round"
+              strokeOpacity="0.95"
+            />
+          </svg>
+
+          <img
+            src={SetaLinhaTempo}
+            alt=""
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 z-10 h-full w-full object-contain object-left-top"
+          />
+
+          <div className="relative z-20 grid w-full grid-cols-[62%_38%]">
+            <div className="flex -translate-y-10 flex-col justify-center pb-5 px-[clamp(64px,7vw,120px)]">
+              <h2 className="max-w-[760px] font-[Fraunces] text-[clamp(76px,7.2vw,118px)] leading-[0.82] tracking-[-0.055em] text-[#FFFBF2]">
+                Linha do
+                <span className="mt-3 flex items-baseline whitespace-nowrap">
+                  <span>Tempo</span>
+                  <span className="ml-5 italic font-semibold text-[#FFCA28]">
+                    Presidencial
+                  </span>
+                </span>
+              </h2>
+
+              <div className="mt-6 flex items-center gap-5">
+                <span className="block h-[74px] w-[4px] flex-none bg-[#2A2A72]" />
+                <p className="max-w-[590px] text-[22px] font-semibold leading-[1.5] text-[#FFFBF2]/90">
+                  Entenda a história do Brasil pelos presidentes que fizeram
+                  parte de cada momento do país.
+                </p>
+              </div>
+            </div>
+            <div className="relative flex items-end justify-start pl-36 pb-[40%]">
+              <button
+                onClick={() => navigate('/linha_do_tempo')}
+                className="group relative z-10 -translate-y-10 flex h-[104px] w-[310px] items-center justify-between rounded-full border-[3px] border-[#FFCA28] bg-[#16803C] px-9 text-[30px] font-black text-[#FFFBF2] shadow-none transition-all duration-500 ease-out hover:-translate-y-[52px] hover:bg-[#106d32]"
+              >
+                <span>Acessar</span>
+                <span className="flex h-12 w-12 items-center justify-center rounded-full bg-[#2A2A72] text-[#FFFFFF] transition-transform duration-300 group-hover:translate-x-1">
+                  <FaArrowRightLong size={21} />
+                </span>
+              </button>
             </div>
           </div>
         </div>
