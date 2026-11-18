@@ -587,7 +587,7 @@ function Perfil() {
                   />
                 </div>
 
-                <div className="flex flex-wrap items-center gap-x-[57px] gap-y-3 pt-2">
+                <div className="flex flex-wrap items-center gap-x-[57px] gap-y-3 pt-2 justify-center sm:justify-start">
                   <button
                     type="button"
                     onClick={abrirEdicao}
