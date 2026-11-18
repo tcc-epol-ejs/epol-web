@@ -356,10 +356,10 @@ export default function Main() {
             <div className="relative flex items-end justify-start pl-36 pb-[40%]">
               <button
                 onClick={() => navigate('/linha_do_tempo')}
-                className="group relative z-10 -translate-y-10 flex h-[104px] w-[310px] items-center justify-between rounded-full border-[3px] border-[#FFCA28] bg-[#16803C] px-9 text-[30px] font-black text-[#FFFBF2] shadow-none transition-all duration-500 ease-out hover:-translate-y-[52px] hover:bg-[#106d32]"
+                className="group relative z-10 -translate-y-10 flex h-[104px] w-[310px] items-center justify-between rounded-full border-[3px] border-[#FFFFFF] bg-[#16803C] px-9 text-[30px] font-black text-[#FFFBF2] shadow-none transition-all duration-500 ease-out hover:-translate-y-[52px] hover:bg-[#106d32]"
               >
-                <span>Acessar</span>
-                <span className="flex h-12 w-12 items-center justify-center rounded-full bg-[#2A2A72] text-[#FFFFFF] transition-transform duration-300 group-hover:translate-x-1">
+                <span>Acessar já!</span>
+                <span className="flex h-12 w-12 items-center justify-center rounded-full bg-[#FFCA28] text-[#FFFFFF] transition-transform duration-300 group-hover:translate-x-1">
                   <FaArrowRightLong size={21} />
                 </span>
               </button>
