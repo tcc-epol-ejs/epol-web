@@ -164,14 +164,15 @@ function LinhaDoTempo() {
                 normalizarNome(periodo.nomeBusca),
             );
             const fundo = index % 2 === 0 ? 'bg-[#2A2A72]' : 'bg-[#16803C]';
+            const periodoAtivo = slideAtual === index + 1;
 
             return (
               <section
                 key={`${periodo.periodo}-${periodo.nomeBusca}`}
-                aria-hidden={slideAtual !== index + 1}
+                aria-hidden={!periodoAtivo}
                 aria-label={`Presidência no período ${periodo.periodo}`}
                 aria-roledescription="slide"
-                className={`flex h-full w-screen shrink-0 items-center justify-center overflow-hidden px-16 pb-8 pt-[150px] text-white ${fundo}`}
+                className={`flex h-full w-screen shrink-0 items-center justify-center overflow-hidden px-20 pb-8 pt-[90px] text-white sm:px-24 ${fundo}`}
               >
                 <div className="w-full max-w-5xl">
                   <div className="mb-5 flex items-center justify-center">
@@ -179,93 +180,100 @@ function LinhaDoTempo() {
                       {periodo.periodo}
                     </p>
                   </div>
-                  <article className="mx-auto flex max-h-[calc(100dvh-230px)] max-w-4xl flex-col overflow-hidden rounded-[28px] border-4 border-white bg-white text-[#2A2A72] shadow-[10px_10px_0_#FFA400] md:min-h-[380px] md:flex-row">
-                    <div className="flex h-40 shrink-0 items-center justify-center overflow-hidden bg-[#e8e8f5] sm:h-48 md:h-auto md:w-[38%]">
-                      {politico?.foto_url ? (
-                        <img
-                          src={politico.foto_url}
-                          alt={`Foto de ${politico.nome_completo}`}
-                          className="h-full w-full object-cover object-[center_20%]"
-                        />
-                      ) : (
-                        <span className="px-6 text-center text-sm font-bold">
-                          {carregando
-                            ? 'Carregando imagem...'
-                            : erro
-                              ? 'Não foi possível carregar a imagem.'
-                              : 'Imagem não cadastrada no banco.'}
-                        </span>
-                      )}
-                    </div>
-                    <div className="flex min-h-0 flex-1 flex-col justify-center p-5 sm:p-7 md:p-9">
-                      {carregando ? (
-                        <p role="status" className="font-semibold">
-                          Carregando dados do banco...
-                        </p>
-                      ) : erro ? (
-                        <p role="alert" className="font-semibold text-red-700">
-                          {erro}
-                        </p>
-                      ) : politico ? (
-                        <>
-                          <h2 className="text-2xl font-black leading-tight sm:text-3xl">
-                            {politico.nome_completo}
-                          </h2>
-                          <p className="mt-4 text-xs font-extrabold uppercase tracking-[0.12em] text-[#16803C]">
-                            Contexto histórico
+                  <div className="relative mx-auto w-full max-w-4xl">
+                    {periodoAtivo && (
+                      <>
+                        <button
+                          type="button"
+                          onClick={voltar}
+                          aria-label="Voltar para o período anterior"
+                          className="absolute left-[-5rem] top-1/2 z-20 flex h-[8rem] w-[8rem] -translate-y-1/2 items-center justify-center rounded-full border-2 border-white bg-[#16803C] text-white shadow-[4px_4px_0_#2A2A72] transition hover:-translate-x-1 hover:shadow-[2px_4px_0_#2A2A72] focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-[#2A2A72] sm:left-[-10rem] sm:h-20 sm:w-25 "
+                        >
+                          <FiArrowLeft
+                            aria-hidden="true"
+                            className="text-4xl"
+                          />
+                        </button>
+                        {index < PERIODOS_PRESIDENCIAIS.length - 1 && (
+                          <button
+                            type="button"
+                            onClick={avancar}
+                            aria-label={`Avançar para o período ${PERIODOS_PRESIDENCIAIS[index + 1].periodo}`}
+                            className="absolute right-[-5rem] top-1/2 z-20 flex h-[8rem] w-[8rem] -translate-y-1/2 items-center justify-center rounded-full border-2 border-white bg-[#16803C] text-white shadow-[4px_4px_0_#2A2A72] transition hover:translate-x-1 hover:shadow-[2px_4px_0_#2A2A72] focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-[#2A2A72] sm:right-[-10rem] sm:h-20 sm:w-25"
+                          >
+                            <FiArrowRight
+                              aria-hidden="true"
+                              className="text-4xl"
+                            />
+                          </button>
+                        )}
+                      </>
+                    )}
+                    <article className="mx-auto flex max-h-[calc(100dvh-230px)] w-full flex-col overflow-hidden rounded-[28px] border-4 border-white bg-white text-[#2A2A72] shadow-[10px_10px_0_#FFA400] md:min-h-[380px] md:flex-row">
+                      <div className="flex h-40 shrink-0 items-center justify-center overflow-hidden bg-[#e8e8f5] sm:h-48 md:h-auto md:w-[38%]">
+                        {politico?.foto_url ? (
+                          <img
+                            src={politico.foto_url}
+                            alt={`Foto de ${politico.nome_completo}`}
+                            className="h-full w-full object-cover object-[center_20%]"
+                          />
+                        ) : (
+                          <span className="px-6 text-center text-sm font-bold">
+                            {carregando
+                              ? 'Carregando imagem...'
+                              : erro
+                                ? 'Não foi possível carregar a imagem.'
+                                : 'Imagem não cadastrada no banco.'}
+                          </span>
+                        )}
+                      </div>
+                      <div className="flex min-h-0 flex-1 flex-col justify-center p-5 sm:p-7 md:p-9">
+                        {carregando ? (
+                          <p role="status" className="font-semibold">
+                            Carregando dados do banco...
                           </p>
-                          <p className="mt-1 text-sm leading-relaxed text-[#333] sm:text-base">
-                            {periodo.contexto}
+                        ) : erro ? (
+                          <p
+                            role="alert"
+                            className="font-semibold text-red-700"
+                          >
+                            {erro}
                           </p>
-                          <p className="mt-4 text-xs font-extrabold uppercase tracking-[0.12em] text-[#16803C]">
-                            Destaques do governo
+                        ) : politico ? (
+                          <>
+                            <h2 className="text-2xl font-black leading-tight sm:text-3xl">
+                              {politico.nome_completo}
+                            </h2>
+                            <p className="mt-4 text-xs font-extrabold uppercase tracking-[0.12em] text-[#16803C]">
+                              Contexto histórico
+                            </p>
+                            <p className="mt-1 text-sm leading-relaxed text-[#333] sm:text-base">
+                              {periodo.contexto}
+                            </p>
+                            <p className="mt-4 text-xs font-extrabold uppercase tracking-[0.12em] text-[#16803C]">
+                              Destaques do governo
+                            </p>
+                            <ul className="mt-1 list-disc space-y-1 pl-5 text-sm leading-relaxed text-[#333] sm:text-base">
+                              {periodo.destaques.map((destaque) => (
+                                <li key={destaque}>{destaque}</li>
+                              ))}
+                            </ul>
+                          </>
+                        ) : (
+                          <p role="alert" className="font-semibold">
+                            Não encontramos o registro de {periodo.periodo} no
+                            banco de dados.
                           </p>
-                          <ul className="mt-1 list-disc space-y-1 pl-5 text-sm leading-relaxed text-[#333] sm:text-base">
-                            {periodo.destaques.map((destaque) => (
-                              <li key={destaque}>{destaque}</li>
-                            ))}
-                          </ul>
-                        </>
-                      ) : (
-                        <p role="alert" className="font-semibold">
-                          Não encontramos o registro de {periodo.periodo} no
-                          banco de dados.
-                        </p>
-                      )}
-                    </div>
-                  </article>
+                        )}
+                      </div>
+                    </article>
+                  </div>
                 </div>
               </section>
             );
           })}
         </div>
       </main>
-
-      {slideAtual > 0 && (
-        <button
-          type="button"
-          onClick={voltar}
-          aria-label="Voltar para o período anterior"
-          className="absolute left-5 top-1/2 z-40 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full border-2 border-white bg-[#16803C] text-white shadow-[4px_4px_0_#2A2A72] transition hover:-translate-x-1 hover:shadow-[2px_4px_0_#2A2A72] focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-[#2A2A72] motion-safe:animate-pulse sm:left-8 sm:h-14 sm:w-14"
-        >
-          <FiArrowLeft aria-hidden="true" className="text-2xl" />
-        </button>
-      )}
-
-      {slideAtual > 0 && slideAtual < totalSlides - 1 && (
-        <button
-          type="button"
-          onClick={avancar}
-          aria-label={
-            slideAtual === 0
-              ? 'Avançar para o período de 1995'
-              : `Avançar para o período ${PERIODOS_PRESIDENCIAIS[slideAtual].periodo}`
-          }
-          className="absolute right-5 top-1/2 z-40 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full border-2 border-white bg-[#16803C] text-white shadow-[4px_4px_0_#2A2A72] transition hover:translate-x-1 hover:shadow-[2px_4px_0_#2A2A72] focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-[#2A2A72] motion-safe:animate-pulse sm:right-8 sm:h-14 sm:w-14"
-        >
-          <FiArrowRight aria-hidden="true" className="text-2xl" />
-        </button>
-      )}
     </div>
   );
 }
