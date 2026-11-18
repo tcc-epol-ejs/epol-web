@@ -102,7 +102,7 @@ function LinhaDoTempo() {
         >
           <section
             aria-hidden={slideAtual !== 0}
-            className="relative isolate flex h-full w-screen shrink-0 flex-col items-center justify-center bg-[#f5f5f5] px-16 pb-8 pt-[130px] text-center"
+            className="relative isolate flex h-full w-screen shrink-0 flex-col items-center justify-center overflow-hidden bg-[#f5f5f5] px-16 pb-8 pt-[130px] text-center"
           >
             <img
               src={Brasil}
@@ -117,9 +117,13 @@ function LinhaDoTempo() {
               <p className="mt-4 text-lg text-[#2A2A72] md:text-xl">
                 Conheça alguns dos principais líderes políticos do Brasil!
               </p>
-              <p className="mt-10 text-sm font-bold uppercase tracking-[0.16em] text-white [text-shadow:0_1px_3px_rgba(0,0,0,0.8)]">
-                Avance pelas setas para conhecer cada período
-              </p>
+              <button
+                type="button"
+                onClick={avancar}
+                className="mt-10 rounded-full border-2 border-white bg-[#16803C] px-9 py-4 text-sm font-extrabold tracking-[0.12em] text-white shadow-[4px_4px_0_#2A2A72] transition hover:translate-y-[-2px] hover:shadow-[4px_6px_0_#2A2A72] focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-[#2A2A72]"
+              >
+                DESCOBRIR
+              </button>
             </div>
           </section>
 
@@ -210,13 +214,13 @@ function LinhaDoTempo() {
           type="button"
           onClick={voltar}
           aria-label="Voltar para o período anterior"
-          className="absolute left-3 top-1/2 z-40 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full border-2 border-white bg-[#16803C] text-white shadow-[4px_4px_0_#2A2A72] transition hover:-translate-x-1 hover:shadow-[2px_4px_0_#2A2A72] focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-[#2A2A72] motion-safe:animate-pulse sm:left-6 sm:h-14 sm:w-14"
+          className="absolute left-5 top-1/2 z-40 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full border-2 border-white bg-[#16803C] text-white shadow-[4px_4px_0_#2A2A72] transition hover:-translate-x-1 hover:shadow-[2px_4px_0_#2A2A72] focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-[#2A2A72] motion-safe:animate-pulse sm:left-8 sm:h-14 sm:w-14"
         >
           <FiArrowLeft aria-hidden="true" className="text-2xl" />
         </button>
       )}
 
-      {slideAtual < totalSlides - 1 && (
+      {slideAtual > 0 && slideAtual < totalSlides - 1 && (
         <button
           type="button"
           onClick={avancar}
@@ -225,7 +229,7 @@ function LinhaDoTempo() {
               ? 'Avançar para o período de 1995'
               : `Avançar para o período ${PERIODOS_PRESIDENCIAIS[slideAtual].periodo}`
           }
-          className="absolute right-3 top-1/2 z-40 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full border-2 border-white bg-[#16803C] text-white shadow-[4px_4px_0_#2A2A72] transition hover:translate-x-1 hover:shadow-[2px_4px_0_#2A2A72] focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-[#2A2A72] motion-safe:animate-pulse sm:right-6 sm:h-14 sm:w-14"
+          className="absolute right-5 top-1/2 z-40 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full border-2 border-white bg-[#16803C] text-white shadow-[4px_4px_0_#2A2A72] transition hover:translate-x-1 hover:shadow-[2px_4px_0_#2A2A72] focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-[#2A2A72] motion-safe:animate-pulse sm:right-8 sm:h-14 sm:w-14"
         >
           <FiArrowRight aria-hidden="true" className="text-2xl" />
         </button>
