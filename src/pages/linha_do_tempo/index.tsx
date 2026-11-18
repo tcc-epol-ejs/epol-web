@@ -9,37 +9,67 @@ const PERIODOS_PRESIDENCIAIS = [
     periodo: '1995 — 2002',
     nomeBusca: 'Fernando Henrique Cardoso',
     contexto:
-      'O período veio após a implantação do Plano Real e foi marcado pela estabilização da moeda, por reformas e pela aprovação da reeleição presidencial.',
+      'Após a implantação do Plano Real, o país buscava consolidar a estabilidade econômica e ampliar sua integração à economia global.',
+    destaques: [
+      'Consolidação do Plano Real e controle da inflação.',
+      'Aprovação da emenda que permitiu a reeleição para cargos executivos.',
+      'Expansão de programas sociais e privatizações de empresas estatais.',
+    ],
   },
   {
     periodo: '2003 — 2010',
     nomeBusca: 'Lula',
     contexto:
-      'Os governos ampliaram programas sociais, como o Bolsa Família, em um período de crescimento econômico e maior projeção internacional do Brasil.',
+      'O Brasil viveu um ciclo de crescimento econômico, fortalecimento do mercado interno e maior presença em fóruns internacionais.',
+    destaques: [
+      'Criação do Bolsa Família, reunindo programas de transferência de renda.',
+      'Valorização real do salário mínimo e ampliação do acesso ao ensino superior.',
+      'Redução da pobreza e expansão do crédito e do consumo.',
+    ],
   },
   {
     periodo: '2011 — 2016',
     nomeBusca: 'Dilma Rousseff',
     contexto:
-      'Dilma Rousseff foi a primeira mulher a presidir o Brasil. Seu segundo mandato foi interrompido em 2016, após o processo de impeachment.',
+      'Primeira mulher eleita presidente do Brasil, Dilma governou em meio à desaceleração econômica, a grandes manifestações e a uma crise política.',
+    destaques: [
+      'Lançamento do programa Mais Médicos para ampliar o atendimento de saúde.',
+      'Sanção do Marco Civil da Internet e da Lei de Cotas.',
+      'O segundo mandato foi interrompido em 2016, após processo de impeachment.',
+    ],
   },
   {
     periodo: '2016 — 2018',
     nomeBusca: 'Michel Temer',
     contexto:
-      'Michel Temer assumiu a Presidência após o impeachment. Seu governo aprovou o teto de gastos públicos e a reforma trabalhista.',
+      'Michel Temer assumiu a Presidência após o impeachment de Dilma Rousseff, em um cenário de recessão e debate sobre as contas públicas.',
+    destaques: [
+      'Aprovação do teto de gastos públicos por meio da Emenda Constitucional 95.',
+      'Reforma trabalhista de 2017, que alterou regras das relações de trabalho.',
+      'Intervenção federal na segurança pública do Rio de Janeiro em 2018.',
+    ],
   },
   {
     periodo: '2019 — 2022',
     nomeBusca: 'Jair Bolsonaro',
     contexto:
-      'O período foi marcado pela pandemia de COVID-19 e pela reforma da Previdência, aprovada em 2019.',
+      'O mandato atravessou a pandemia de COVID-19, com impactos sanitários, sociais e econômicos, além de debates sobre a resposta do governo.',
+    destaques: [
+      'Aprovação da reforma da Previdência em 2019.',
+      'Implementação do Auxílio Emergencial durante a pandemia.',
+      'Avanço de marcos legais para o saneamento básico e as ferrovias.',
+    ],
   },
   {
     periodo: '2023 — atual',
     nomeBusca: 'Lula',
     contexto:
-      'Lula iniciou seu terceiro mandato em 2023, com foco anunciado no combate à pobreza, em políticas sociais e na agenda ambiental.',
+      'Em seu terceiro mandato, Lula retomou políticas sociais e colocou o combate à fome e a agenda ambiental entre as prioridades do governo.',
+    destaques: [
+      'Relançamento do Bolsa Família com novas regras e benefícios adicionais.',
+      'Promulgação da reforma tributária sobre o consumo.',
+      'Retomada do Plano de Prevenção e Controle do Desmatamento na Amazônia.',
+    ],
   },
 ];
 
@@ -178,21 +208,23 @@ function LinhaDoTempo() {
                         </p>
                       ) : politico ? (
                         <>
-                          <p className="mb-2 text-xs font-extrabold uppercase tracking-[0.16em] text-[#16803C]">
-                            Presidente da República
-                          </p>
                           <h2 className="text-2xl font-black leading-tight sm:text-3xl">
-                            {politico.nome_politico || politico.nome_completo}
+                            {politico.nome_completo}
                           </h2>
-                          {politico.nome_politico !==
-                            politico.nome_completo && (
-                            <p className="mt-1 text-xs font-medium text-[#555]">
-                              {politico.nome_completo}
-                            </p>
-                          )}
-                          <p className="mt-4 text-sm leading-relaxed text-[#333] sm:text-base">
+                          <p className="mt-4 text-xs font-extrabold uppercase tracking-[0.12em] text-[#16803C]">
+                            Contexto histórico
+                          </p>
+                          <p className="mt-1 text-sm leading-relaxed text-[#333] sm:text-base">
                             {periodo.contexto}
                           </p>
+                          <p className="mt-4 text-xs font-extrabold uppercase tracking-[0.12em] text-[#16803C]">
+                            Destaques do governo
+                          </p>
+                          <ul className="mt-1 list-disc space-y-1 pl-5 text-sm leading-relaxed text-[#333] sm:text-base">
+                            {periodo.destaques.map((destaque) => (
+                              <li key={destaque}>{destaque}</li>
+                            ))}
+                          </ul>
                         </>
                       ) : (
                         <p role="alert" className="font-semibold">
