@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { FiArrowLeft, FiArrowRight } from 'react-icons/fi';
+import { FiArrowLeft, FiArrowRight, FiRotateCcw } from 'react-icons/fi';
 import { useLocation, useNavigate } from 'react-router-dom';
 import Brasil from '../../assets/SVGs/brasil.svg';
 import Header from '../../components/header';
@@ -128,6 +128,7 @@ function LinhaDoTempo() {
   const avancar = () =>
     setSlideAtual((atual) => Math.min(atual + 1, totalSlides - 1));
   const voltar = () => setSlideAtual((atual) => Math.max(atual - 1, 0));
+  const reiniciar = () => setSlideAtual(0);
 
   return (
     <div className="fixed inset-0 h-[100dvh] w-full overflow-hidden bg-[#FFA400]">
@@ -213,7 +214,7 @@ function LinhaDoTempo() {
                             className="text-4xl"
                           />
                         </button>
-                        {index < PERIODOS_PRESIDENCIAIS.length - 1 && (
+                        {index < PERIODOS_PRESIDENCIAIS.length - 1 ? (
                           <button
                             type="button"
                             onClick={avancar}
@@ -223,6 +224,18 @@ function LinhaDoTempo() {
                             <FiArrowRight
                               aria-hidden="true"
                               className="text-4xl"
+                            />
+                          </button>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={reiniciar}
+                            aria-label="Reiniciar linha do tempo"
+                            className="group absolute right-[-5rem] top-1/2 z-20 flex h-[8rem] w-[8rem] -translate-y-1/2 items-center justify-center text-white focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-[#2A2A72] sm:right-[-10rem] sm:h-20 sm:w-25"
+                          >
+                            <FiRotateCcw
+                              aria-hidden="true"
+                              className="text-4xl transition-transform duration-500 group-hover:rotate-[-360deg]"
                             />
                           </button>
                         )}
