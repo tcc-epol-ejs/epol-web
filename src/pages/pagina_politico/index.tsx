@@ -151,10 +151,7 @@ function PaginaPolitico() {
         <button
           type="button"
           onClick={() => {
-            if (
-              voltarPara === '/linha_do_tempo' &&
-              slideAtualVolta !== null
-            ) {
+            if (voltarPara === '/linha_do_tempo' && slideAtualVolta !== null) {
               navigate(voltarPara, { state: { slideAtual: slideAtualVolta } });
               return;
             }

@@ -228,64 +228,71 @@ function LinhaDoTempo() {
                         )}
                       </>
                     )}
-                    <article className="mx-auto flex h-[min(38rem,calc(100dvh_-_230px))] w-full flex-col overflow-hidden rounded-[28px] border-4 border-white bg-white text-[#2A2A72] shadow-[10px_10px_0_#FFA400] md:h-[min(30rem,calc(100dvh_-_230px))] md:flex-row">
-                      <div className="flex h-40 shrink-0 items-center justify-center overflow-hidden bg-[#e8e8f5] sm:h-48 md:h-auto md:w-[38%]">
-                        {politico?.foto_url ? (
-                          <img
-                            src={politico.foto_url}
-                            alt={`Foto de ${politico.nome_completo}`}
-                            className="h-full w-full object-cover object-[center_20%]"
-                          />
-                        ) : (
-                          <span className="px-6 text-center text-sm font-bold">
-                            {carregando
-                              ? 'Carregando imagem...'
-                              : erro
+                    {carregando ? (
+                      <div
+                        role="status"
+                        aria-label="Carregando dados da linha do tempo"
+                        className="mx-auto flex h-[min(38rem,calc(100dvh_-_230px))] w-full items-center justify-center rounded-[28px] border-4 border-white bg-white text-[#2A2A72] shadow-[10px_10px_0_#FFA400] md:h-[min(30rem,calc(100dvh_-_230px))]"
+                      >
+                        <span className="h-12 w-12 animate-spin rounded-full border-4 border-[#2A2A72]/20 border-t-[#2A2A72]" />
+                        <span className="sr-only">
+                          Carregando dados da linha do tempo...
+                        </span>
+                      </div>
+                    ) : (
+                      <article className="mx-auto flex h-[min(38rem,calc(100dvh_-_230px))] w-full flex-col overflow-hidden rounded-[28px] border-4 border-white bg-white text-[#2A2A72] shadow-[10px_10px_0_#FFA400] md:h-[min(30rem,calc(100dvh_-_230px))] md:flex-row">
+                        <div className="flex h-40 shrink-0 items-center justify-center overflow-hidden bg-[#e8e8f5] sm:h-48 md:h-auto md:w-[38%]">
+                          {politico?.foto_url ? (
+                            <img
+                              src={politico.foto_url}
+                              alt={`Foto de ${politico.nome_completo}`}
+                              className="h-full w-full object-cover object-[center_20%]"
+                            />
+                          ) : (
+                            <span className="px-6 text-center text-sm font-bold">
+                              {erro
                                 ? 'Não foi possível carregar a imagem.'
                                 : 'Imagem não cadastrada no banco.'}
-                          </span>
-                        )}
-                      </div>
-                      <div className="flex min-h-0 flex-1 flex-col justify-center overflow-y-auto p-5 sm:p-7 md:p-9">
-                        {carregando ? (
-                          <p role="status" className="font-semibold">
-                            Carregando dados do banco...
-                          </p>
-                        ) : erro ? (
-                          <p
-                            role="alert"
-                            className="font-semibold text-red-700"
-                          >
-                            {erro}
-                          </p>
-                        ) : politico ? (
-                          <>
-                            <h2 className="text-2xl font-black leading-tight sm:text-3xl">
-                              {politico.nome_completo}
-                            </h2>
-                            <p className="mt-4 text-xs font-extrabold uppercase tracking-[0.12em] text-[#16803C]">
-                              Contexto histórico
+                            </span>
+                          )}
+                        </div>
+                        <div className="flex min-h-0 flex-1 flex-col justify-center overflow-y-auto p-5 sm:p-7 md:p-9">
+                          {erro ? (
+                            <p
+                              role="alert"
+                              className="font-semibold text-red-700"
+                            >
+                              {erro}
                             </p>
-                            <p className="mt-1 text-sm leading-relaxed text-[#333] sm:text-base">
-                              {periodo.contexto}
+                          ) : politico ? (
+                            <>
+                              <h2 className="text-2xl font-black leading-tight sm:text-3xl">
+                                {politico.nome_completo}
+                              </h2>
+                              <p className="mt-4 text-xs font-extrabold uppercase tracking-[0.12em] text-[#16803C]">
+                                Contexto histórico
+                              </p>
+                              <p className="mt-1 text-sm leading-relaxed text-[#333] sm:text-base">
+                                {periodo.contexto}
+                              </p>
+                              <p className="mt-4 text-xs font-extrabold uppercase tracking-[0.12em] text-[#16803C]">
+                                Destaques do governo
+                              </p>
+                              <ul className="mt-1 list-disc space-y-1 pl-5 text-sm leading-relaxed text-[#333] sm:text-base">
+                                {periodo.destaques.map((destaque) => (
+                                  <li key={destaque}>{destaque}</li>
+                                ))}
+                              </ul>
+                            </>
+                          ) : (
+                            <p role="alert" className="font-semibold">
+                              Não encontramos o registro de {periodo.periodo} no
+                              banco de dados.
                             </p>
-                            <p className="mt-4 text-xs font-extrabold uppercase tracking-[0.12em] text-[#16803C]">
-                              Destaques do governo
-                            </p>
-                            <ul className="mt-1 list-disc space-y-1 pl-5 text-sm leading-relaxed text-[#333] sm:text-base">
-                              {periodo.destaques.map((destaque) => (
-                                <li key={destaque}>{destaque}</li>
-                              ))}
-                            </ul>
-                          </>
-                        ) : (
-                          <p role="alert" className="font-semibold">
-                            Não encontramos o registro de {periodo.periodo} no
-                            banco de dados.
-                          </p>
-                        )}
-                      </div>
-                    </article>
+                          )}
+                        </div>
+                      </article>
+                    )}
                     {politico && !carregando && !erro && (
                       <button
                         type="button"
