@@ -180,7 +180,7 @@ function LinhaDoTempo() {
                       {periodo.periodo}
                     </p>
                   </div>
-                  <div className="relative mx-auto w-full max-w-4xl">
+                  <div className="relative mx-auto w-full max-w-[60rem]">
                     {periodoAtivo && (
                       <>
                         <button
@@ -209,7 +209,7 @@ function LinhaDoTempo() {
                         )}
                       </>
                     )}
-                    <article className="mx-auto flex max-h-[calc(100dvh-230px)] w-full flex-col overflow-hidden rounded-[28px] border-4 border-white bg-white text-[#2A2A72] shadow-[10px_10px_0_#FFA400] md:min-h-[380px] md:flex-row">
+                    <article className="mx-auto flex h-[min(38rem,calc(100dvh_-_230px))] w-full flex-col overflow-hidden rounded-[28px] border-4 border-white bg-white text-[#2A2A72] shadow-[10px_10px_0_#FFA400] md:h-[min(30rem,calc(100dvh_-_230px))] md:flex-row">
                       <div className="flex h-40 shrink-0 items-center justify-center overflow-hidden bg-[#e8e8f5] sm:h-48 md:h-auto md:w-[38%]">
                         {politico?.foto_url ? (
                           <img
@@ -227,7 +227,7 @@ function LinhaDoTempo() {
                           </span>
                         )}
                       </div>
-                      <div className="flex min-h-0 flex-1 flex-col justify-center p-5 sm:p-7 md:p-9">
+                      <div className="flex min-h-0 flex-1 flex-col justify-center overflow-y-auto p-5 sm:p-7 md:p-9">
                         {carregando ? (
                           <p role="status" className="font-semibold">
                             Carregando dados do banco...
@@ -274,6 +274,22 @@ function LinhaDoTempo() {
           })}
         </div>
       </main>
+      <div
+        role="progressbar"
+        aria-label="Progresso da linha do tempo"
+        aria-valuemin={0}
+        aria-valuemax={totalSlides - 1}
+        aria-valuenow={slideAtual}
+        aria-valuetext={`${slideAtual} de ${totalSlides - 1} períodos`}
+        className="absolute inset-x-0 bottom-0 z-50 h-2 bg-white/35"
+      >
+        <div
+          className="h-full bg-[#FFA400] transition-[width] duration-700 ease-in-out"
+          style={{
+            width: `${(slideAtual / (totalSlides - 1)) * 100}%`,
+          }}
+        />
+      </div>
     </div>
   );
 }
