@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { FiArrowLeft, FiArrowRight } from 'react-icons/fi';
+import { useLocation, useNavigate } from 'react-router-dom';
 import Brasil from '../../assets/SVGs/brasil.svg';
 import Header from '../../components/header';
 import { listarCandidatos, type Candidato } from '../../services/api';
@@ -81,10 +82,23 @@ function normalizarNome(nome: string) {
 }
 
 function LinhaDoTempo() {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const estadoNavegacao = location.state;
+  const slideInicial =
+    estadoNavegacao &&
+    typeof estadoNavegacao === 'object' &&
+    'slideAtual' in estadoNavegacao &&
+    typeof estadoNavegacao.slideAtual === 'number' &&
+    Number.isInteger(estadoNavegacao.slideAtual) &&
+    estadoNavegacao.slideAtual >= 0 &&
+    estadoNavegacao.slideAtual <= PERIODOS_PRESIDENCIAIS.length
+      ? estadoNavegacao.slideAtual
+      : 0;
   const [politicos, setPoliticos] = useState<Candidato[]>([]);
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState('');
-  const [slideAtual, setSlideAtual] = useState(0);
+  const [slideAtual, setSlideAtual] = useState<number>(slideInicial);
   const totalSlides = PERIODOS_PRESIDENCIAIS.length + 1;
 
   useEffect(() => {
@@ -150,7 +164,7 @@ function LinhaDoTempo() {
               <button
                 type="button"
                 onClick={avancar}
-                className="mt-10 rounded-full border-2 border-white bg-[#16803C] px-9 py-4 text-sm font-extrabold tracking-[0.12em] text-white shadow-[4px_4px_0_#2A2A72] transition hover:translate-y-[-2px] hover:shadow-[4px_6px_0_#2A2A72] focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-[#2A2A72]"
+                className="mt-10 rounded-full border-2 border-white bg-[#16803C] px-9 py-4 text-sm font-extrabold tracking-[0.12em] text-white transition hover:translate-y-[-2px] focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-[#2A2A72]"
               >
                 DESCOBRIR
               </button>
@@ -175,7 +189,12 @@ function LinhaDoTempo() {
                 className={`flex h-full w-screen shrink-0 items-center justify-center overflow-hidden px-20 pb-8 pt-[90px] text-white sm:px-24 ${fundo}`}
               >
                 <div className="w-full max-w-5xl">
-                  <div className="mb-5 flex items-center justify-center">
+                  <div className="mb-5 flex items-center justify-center gap-3">
+                    <img
+                      src={Brasil}
+                      alt="Bandeira do Brasil"
+                      className="h-6 w-9 rounded-sm object-cover shadow-sm"
+                    />
                     <p className="text-center text-3xl font-black text-[#FFA400] md:text-5xl">
                       {periodo.periodo}
                     </p>
@@ -187,7 +206,7 @@ function LinhaDoTempo() {
                           type="button"
                           onClick={voltar}
                           aria-label="Voltar para o período anterior"
-                          className="absolute left-[-5rem] top-1/2 z-20 flex h-[8rem] w-[8rem] -translate-y-1/2 items-center justify-center rounded-full border-2 border-white bg-[#16803C] text-white shadow-[4px_4px_0_#2A2A72] transition hover:-translate-x-1 hover:shadow-[2px_4px_0_#2A2A72] focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-[#2A2A72] sm:left-[-10rem] sm:h-20 sm:w-25 "
+                          className="absolute left-[-5rem] top-1/2 z-20 flex h-[8rem] w-[8rem] -translate-y-1/2 items-center justify-center rounded-full border-2 border-white bg-[#16803C] text-white transition hover:-translate-x-1 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-[#2A2A72] sm:left-[-10rem] sm:h-20 sm:w-25 "
                         >
                           <FiArrowLeft
                             aria-hidden="true"
@@ -199,7 +218,7 @@ function LinhaDoTempo() {
                             type="button"
                             onClick={avancar}
                             aria-label={`Avançar para o período ${PERIODOS_PRESIDENCIAIS[index + 1].periodo}`}
-                            className="absolute right-[-5rem] top-1/2 z-20 flex h-[8rem] w-[8rem] -translate-y-1/2 items-center justify-center rounded-full border-2 border-white bg-[#16803C] text-white shadow-[4px_4px_0_#2A2A72] transition hover:translate-x-1 hover:shadow-[2px_4px_0_#2A2A72] focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-[#2A2A72] sm:right-[-10rem] sm:h-20 sm:w-25"
+                            className="absolute right-[-5rem] top-1/2 z-20 flex h-[8rem] w-[8rem] -translate-y-1/2 items-center justify-center rounded-full border-2 border-white bg-[#16803C] text-white transition hover:translate-x-1 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-[#2A2A72] sm:right-[-10rem] sm:h-20 sm:w-25"
                           >
                             <FiArrowRight
                               aria-hidden="true"
@@ -267,6 +286,25 @@ function LinhaDoTempo() {
                         )}
                       </div>
                     </article>
+                    {politico && !carregando && !erro && (
+                      <button
+                        type="button"
+                        onClick={() =>
+                          navigate(
+                            `/pagina_politico?id=${encodeURIComponent(politico.id)}`,
+                            {
+                              state: {
+                                voltarPara: '/linha_do_tempo',
+                                slideAtual,
+                              },
+                            },
+                          )
+                        }
+                        className="mt-5 rounded-full border-2 border-white bg-[#FFA400] px-5 py-2 text-sm font-bold text-[#2A2A72] transition hover:-translate-y-0.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+                      >
+                        Saiba mais
+                      </button>
+                    )}
                   </div>
                 </div>
               </section>
