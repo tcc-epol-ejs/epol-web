@@ -221,7 +221,7 @@ const CANDIDATOS_EXEMPLO: CandidatoUrna[] = [
 
 function Stepper({ atual }: { atual: number }) {
   return (
-    <ol className="grid grid-cols-1 sm:grid-cols-3 overflow-hidden rounded-t-xl">
+    <ol className="grid grid-cols-3 overflow-hidden rounded-t-xl">
       {ETAPAS.map((nome, i) => {
         const numero = i + 1;
         const ativa = numero === atual;
@@ -231,7 +231,7 @@ function Stepper({ atual }: { atual: number }) {
           <li
             key={nome}
             aria-current={ativa ? 'step' : undefined}
-            className={`flex items-center gap-3 px-5 py-4 border-b-4 transition-colors ${
+            className={`flex items-center justify-center sm:justify-start gap-2 sm:gap-3 px-2 sm:px-5 py-3 sm:py-4 border-b-4 transition-colors ${
               ativa
                 ? 'bg-[#FFA400] border-[#c47f00] text-white'
                 : concluida
@@ -240,7 +240,7 @@ function Stepper({ atual }: { atual: number }) {
             }`}
           >
             <span
-              className={`flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full border-2 text-base font-bold ${
+              className={`flex h-8 w-8 sm:h-9 sm:w-9 flex-shrink-0 items-center justify-center rounded-full border-2 text-base font-bold ${
                 ativa
                   ? 'bg-white text-[#FFA400] border-white'
                   : concluida
@@ -250,7 +250,13 @@ function Stepper({ atual }: { atual: number }) {
             >
               {numero}
             </span>
-            <span className="text-sm font-bold leading-tight">{nome}</span>
+            <span
+              className={`text-xs sm:text-sm font-bold leading-tight ${
+                ativa ? '' : 'hidden sm:inline'
+              }`}
+            >
+              {nome}
+            </span>
           </li>
         );
       })}
@@ -311,8 +317,10 @@ function CardCenario({
           : 'bg-white hover:bg-[#f4f4fd]'
       }`}
     >
-      <h3 className="text-3xl font-bold text-[#1f2a52]">{cenario.titulo}</h3>
-      <p className="text-xl text-[#5A5A70]">{cenario.descricao}</p>
+      <h3 className="text-2xl sm:text-3xl font-bold text-[#1f2a52]">
+        {cenario.titulo}
+      </h3>
+      <p className="text-base sm:text-xl text-[#5A5A70]">{cenario.descricao}</p>
 
       {selecionado && (
         <span className="mt-auto rounded-full bg-[#2a2a72] px-4 py-1 text-base font-semibold text-white">
@@ -328,7 +336,7 @@ function CardCenario({
 function Cabecalho({ cenario }: { cenario: Cenario }) {
   return (
     <header className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-      <h1 className="text-4xl font-bold text-[#2a2a72]">
+      <h1 className="text-2xl sm:text-4xl font-bold text-[#2a2a72]">
         Simulador de votação
       </h1>
 
@@ -361,7 +369,7 @@ function SimuladorEtapa1({
       <div className="mt-6 overflow-hidden rounded-xl bg-[#f4f5f9] shadow-sm">
         <Stepper atual={1} />
 
-        <div className="px-6 py-8 sm:px-12">
+        <div className="px-3 py-6 sm:px-12 sm:py-8">
           <div className="mb-5 flex items-start justify-between gap-4">
             <p className="text-base text-[#1f2a52]">
               Defina o tipo de eleição e o turno que deseja simular.
@@ -379,7 +387,7 @@ function SimuladorEtapa1({
             </BotaoDuvida>
           </div>
 
-          <div className="rounded-xl bg-[#8888D3] p-6">
+          <div className="rounded-xl bg-[#8888D3] p-3 sm:p-6">
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
               {CENARIOS.map((cenario) => (
                 <CardCenario
@@ -434,7 +442,7 @@ function SimuladorEtapa2({
       <div className="mt-6 overflow-hidden rounded-xl bg-[#f4f5f9] shadow-sm">
         <Stepper atual={2} />
 
-        <div className="px-6 py-8 sm:px-12">
+        <div className="px-3 py-6 sm:px-12 sm:py-8">
           <div className="mb-5 flex items-start justify-between gap-4">
             <p className="text-base text-[#1f2a52]">
               Escolha um cargo para conhecer os candidatos e anote os números
@@ -462,7 +470,7 @@ function SimuladorEtapa2({
           </div>
 
           {/* Escolha do cargo */}
-          <div className="rounded-xl bg-[#8888D3] p-6">
+          <div className="rounded-xl bg-[#8888D3] p-3 sm:p-6">
             <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
               {cenario.cargos.map((id) => (
                 <CardCargo
@@ -479,7 +487,7 @@ function SimuladorEtapa2({
           </div>
 
           {/* Candidatos do cargo escolhido */}
-          <div className="mt-6 rounded-xl bg-[#8888D3] p-6">
+          <div className="rounded-xl bg-[#8888D3] p-3 sm:p-6">
             <h2 className="mb-4 text-xl font-bold text-white">
               {cargo.nome}{' '}
               <span className="text-sm font-semibold opacity-80">
@@ -644,7 +652,7 @@ function SimuladorEtapa3({
       <div className="mt-6 overflow-hidden rounded-xl bg-[#f4f5f9] shadow-sm">
         <Stepper atual={3} />
 
-        <div className="px-6 py-8 sm:px-12">
+        <div className="px-3 py-6 sm:px-12 sm:py-8">
           <div className="mb-4 flex justify-end">
             <BotaoDuvida
               alinhamento="direita"
@@ -669,11 +677,10 @@ function SimuladorEtapa3({
             </BotaoDuvida>
           </div>
 
-          <div className="mx-auto w-full max-w-[520px] rounded-2xl bg-[#ecece4] p-4 shadow-lg ring-1 ring-black/10">
-            {/* Visor */}
-            <div className="rounded-sm bg-black p-3">
+          <div className="mx-auto w-full max-w-[520px] rounded-2xl bg-[#ecece4] p-2 sm:p-4 shadow-lg ring-1 ring-black/10">
+            <div className="rounded-sm bg-black p-2 sm:p-3">
               <div
-                className="flex h-[340px] flex-col overflow-hidden bg-white p-4 text-black"
+                className="flex h-[320px] sm:h-[340px] flex-col overflow-hidden bg-white p-3 sm:p-4 text-black"
                 aria-live="polite"
               >
                 {fase === 'fim' && (
