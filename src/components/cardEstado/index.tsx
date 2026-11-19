@@ -71,24 +71,6 @@ export default function CardEstado({
         </div>
       </div>
 
-      {/* CIDADE */}
-      <div className="mb-3">
-        <p className="mb-1 text-[8px] font-extrabold uppercase tracking-wide text-[#555]">
-          Cidade
-        </p>
-
-        <select
-          defaultValue=""
-          className="h-[27px] w-full rounded-[6px] border border-gray-200 bg-[#F7F7F7] px-2 text-[9px] font-semibold text-[#555] outline-none"
-        >
-          <option value="" disabled>
-            Selecione uma cidade
-          </option>
-
-          <option value="capital">Capital</option>
-        </select>
-      </div>
-
       {/* GOVERNADOR */}
       <div className="mb-3">
         <p className="mb-1 text-[8px] font-extrabold uppercase tracking-wide text-[#555]">
@@ -133,7 +115,7 @@ export default function CardEstado({
       </div>
 
       {/* VICE GOVERNADOR */}
-      <div className="mb-3">
+      <div>
         <p className="mb-1 text-[8px] font-extrabold uppercase tracking-wide text-[#555]">
           Vice-Governador(a):
         </p>
@@ -148,32 +130,6 @@ export default function CardEstado({
               {VICE_VAGO.has(sigla) ? 'Cargo vago' : 'Informação em breve'}
             </p>
           )}
-        </div>
-      </div>
-
-      {/* PREFEITO */}
-      <div className="mb-3">
-        <p className="mb-1 text-[8px] font-extrabold uppercase tracking-wide text-[#555]">
-          Prefeito(a):
-        </p>
-
-        <div className="flex items-center justify-end">
-          <p className="text-right text-[9px] font-bold text-gray-400">
-            Informação em breve
-          </p>
-        </div>
-      </div>
-
-      {/* VICE-PREFEITO */}
-      <div>
-        <p className="mb-1 text-[8px] font-extrabold uppercase tracking-wide text-[#555]">
-          Vice-Prefeito(a):
-        </p>
-
-        <div className="flex items-center justify-end">
-          <p className="text-right text-[9px] font-bold text-gray-400">
-            Informação em breve
-          </p>
         </div>
       </div>
     </div>

@@ -167,12 +167,20 @@ type Item =
       sigla: string;
       nome: string;
       governos: number;
+    }
+  | {
+      tipo: 'vice';
+      chave: string;
+      nome: string;
+      governador: Candidato;
+      estado: Estado;
     };
 
 const TITULO_GRUPO: Record<Item['tipo'], string> = {
   estado: 'Estados',
   politico: 'Políticos',
   partido: 'Partidos',
+  vice: 'Vice-governadores',
 };
 
 export default function VisualizadorGeografico() {
@@ -467,6 +475,24 @@ export default function VisualizadorGeografico() {
             : null,
       }));
 
+    const vices: Item[] = ESTADOS.flatMap((estado) => {
+      const governador = governadoresPorUF[estado.sigla];
+      return governador?.vice
+        ? [{ estado, governador, nome: governador.vice }]
+        : [];
+    })
+      .map((x) => ({ ...x, p: pontuar([norm(x.nome)], tokens) }))
+      .filter((x) => x.p > 0)
+      .sort((a, b) => b.p - a.p)
+      .slice(0, 5)
+      .map((x) => ({
+        tipo: 'vice' as const,
+        chave: `v-${x.estado.sigla}`,
+        nome: x.nome,
+        governador: x.governador,
+        estado: x.estado,
+      }));
+
     const partidos: Item[] = partidosConhecidos
       .map((partido) => ({
         partido,
@@ -485,7 +511,7 @@ export default function VisualizadorGeografico() {
         ).length,
       }));
 
-    return [...estados, ...politicos, ...partidos];
+    return [...estados, ...politicos, ...vices, ...partidos];
   }, [pesquisa, candidatos, partidosConhecidos, governadoresPorUF]);
 
   function escolher(item: Item) {
@@ -495,6 +521,8 @@ export default function VisualizadorGeografico() {
       setPartidosAtivos((prev) =>
         prev.includes(item.sigla) ? prev : [...prev, item.sigla],
       );
+    } else if (item.tipo === 'vice') {
+      setEstadoFixo(item.estado.sigla);
     } else if (item.estado) {
       setEstadoFixo(item.estado.sigla);
     } else {
@@ -532,7 +560,8 @@ export default function VisualizadorGeografico() {
     <>
       <main className="min-h-screen w-full bg-[#FFA400] overflow-hidden">
         <style>{`
-        .epol-map { width: 100%; max-width: 620px; height: auto; display: block; overflow: visible; }
+        .epol-map { width: 100%; max-width: 600px; height: auto; display: block; overflow: visible; margin: 0 auto; }
+        .epol-map .map { width: 100% !important; }
         .epol-map svg { width: 100%; height: auto; }
         .epol-map svg path { stroke: #B4B4B4; stroke-width: 1.2; transition: fill 0.2s ease; cursor: pointer !important; }
         .epol-map svg text.epol-sigla { fill: #2A2A72; stroke: none; font-weight: 800; font-family: 'Montserrat', sans-serif; pointer-events: none; user-select: none; transition: fill 0.2s ease; }
@@ -544,7 +573,7 @@ export default function VisualizadorGeografico() {
         </div>
 
         <section className="min-h-screen w-full px-6 pb-10 pt-[155px] md:px-10 lg:px-[65px]">
-          <div className="mx-auto grid min-h-[calc(100vh-155px)] w-full max-w-[1600px] grid-cols-1 gap-8 lg:grid-cols-[280px_minmax(420px,1fr)_360px] items-start pt-8">
+          <div className="mx-auto grid min-h-[calc(100vh-155px)] w-full max-w-[1600px] grid-cols-1 gap-8 lg:grid-cols-[260px_minmax(0,1fr)_340px] items-start pt-8">
             {/*ESQUERDA*/}
             <div className="flex flex-col justify-center gap-32">
               <div className="select-none">
@@ -567,10 +596,10 @@ export default function VisualizadorGeografico() {
 
             {/* MAPA */}
             <div className="flex items-center justify-center">
-              <div className="w-full max-w-[620px]">
+              <div className="w-full max-w-[800px]">
                 <div
                   ref={mapaRef}
-                  className="epol-map w-full max-w-[620px]"
+                  className="epol-map w-full max-w-[800px]"
                   onMouseOver={obterEstadoDoMapa}
                   onMouseOut={limparEstado}
                   onClick={clicarEstadoNoMapa}
@@ -807,6 +836,24 @@ export default function VisualizadorGeografico() {
                                   {item.estado
                                     ? `Ver ${item.estado.sigla}`
                                     : 'Ver perfil'}
+                                </span>
+                              </>
+                            )}
+
+                            {item.tipo === 'vice' && (
+                              <>
+                                <div className="min-w-0 flex-1">
+                                  <p className="truncate text-sm font-bold text-[#333]">
+                                    {item.nome}
+                                  </p>
+                                  <p className="truncate text-xs text-[#777]">
+                                    Vice-governador(a) de {item.estado.nome} ·
+                                    Governador(a):{' '}
+                                    {item.governador.nome_politico}
+                                  </p>
+                                </div>
+                                <span className="shrink-0 text-xs font-bold text-[#FFA400]">
+                                  Ver {item.estado.sigla}
                                 </span>
                               </>
                             )}
