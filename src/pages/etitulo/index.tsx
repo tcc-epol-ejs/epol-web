@@ -38,38 +38,36 @@ function Etitulo() {
         </div>
 
         {/* PRIMEIRA PARTE SEÇÃO */}
-        <div className="relative w-full min-h-[100dvh] bg-[#eaf6ff] flex flex-col md:flex-row justify-between items-center md:items-start overflow-hidden pt-24 sm:pt-32 md:pt-40 lg:pt-[8vw] pb-16 md:pb-20 px-4 sm:px-8 md:pl-[0vw] gap-10 md:gap-6">
+
+        <div className="relative w-full min-h-[100dvh] bg-[#eaf6ff] flex flex-col md:flex-row justify-between items-center md:items-start overflow-hidden pt-24 sm:pt-32 md:pt-40 lg:pt-[8vw] pb-24 md:pb-20 px-4 sm:px-8 md:pl-[0vw] gap-6 md:gap-6">
           {/* COLUNA ESQUERDA - IMAGEM COM TEXTO */}
-          <div className="flex flex-col items-center md:items-start w-full md:max-w-[55%] mt-4 md:mt-[4vw]">
+          <div className="flex flex-col items-center md:items-start w-full md:max-w-[55%] mt-2 md:mt-[4vw]">
             <img
               src={etitulo}
               alt="etitulo"
-              className="w-full max-w-[720px] md:max-w-none md:w-[115%] lg:w-[130%] h-auto "
+              className="w-full max-w-[420px] sm:max-w-[560px] md:max-w-none md:w-[115%] lg:w-[130%] h-auto"
             />
           </div>
 
           {/* COLUNA DIREITA - MASCOTE */}
-          <div className="shrink-0 flex justify-center md:justify-end w-full md:w-[38%] max-w-[380px] md:max-w-[560px]">
+          <div className="shrink-0 flex justify-center md:justify-end w-full md:w-[38%] max-w-[300px] sm:max-w-[380px] md:max-w-[560px]">
             <div
               ref={trackRef}
-              className="relative w-full aspect-[480/500] mt-4 md:mt-8"
+              className="relative w-full aspect-[480/500] mt-2 md:mt-8"
             >
               <img
                 src={retanguloazul}
                 alt="retanguloazul"
-                className="absolute top-0 left-[30%] w-full h-full object-contain"
+                className="absolute top-0 left-0 md:left-[30%] w-full h-full object-contain"
               />
               <img
                 src={pipo_fechado}
                 alt="pipo_fechado"
-                className="absolute"
-                style={{
-                  bottom: '-30%',
-                  left: '25%',
-                  width: '200%',
-                  height: '140%',
-                  objectFit: 'cover',
-                }}
+                className="
+          absolute object-contain
+          bottom-0 left-1/2 -translate-x-1/2 w-[110%] h-[110%]
+          md:bottom-[-30%] md:left-[25%] md:translate-x-0 md:w-[200%] md:h-[140%] md:object-cover
+        "
               />
             </div>
           </div>
@@ -78,7 +76,7 @@ function Etitulo() {
           <button
             onClick={scrollToNextSection}
             aria-label="Rolar para a próxima seção"
-            className="absolute bottom-6 sm:bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center animate-bounce z-[1] cursor-pointer"
+            className="absolute bottom-4 sm:bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center animate-bounce z-[1] cursor-pointer"
           >
             <svg
               width="28"
@@ -113,10 +111,10 @@ function Etitulo() {
           {bolasConfig.map((b, i) => (
             <div
               key={i}
-              className="absolute rounded-full hidden sm:block"
+              className="absolute rounded-full"
               style={{
-                width: `min(${b.size}px, 22vw)`,
-                height: `min(${b.size}px, 22vw)`,
+                width: `min(${b.size}px, 28vw)`,
+                height: `min(${b.size}px, 28vw)`,
                 top: 'top' in b ? b.top : undefined,
                 bottom: 'bottom' in b ? b.bottom : undefined,
                 left: 'left' in b ? b.left : undefined,
