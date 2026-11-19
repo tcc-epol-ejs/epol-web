@@ -82,6 +82,14 @@ function RecuperarSenha({ onSuccess }: RecuperarSenhaProps) {
   // arredondado que cresce conforme o conteúdo.
   const isCircle = useMediaQuery('(min-width: 768px) and (min-height: 640px)');
 
+  // As duas formas amarelas formam o losango da bandeira do Brasil (com o
+  // círculo como o globo). Isso só funciona em tela larga e deitada; em tela
+  // vertical elas viram triângulos finos e perdem o sentido, então ali o
+  // fundo fica só com as bolinhas.
+  const mostrarBandeira = useMediaQuery(
+    '(min-width: 768px) and (orientation: landscape)',
+  );
+
   const circleSize = 'min(580px, 75vw, 75dvh)';
   const gap = '20px';
 
@@ -175,23 +183,27 @@ function RecuperarSenha({ onSuccess }: RecuperarSenhaProps) {
           />
         ))}
 
-        <div
-          className="absolute inset-y-0 left-0 z-10"
-          style={{
-            width: '50vw',
-            backgroundColor: '#FFA400',
-            clipPath: `polygon(0% 50%, 100% 0%, calc(100% - ${gap}) 50%, 100% 100%)`,
-          }}
-        />
+        {mostrarBandeira && (
+          <>
+            <div
+              className="absolute inset-y-0 left-0 z-10"
+              style={{
+                width: '50vw',
+                backgroundColor: '#FFA400',
+                clipPath: `polygon(0% 50%, 100% 0%, calc(100% - ${gap}) 50%, 100% 100%)`,
+              }}
+            />
 
-        <div
-          className="absolute inset-y-0 right-0 z-10"
-          style={{
-            width: '50vw',
-            backgroundColor: '#FFA400',
-            clipPath: `polygon(${gap} 0%, 100% 50%, ${gap} 100%, 0% 50%)`,
-          }}
-        />
+            <div
+              className="absolute inset-y-0 right-0 z-10"
+              style={{
+                width: '50vw',
+                backgroundColor: '#FFA400',
+                clipPath: `polygon(${gap} 0%, 100% 50%, ${gap} 100%, 0% 50%)`,
+              }}
+            />
+          </>
+        )}
 
         {/* Desktop/tablet com altura suficiente: círculo (layout original).
             Celular ou tela baixa: cartão arredondado com altura automática. */}
