@@ -39,35 +39,32 @@ function Etitulo() {
 
         {/* PRIMEIRA PARTE SEÇÃO */}
 
-        <div className="relative w-full min-h-[100dvh] bg-[#eaf6ff] flex flex-col md:flex-row justify-between items-center md:items-start overflow-hidden pt-24 sm:pt-32 md:pt-40 lg:pt-[8vw] pb-24 md:pb-20 px-4 sm:px-8 md:pl-[0vw] gap-6 md:gap-6">
-          {/* COLUNA ESQUERDA - IMAGEM COM TEXTO */}
-          <div className="flex flex-col items-center md:items-start w-full md:max-w-[55%] mt-2 md:mt-[4vw]">
+        {/* PRIMEIRA PARTE SEÇÃO */}
+        <div className="relative w-full min-h-[100dvh] bg-[#eaf6ff] flex flex-col md:flex-row justify-center md:justify-between items-center md:items-start overflow-hidden pt-24 sm:pt-32 md:pt-40 lg:pt-[8vw] pb-24 md:pb-20 px-4 sm:px-8 md:pl-[0vw] gap-8 md:gap-6">
+          {/* COLUNA ESQUERDA */}
+          <div className="flex flex-col items-center md:items-start w-full md:max-w-[55%] md:mt-[4vw] -mx-4 sm:mx-0">
             <img
               src={etitulo}
               alt="etitulo"
-              className="w-full max-w-[420px] sm:max-w-[560px] md:max-w-none md:w-[115%] lg:w-[130%] h-auto"
+              className="w-[calc(100%+2rem)] max-w-none sm:w-full sm:max-w-[520px] md:max-w-none md:w-[115%] lg:w-[130%] h-auto"
             />
           </div>
 
           {/* COLUNA DIREITA - MASCOTE */}
-          <div className="shrink-0 flex justify-center md:justify-end w-full md:w-[38%] max-w-[300px] sm:max-w-[380px] md:max-w-[560px]">
+          <div className="shrink-0 flex justify-center md:justify-end w-full md:w-[38%] md:max-w-[560px]">
             <div
               ref={trackRef}
-              className="relative w-full aspect-[480/500] mt-2 md:mt-8"
+              className="relative w-[70%] max-w-[260px] aspect-square md:w-full md:max-w-none md:aspect-[480/500] md:mt-8"
             >
               <img
                 src={retanguloazul}
                 alt="retanguloazul"
-                className="absolute top-0 left-0 md:left-[30%] w-full h-full object-contain"
+                className="absolute inset-0 w-full h-full object-contain md:inset-auto md:top-0 md:left-[30%]"
               />
               <img
                 src={pipo_fechado}
                 alt="pipo_fechado"
-                className="
-          absolute object-contain
-          bottom-0 left-1/2 -translate-x-1/2 w-[110%] h-[110%]
-          md:bottom-[-30%] md:left-[25%] md:translate-x-0 md:w-[200%] md:h-[140%] md:object-cover
-        "
+                className="absolute inset-0 w-full h-full object-contain md:inset-auto md:bottom-[-30%] md:left-[25%] md:w-[200%] md:h-[140%] md:object-cover"
               />
             </div>
           </div>
