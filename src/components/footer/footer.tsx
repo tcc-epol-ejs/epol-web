@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 
 // 1º turno das Eleições 2026 - 4 de outubro, 8h (horário de Brasília)
-const ELECTION_DATE = new Date('2026-10-04T08:00:00-03:00');
+const ELECTION_DATE = new Date('2026-12-10T08:00:00-03:00');
 
 interface TimeLeft {
   days: number;
