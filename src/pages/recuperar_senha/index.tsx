@@ -1,5 +1,6 @@
 import { ChangeEvent, useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
+import { useAuth } from '../../contexts/AuthContext';
 import Textbox from '../../components/inputs';
 import Botao from '../../components/botoes/botao';
 import Confirmar from '../../components/botoes/botaoRecuperar/confirmar';
@@ -35,8 +36,14 @@ function RecuperarSenha({ onSuccess }: RecuperarSenhaProps) {
   const [searchParams] = useSearchParams();
   const token = searchParams.get('token');
   const isResetStep = Boolean(token);
+  const location = useLocation();
+  const { usuario } = useAuth();
+  const veioDoPerfil =
+    (location.state as { origem?: string } | null)?.origem === 'perfil';
 
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState(
+    veioDoPerfil ? (usuario?.email ?? '') : '',
+  );
   const [novaSenha, setNovaSenha] = useState('');
   const [confirmarSenha, setConfirmarSenha] = useState('');
 
@@ -107,6 +114,8 @@ function RecuperarSenha({ onSuccess }: RecuperarSenhaProps) {
     setConfirmarSenha('');
     if (isResetStep) {
       navigate('/login');
+    } else if (veioDoPerfil) {
+      navigate('/perfil');
     } else if (onSuccess) {
       onSuccess();
     }
@@ -163,7 +172,11 @@ function RecuperarSenha({ onSuccess }: RecuperarSenhaProps) {
             />
 
             <h1 className="text-[#2d2d6b] font-bold text-center text-[22px] leading-tight">
-              {isResetStep ? 'Defina sua nova senha!' : 'Recupere sua senha!'}
+              {isResetStep
+                ? 'Defina sua nova senha!'
+                : veioDoPerfil
+                  ? 'Altere sua senha!'
+                  : 'Recupere sua senha!'}
             </h1>
 
             {isResetStep ? (
@@ -206,10 +219,18 @@ function RecuperarSenha({ onSuccess }: RecuperarSenhaProps) {
             )}
 
             <Botao onClick={isResetStep ? handleResetPassword : handleRecover}>
-              {isResetStep ? 'REDEFINIR SENHA' : 'ENVIAR LINK DE RECUPERAÇÃO'}
+              {isResetStep
+                ? 'REDEFINIR SENHA'
+                : veioDoPerfil
+                  ? 'ENVIAR LINK PARA ALTERAR SENHA'
+                  : 'ENVIAR LINK DE RECUPERAÇÃO'}
             </Botao>
 
-            <Voltar onClick={() => navigate('/login')}>Voltar</Voltar>
+            <Voltar
+              onClick={() => navigate(veioDoPerfil ? '/perfil' : '/login')}
+            >
+              Voltar
+            </Voltar>
           </div>
         </div>
       </section>
@@ -219,14 +240,20 @@ function RecuperarSenha({ onSuccess }: RecuperarSenhaProps) {
           <div className="relative w-full max-w-md rounded-[32px] bg-white p-6 text-[#2d2d6b] shadow-[0_35px_60px_-15px_rgba(0,0,0,0.45)]">
             <div className="mt-8 text-center">
               <p className="text-lg font-bold">
-                {isResetStep ? 'Senha redefinida!' : 'Recuperação iniciada'}
+                {isResetStep
+                  ? 'Senha redefinida!'
+                  : veioDoPerfil
+                    ? 'Link enviado'
+                    : 'Recuperação iniciada'}
               </p>
               <p className="mt-4 text-base leading-7 text-[#7b6bb5]">
                 {isResetStep ? (
                   'Sua senha foi alterada com sucesso. Você já pode fazer login normalmente.'
                 ) : (
                   <>
-                    Um link de recuperação foi enviado para o e-mail:{' '}
+                    {veioDoPerfil
+                      ? 'Enviamos um link para alterar sua senha para o e-mail: '
+                      : 'Um link de recuperação foi enviado para o e-mail: '}
                     <strong>{email}</strong>
                   </>
                 )}

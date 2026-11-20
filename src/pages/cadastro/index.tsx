@@ -1,7 +1,11 @@
 import { ChangeEvent, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { cadastrar, listarPartidos } from '../../services/api';
-import type { Partido } from '../../services/api';
+import { cadastrar } from '../../services/api';
+import {
+  uploadFotoPerfil,
+  FOTO_MAX_BYTES,
+  FOTO_TIPOS,
+} from '../../services/supabase';
 import { useAuth } from '../../contexts/AuthContext';
 import Textbox from '../../components/inputs';
 import Botao from '../../components/botoes/botao';
@@ -9,6 +13,7 @@ import LogoEpol from '../../assets/Imagens/Logos/logoepol.png';
 import { ToastContainer, useToasts } from '../../components/toast';
 import DateField from '../../components/inputs/data';
 import Footer from '../../components/footer/footer';
+import SeletorPfpModal from '../../components/seletorPfpModal/index';
 
 const bolasConfig = [
   { size: 280, top: '-40px', left: '-30px', opacity: 1 },
@@ -36,7 +41,6 @@ interface FormData {
   data_nascimento: string;
   email: string;
   confirmEmail: string;
-  partido_id: string;
   senha: string;
   confirmSenha: string;
   estado: string;
@@ -48,7 +52,6 @@ const initialFormData: FormData = {
   data_nascimento: '',
   email: '',
   confirmEmail: '',
-  partido_id: '',
   senha: '',
   confirmSenha: '',
   estado: '',
@@ -130,7 +133,7 @@ function validarCampo(
   }
 }
 
-// Campos que pertencem a cada passo (partido não entra aqui: é opcional, sem validação)
+// Campos que pertencem a cada passo (a foto de perfil é opcional, sem validação)
 const CAMPOS_POR_PASSO: Record<Passo, (keyof FormData)[]> = {
   1: ['nome', 'apelido', 'data_nascimento'],
   2: ['email', 'confirmEmail', 'estado'],
@@ -252,173 +255,59 @@ function EstadoField({
   );
 }
 
-// Seletor de partido customizado (mesmo estilo visual do calendário/estado)
+// Seletor de foto de perfil (opcional)
 
-// Círculo com as iniciais da sigla, usado quando o partido não tem bandeira_url
-// (ou quando a imagem falha ao carregar)
-function IniciaisPartido({ sigla }: { sigla: string }) {
-  return (
-    <span className="w-6 h-6 rounded-full flex-shrink-0 bg-white/70 flex items-center justify-center text-[9px] font-bold text-[#2a2a72]">
-      {sigla.slice(0, 3)}
-    </span>
-  );
-}
-
-function PartidoField({
-  partidos,
-  carregando,
-  value,
-  onChange,
-  placeholder = 'Partido de preferência (opcional)',
+function FotoPerfilField({
+  preview,
+  onAbrir,
+  onRemover,
 }: {
-  partidos: Partido[];
-  carregando?: boolean;
-  value: string;
-  onChange: (idPartido: string) => void;
-  placeholder?: string;
+  preview: string | null;
+  onAbrir: () => void;
+  onRemover: () => void;
 }) {
-  const [aberto, setAberto] = useState(false);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const partidoSelecionado = partidos.find((p) => p.id === value);
-
-  useEffect(() => {
-    function aoClicarFora(event: MouseEvent) {
-      if (
-        containerRef.current &&
-        !containerRef.current.contains(event.target as Node)
-      ) {
-        setAberto(false);
-      }
-    }
-    document.addEventListener('mousedown', aoClicarFora);
-    return () => document.removeEventListener('mousedown', aoClicarFora);
-  }, []);
-
-  function selecionar(idPartido: string) {
-    onChange(idPartido);
-    setAberto(false);
-  }
-
   return (
-    <div className="relative w-full" ref={containerRef}>
+    <div className="flex flex-col items-center gap-2">
       <button
         type="button"
-        onClick={() => setAberto((prev) => !prev)}
-        className="w-full flex items-center justify-between gap-2 rounded-full border border-[#a9a9f6] bg-[#a9a9f6] px-4 py-2.5 font-medium text-sm outline-none transition-all duration-300 focus:brightness-[1.2]"
+        onClick={onAbrir}
+        aria-label="Escolher foto de perfil"
+        className="w-28 h-28 rounded-full overflow-hidden bg-[#a9a9f6] flex items-center justify-center transition-all duration-300 hover:brightness-[1.15]"
       >
-        <span className="flex items-center gap-2 min-w-0">
-          {partidoSelecionado &&
-            (partidoSelecionado.numero_legenda ? (
-              <div
-                className="w-5 h-5 text-[12px] text-[#2A2A72] font-semibold rounded-full object-cover flex-shrink-0 bg-[#F3C994]"
-                onError={(e) => {
-                  (e.currentTarget as HTMLImageElement).style.display = 'none';
-                }}
-              >
-                {partidoSelecionado.numero_legenda}
-              </div>
-            ) : (
-              // <img
-              //   src={partidoSelecionado.bandeira_url}
-              //   alt=""
-              //   className="w-5 h-5 rounded-full object-cover flex-shrink-0 bg-white"
-              //   onError={(e) => {
-              //     (e.currentTarget as HTMLImageElement).style.display = 'none';
-              //   }}
-              // />
-              <IniciaisPartido sigla={partidoSelecionado.sigla} />
-            ))}
-          <span
-            className={`truncate ${value ? 'text-[#1f2a52]' : 'text-[#5A5A70]'}`}
+        {preview ? (
+          <img
+            src={preview}
+            alt="Pré-visualização da foto de perfil"
+            className="w-full h-full object-cover"
+          />
+        ) : (
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="#2a2a72"
+            strokeWidth={1.8}
+            className="w-10 h-10"
           >
-            {partidoSelecionado
-              ? `${partidoSelecionado.nome_completo} - ${partidoSelecionado.sigla}`
-              : placeholder}
-          </span>
-        </span>
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="#2a2a72"
-          strokeWidth={2}
-          className="w-4 h-4 flex-shrink-0"
-        >
-          <path d="M6 9l6 6 6-6" />
-        </svg>
+            <path d="M12 5v14M5 12h14" strokeLinecap="round" />
+          </svg>
+        )}
       </button>
 
-      {aberto && (
-        <div className="absolute z-50 top-full left-0 mt-2 w-full max-h-72 overflow-y-auto rounded-2xl bg-[#A9A9F6] border border-[#8888D3] p-2 shadow-xl custom-scroll">
-          <div className="flex flex-col gap-0.5">
-            <button
-              type="button"
-              onClick={() => selecionar('')}
-              className={`text-left px-3 py-2 rounded-lg text-xs font-semibold transition-colors ${
-                value === ''
-                  ? 'bg-[#FFA400] text-white'
-                  : 'text-[#2a2a72] hover:bg-[#6262AD]/60'
-              }`}
-            >
-              Ainda não tenho um partido
-            </button>
+      <p className="text-[#CBCBEC] text-[11px] text-center">
+        {preview
+          ? 'Toque na foto para trocar'
+          : 'Escolha uma foto de perfil (opcional)'}
+      </p>
 
-            {carregando && (
-              <p className="px-3 py-2 text-xs text-[#2a2a72]">
-                Carregando partidos...
-              </p>
-            )}
-
-            {!carregando && partidos.length === 0 && (
-              <p className="px-3 py-2 text-xs text-[#2a2a72]">
-                Não foi possível carregar os partidos.
-              </p>
-            )}
-
-            {!carregando &&
-              partidos.map((partido) => {
-                const selecionado = partido.id === value;
-                return (
-                  <button
-                    key={partido.id}
-                    type="button"
-                    onClick={() => selecionar(partido.id)}
-                    className={`flex items-center gap-2 text-left px-3 py-2 rounded-lg text-xs font-medium transition-colors ${
-                      selecionado
-                        ? 'bg-[#FFA400] text-white font-semibold'
-                        : 'text-[#2a2a72] hover:bg-[#6262AD]/60'
-                    }`}
-                  >
-                    {partido.numero_legenda ? (
-                      <div
-                        className="w-5 h-5 text-[11px] rounded-full flex items-center justify-center flex-shrink-0 bg-[#F3C994]"
-                        onError={(e) => {
-                          (e.currentTarget as HTMLImageElement).style.display =
-                            'none';
-                        }}
-                      >
-                        {partido.numero_legenda}
-                      </div>
-                    ) : (
-                      // <img
-                      //   src={partido.bandeira_url}
-                      //   alt=""
-                      //   className="w-6 h-6 rounded-full object-cover flex-shrink-0 bg-white"
-                      //   onError={(e) => {
-                      //     (e.currentTarget as HTMLImageElement).style.display =
-                      //       'none';
-                      //   }}
-                      // />
-                      <IniciaisPartido sigla={partido.sigla} />
-                    )}
-                    <span className="truncate">
-                      {partido.nome_completo} - {partido.sigla}
-                    </span>
-                  </button>
-                );
-              })}
-          </div>
-        </div>
+      {preview && (
+        <button
+          type="button"
+          onClick={onRemover}
+          className="text-[11px] font-semibold text-[#FFA400] hover:underline"
+        >
+          Remover foto
+        </button>
       )}
     </div>
   );
@@ -480,23 +369,16 @@ function Cadastro() {
   const { toasts, mostrarErro, fecharToast } = useToasts();
   const [enviando, setEnviando] = useState(false);
 
-  const [partidos, setPartidos] = useState<Partido[]>([]);
-  const [carregandoPartidos, setCarregandoPartidos] = useState(true);
+  const [modalFoto, setModalFoto] = useState(false);
+  const [fotoFile, setFotoFile] = useState<File | null>(null);
+  const [fotoPreview, setFotoPreview] = useState<string | null>(null);
 
+  // libera a URL temporária quando a foto muda ou o componente desmonta
   useEffect(() => {
-    listarPartidos()
-      .then((data: Partido[]) => setPartidos(data))
-      .catch((err: any) => {
-        console.error('Erro ao buscar partidos:', err);
-        mostrarErro(
-          err?.message
-            ? `Não foi possível carregar os partidos: ${err.message}`
-            : 'Não foi possível carregar a lista de partidos.',
-        );
-      })
-      .finally(() => setCarregandoPartidos(false));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    return () => {
+      if (fotoPreview) URL.revokeObjectURL(fotoPreview);
+    };
+  }, [fotoPreview]);
 
   function handleChange(campo: keyof FormData) {
     return (event: ChangeEvent<HTMLInputElement>) => {
@@ -513,8 +395,22 @@ function Cadastro() {
     setFormData((prev) => ({ ...prev, estado: nomeEstado }));
   }
 
-  function handlePartidoChange(idPartido: string) {
-    setFormData((prev) => ({ ...prev, partido_id: idPartido }));
+  function handleFotoSelecionada(file: File) {
+    if (!FOTO_TIPOS.includes(file.type)) {
+      mostrarErro('Use uma imagem JPG, PNG ou WEBP.');
+      return;
+    }
+    if (file.size > FOTO_MAX_BYTES) {
+      mostrarErro('A foto deve ter no máximo 2 MB.');
+      return;
+    }
+    setFotoFile(file);
+    setFotoPreview(URL.createObjectURL(file));
+  }
+
+  function handleRemoverFoto() {
+    setFotoFile(null);
+    setFotoPreview(null);
   }
 
   function validarPasso(passo: Passo): boolean {
@@ -546,14 +442,18 @@ function Cadastro() {
     setEnviando(true);
 
     try {
+      const foto_perfil_url = fotoFile
+        ? await uploadFotoPerfil(fotoFile)
+        : null;
+
       await cadastrar({
         nome: formData.nome.trim(),
         apelido: formData.apelido.trim(),
         data_nascimento: formData.data_nascimento,
         email: formData.email.trim(),
-        partido_preferencia_id: formData.partido_id || null,
         senha: formData.senha,
         estado: formData.estado.trim(),
+        foto_perfil_url,
       });
       navigate('/login');
     } catch (err: any) {
@@ -684,11 +584,10 @@ function Cadastro() {
                 )}
 
                 {step === 3 && (
-                  <PartidoField
-                    partidos={partidos}
-                    carregando={carregandoPartidos}
-                    value={formData.partido_id}
-                    onChange={handlePartidoChange}
+                  <FotoPerfilField
+                    preview={fotoPreview}
+                    onAbrir={() => setModalFoto(true)}
+                    onRemover={handleRemoverFoto}
                   />
                 )}
 
@@ -779,6 +678,12 @@ function Cadastro() {
       </section>
 
       <Footer />
+
+      <SeletorPfpModal
+        aberto={modalFoto}
+        onFechar={() => setModalFoto(false)}
+        onEscolher={handleFotoSelecionada}
+      />
     </div>
   );
 }
