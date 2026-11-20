@@ -63,7 +63,12 @@ function Pessoa({ pessoa, titulo }: { pessoa: Candidato; titulo: string }) {
         {titulo}
       </p>
       <button
-        onClick={() => navigate(`/candidatos/${pessoa.id}`)}
+        onClick={() =>
+          navigate(`/pagina_politico?id=${encodeURIComponent(pessoa.id)}`, {
+            state: { voltarPara: '/visualizador' },
+          })
+        }
+        aria-label={`Ver perfil de ${pessoa.nome_politico}`}
         className="flex w-full items-center gap-2 text-left transition-opacity hover:opacity-80"
       >
         {pessoa.foto_url && (

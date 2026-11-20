@@ -10,13 +10,7 @@ import { listarCandidatos } from '../../services/api';
 import type { Candidato } from '../../services/api';
 import { useNavigate } from 'react-router-dom';
 import BandeiraEstado from '../../components/bandeiraEstado';
-import {
-  REGIOES,
-  VICE_VAGO,
-  acharGovernador,
-  candidatoAGovernador,
-  ocupaGoverno,
-} from '../../utils/governadores';
+import { REGIOES, VICE_VAGO, acharGovernador } from '../../utils/governadores';
 
 interface Estado {
   id: string;
@@ -159,7 +153,6 @@ type Item =
       tipo: 'politico';
       chave: string;
       candidato: Candidato;
-      estado: Estado | null;
     }
   | {
       tipo: 'partido';
@@ -468,11 +461,6 @@ export default function VisualizadorGeografico() {
         tipo: 'politico' as const,
         chave: `c-${x.candidato.id}`,
         candidato: x.candidato,
-        estado:
-          candidatoAGovernador(x.candidato) && ocupaGoverno(x.candidato)
-            ? (ESTADOS.find((e) => e.sigla === x.candidato.uf_candidatura) ??
-              null)
-            : null,
       }));
 
     const vices: Item[] = ESTADOS.flatMap((estado) => {
@@ -523,10 +511,11 @@ export default function VisualizadorGeografico() {
       );
     } else if (item.tipo === 'vice') {
       setEstadoFixo(item.estado.sigla);
-    } else if (item.estado) {
-      setEstadoFixo(item.estado.sigla);
     } else {
-      navigate(`/candidatos/${item.candidato.id}`);
+      // Político: vai para a página de perfil e o "Voltar" retorna ao visualizador
+      navigate(`/pagina_politico?id=${encodeURIComponent(item.candidato.id)}`, {
+        state: { voltarPara: '/visualizador' },
+      });
     }
 
     setPesquisa('');
@@ -573,7 +562,7 @@ export default function VisualizadorGeografico() {
         </div>
 
         <section className="min-h-screen w-full px-6 pb-10 pt-[155px] md:px-10 lg:px-[65px]">
-          <div className="mx-auto grid min-h-[calc(100vh-155px)] w-full max-w-[1600px] grid-cols-1 gap-8 lg:grid-cols-[260px_minmax(0,1fr)_340px] items-start pt-8">
+          <div className="mx-auto grid min-h-[calc(100vh-155px)] w-full max-w-[1600px] grid-cols-1 gap-8 lg:grid-cols-[340px_minmax(0,1fr)_340px] items-start pt-8">
             {/*ESQUERDA*/}
             <div className="flex flex-col justify-center gap-32">
               <div className="select-none">
@@ -833,9 +822,7 @@ export default function VisualizadorGeografico() {
                                   </p>
                                 </div>
                                 <span className="shrink-0 text-xs font-bold text-[#FFA400]">
-                                  {item.estado
-                                    ? `Ver ${item.estado.sigla}`
-                                    : 'Ver perfil'}
+                                  Ver perfil
                                 </span>
                               </>
                             )}
