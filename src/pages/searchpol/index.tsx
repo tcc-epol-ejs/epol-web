@@ -8,7 +8,7 @@ import {
 } from 'react-icons/fi';
 import { FormEvent, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Header from '../../components/header';
+import Header from '../../components/header/index';
 import { obterPaletaPartido } from '../../data/partidoPaletas';
 import {
   type Candidato,
@@ -429,10 +429,10 @@ function SearchPol() {
       </div>
 
       <div className="relative z-10 w-full">
-        <Header isBgWhite disableScrollHide />
+        <Header isBgWhite disableScrollHide reservarEspaco />
       </div>
 
-      <section className="relative z-10 isolate overflow-clip bg-transparent lg:h-[calc(100dvh-122px)]">
+      <section className="relative z-10 isolate overflow-clip bg-transparent lg:h-[calc(100dvh-80px)]">
         <div className="mx-auto flex w-full max-w-[1200px] flex-col px-6 pt-8 sm:px-10 sm:pt-10 lg:h-full lg:min-h-0 lg:flex-row lg:overflow-visible lg:px-0">
           <aside className="w-full self-start pb-8 lg:h-full lg:w-1/4 lg:shrink-0 lg:self-stretch lg:overflow-x-hidden lg:overflow-y-auto lg:border-r-2 lg:border-[#2A2A72]/30 lg:pb-6 lg:pl-8 lg:pr-8 lg:[scrollbar-color:#2A2A72_#dbeafe] lg:[scrollbar-width:thin] lg:[&::-webkit-scrollbar]:w-2 lg:[&::-webkit-scrollbar-track]:bg-[#dbeafe] lg:[&::-webkit-scrollbar-thumb]:rounded-full lg:[&::-webkit-scrollbar-thumb]:bg-[#2A2A72]/60">
             <h2 className="flex items-center gap-3 text-[18px] font-bold uppercase tracking-[0.12em] text-[#2A2A72]">

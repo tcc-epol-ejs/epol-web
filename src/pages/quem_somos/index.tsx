@@ -107,11 +107,11 @@ function QuemSomos() {
         </section>
 
         <section className="flex w-full flex-col bg-[#FFA400] lg:min-h-[100dvh] lg:flex-row">
-          <div className="order-last flex h-[clamp(11rem,55vw,22rem)] w-full items-end justify-center overflow-hidden lg:order-first lg:h-auto lg:w-1/3 lg:justify-start">
+          <div className="order-last flex h-[clamp(11rem,55vw,22rem)] w-full items-end justify-center px-4 lg:order-first lg:h-auto lg:w-1/3 lg:shrink-0">
             <img
               src={PipoMascote}
               alt="Pipo, mascote do EPOL"
-              className="h-full w-full object-contain object-bottom lg:-ml-12 lg:h-[min(90dvh,52rem)] lg:w-auto lg:max-w-none lg:origin-bottom-left lg:rotate-[15deg]"
+              className="block h-full w-full object-contain object-bottom lg:h-auto lg:max-h-[min(85dvh,32rem)]"
             />
           </div>
 

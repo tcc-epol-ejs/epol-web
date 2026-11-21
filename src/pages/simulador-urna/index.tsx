@@ -855,7 +855,7 @@ export default function SimuladorUrna() {
     <div>
       <div className="relative min-h-[100dvh] w-full overflow-hidden bg-white">
         <Bolas />
-        <Header />
+        <Header reservarEspaco />
 
         {etapa === 1 && (
           <SimuladorEtapa1

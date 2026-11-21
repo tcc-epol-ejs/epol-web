@@ -303,6 +303,7 @@ function PaginaPartido() {
         <Header
           isBgWhite
           disableScrollHide
+          reservarEspaco
           backgroundColor={paleta.corFundoCabecalho}
           borderColor={paleta.cor}
         />
