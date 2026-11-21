@@ -32,6 +32,34 @@ import {
 import Footer from '../../components/footer/footer';
 
 // -----------------------------------------------------------------------------
+// RESPONSIVIDADE
+// -----------------------------------------------------------------------------
+// Breakpoints (Tailwind): base < 640px (celular) | sm ≥ 640px | md ≥ 768px (tablet) | lg ≥ 1024px
+
+function useMediaQuery(query: string) {
+  const [matches, setMatches] = useState(
+    () => window.matchMedia(query).matches,
+  );
+
+  useEffect(() => {
+    const mq = window.matchMedia(query);
+    const onChange = (e: MediaQueryListEvent) => setMatches(e.matches);
+    mq.addEventListener('change', onChange);
+    return () => mq.removeEventListener('change', onChange);
+  }, [query]);
+
+  return matches;
+}
+
+// Wrapper compartilhado pelas telas (status, intro, quiz e resultado).
+// Antes era `h-full min-h-[640px]` dentro de uma section de altura fixa
+// (100dvh) com overflow-hidden: no celular o quiz é mais alto que a tela e o
+// final era cortado. Com min-h-[100dvh] a tela continua ocupando a altura
+// toda quando o conteúdo é pequeno e CRESCE quando o conteúdo é maior.
+const TELA =
+  'relative w-full min-h-[100dvh] bg-[#2E2A6B] overflow-hidden flex items-center justify-center px-4 pt-28 pb-8';
+
+// -----------------------------------------------------------------------------
 // TIPOS
 // -----------------------------------------------------------------------------
 type Mood = 'neutral' | 'happy' | 'sad';
@@ -111,9 +139,6 @@ function mapearPartido(p: PartidoAPI): Partido {
   };
 }
 
-// Junta o ranking que veio do backend (calcular_compatibilidade, com o
-// percentual já certo) com os dados visuais que só existem no front
-// (cor, logo, tags) — combinando pelo id do partido.
 function montarRanking(
   ranking: CompatibilidadePartido[],
   partidos: Partido[],
@@ -132,9 +157,6 @@ function montarRanking(
   });
 }
 
-// Tags vêm do banco (livres, cadastradas por quem administra as perguntas/
-// partidos), então não dá pra confiar só num dicionário fixo. Usa um rótulo
-// bonito se existir aqui, senão formata o próprio valor da tag.
 const LABELS: Record<string, string> = {
   intervencionismo: 'Intervenção estatal',
   estado_forte: 'Estado forte',
@@ -157,7 +179,6 @@ function formatarTag(tag: string): string {
     .join(' ');
 }
 
-// Texto/cores de cada tipo de resposta (usado na revisão e na navegação)
 const VALOR_INFO: Record<Valor, { label: string; chip: string; dot: string }> =
   {
     '1': {
@@ -311,8 +332,6 @@ function selecionarPerguntas(todas: Pergunta[], quantidade = 15): Pergunta[] {
   return embaralhar(selecionadas);
 }
 
-// Próxima pergunta ainda sem resposta (procura "pra frente", dando a volta).
-// Retorna -1 quando todas já foram respondidas.
 function proximaSemResposta(
   perguntas: Pergunta[],
   respostas: Record<string, Valor>,
@@ -511,7 +530,7 @@ function StatusScreen({
   acao?: { label: string; onClick: () => void };
 }) {
   return (
-    <div className="relative w-full h-full min-h-[640px] bg-[#2E2A6B] overflow-hidden flex items-center justify-center px-4 pt-28 pb-8">
+    <div className={TELA}>
       <Blobs />
       <div className="relative z-10 bg-white rounded-[28px] p-9 w-full max-w-[420px] shadow-[0_30px_60px_rgba(15,12,60,0.35)] text-center">
         <Pipo mood={acao ? 'sad' : 'neutral'} size={90} />
@@ -543,7 +562,7 @@ interface IntroScreenProps {
 
 function IntroScreen({ onStart }: IntroScreenProps) {
   return (
-    <div className="relative w-full h-full min-h-[640px] bg-[#2E2A6B] overflow-hidden flex items-center justify-center px-4 pt-28 pb-8">
+    <div className={TELA}>
       <Blobs />
       <div className="relative z-10 bg-white rounded-[28px] p-7 sm:p-9 w-full max-w-[560px] shadow-[0_30px_60px_rgba(15,12,60,0.35)] text-center">
         <h1 className="[font-family:'Sora',sans-serif] font-extrabold text-[24px] sm:text-[28px] text-[#1B1B3A] mt-4 mb-2">
@@ -613,7 +632,7 @@ function ReviewModal({
 
   return (
     <Modal onClose={onBack} maxW="max-w-[600px]" labelledBy="revisao-titulo">
-      <div className="p-6 pb-4 border-b border-[#ECEAFB]">
+      <div className="p-5 sm:p-6 pb-4 border-b border-[#ECEAFB]">
         <h2
           id="revisao-titulo"
           className="[font-family:'Sora',sans-serif] font-extrabold text-[20px] text-[#1B1B3A]"
@@ -636,7 +655,7 @@ function ReviewModal({
         </div>
       </div>
 
-      <ol className="flex-1 overflow-y-auto px-6 py-2 m-0 list-none">
+      <ol className="flex-1 overflow-y-auto px-5 sm:px-6 py-2 m-0 list-none">
         {perguntas.map((p, i) => {
           const v = respostas[p.id];
           return (
@@ -661,7 +680,7 @@ function ReviewModal({
               </div>
               <button
                 onClick={() => onEdit(i)}
-                className="shrink-0 flex items-center gap-1 text-[12px] font-semibold text-[#6F68C9] hover:underline mt-0.5"
+                className="shrink-0 flex items-center gap-1 text-[12px] font-semibold text-[#6F68C9] hover:underline mt-0.5 py-1"
               >
                 <FiEdit2 size={13} /> Editar
               </button>
@@ -670,7 +689,7 @@ function ReviewModal({
         })}
       </ol>
 
-      <div className="p-5 border-t border-[#ECEAFB] flex flex-col-reverse sm:flex-row gap-3 sm:justify-end">
+      <div className="p-4 sm:p-5 border-t border-[#ECEAFB] flex flex-col-reverse sm:flex-row gap-3 sm:justify-end">
         <button
           onClick={onBack}
           className="[font-family:'Sora',sans-serif] font-bold text-[13px] text-[#2E2A47] px-5 py-3 rounded-full bg-[#F4F3FA] hover:bg-[#ECEAFB] transition-colors"
@@ -699,7 +718,6 @@ interface QuizScreenProps {
 
 function QuizScreen({ perguntas, onAnswer, onFinish }: QuizScreenProps) {
   const [index, setIndex] = useState(0);
-  // Respostas indexadas pelo id da pergunta, pra dar pra voltar e trocar.
   const [respostas, setRespostas] = useState<Record<string, Valor>>({});
   const [revisando, setRevisando] = useState(false);
   const [dragX, setDragX] = useState(0);
@@ -707,6 +725,8 @@ function QuizScreen({ perguntas, onAnswer, onFinish }: QuizScreenProps) {
   const [exit, setExit] = useState<'like' | 'dislike' | 'neutral' | null>(null);
   const [mood, setMood] = useState<Mood>('neutral');
   const startX = useRef(0);
+  const navRef = useRef<HTMLDivElement>(null);
+  const isSm = useMediaQuery('(min-width: 640px)');
 
   const total = perguntas.length;
   const question = perguntas[index];
@@ -719,11 +739,23 @@ function QuizScreen({ perguntas, onAnswer, onFinish }: QuizScreenProps) {
   const respostaAtual = question ? respostas[question.id] : undefined;
   const tudoRespondido = total > 0 && respondidas === total;
 
+  useEffect(() => {
+    const nav = navRef.current;
+    const atual = nav?.querySelector<HTMLElement>('[aria-current="step"]');
+    if (!nav || !atual) return;
+    const reduce = window.matchMedia(
+      '(prefers-reduced-motion: reduce)',
+    ).matches;
+    nav.scrollTo({
+      left: atual.offsetLeft - nav.clientWidth / 2 + atual.offsetWidth / 2,
+      behavior: reduce ? 'auto' : 'smooth',
+    });
+  }, [index]);
+
   function commit(valor: Valor, novoMood: Mood) {
     if (exit || !question) return;
     setMood(novoMood);
     setExit(valor === 1 ? 'like' : valor === -1 ? 'dislike' : 'neutral');
-    // Salva no backend (de novo, se for uma troca de resposta).
     onAnswer(question.id, valor);
 
     const atualizadas = { ...respostas, [question.id]: valor };
@@ -732,7 +764,6 @@ function QuizScreen({ perguntas, onAnswer, onFinish }: QuizScreenProps) {
       setExit(null);
       setDragX(0);
 
-      // Vai pra próxima sem resposta; se acabou, abre a revisão.
       const proxima = proximaSemResposta(perguntas, atualizadas, index);
       if (proxima === -1) setRevisando(true);
       else setIndex(proxima);
@@ -768,6 +799,10 @@ function QuizScreen({ perguntas, onAnswer, onFinish }: QuizScreenProps) {
     if (dragX > 90) commit(1, 'happy');
     else if (dragX < -90) commit(-1, 'sad');
     else setDragX(0);
+  }
+  function onPointerCancel() {
+    setDragging(false);
+    setDragX(0);
   }
 
   const rotate = dragX / 18;
@@ -805,59 +840,66 @@ function QuizScreen({ perguntas, onAnswer, onFinish }: QuizScreenProps) {
   }
 
   return (
-    <div className="relative w-full h-full min-h-[640px] bg-[#2E2A6B] overflow-hidden flex items-center justify-center px-4 pt-28 pb-8">
+    <div className={TELA}>
       <Blobs tint={tint} />
-      <div className="relative z-10 bg-white rounded-[28px] p-7 min-h-[394px] w-full max-w-[620px] shadow-[0_30px_60px_rgba(15,12,60,0.35)]">
+      <div className="relative z-10 bg-white rounded-[28px] p-5 sm:p-7 min-h-[394px] w-full max-w-[620px] shadow-[0_30px_60px_rgba(15,12,60,0.35)]">
         <nav
           aria-label="Perguntas do quiz"
-          className="flex items-center justify-center flex-wrap gap-1 mb-5"
+          className="flex items-center gap-1 mb-4 sm:mb-5"
         >
           <button
             onClick={() => irPara(index - 1)}
             disabled={index === 0}
             aria-label="Pergunta anterior"
-            className="w-6 h-6 rounded-full flex items-center justify-center text-[#6F68C9] hover:bg-[#F4F3FA] disabled:opacity-30 disabled:hover:bg-transparent"
+            className="shrink-0 w-7 h-7 sm:w-6 sm:h-6 rounded-full flex items-center justify-center text-[#6F68C9] hover:bg-[#F4F3FA] disabled:opacity-30 disabled:hover:bg-transparent"
           >
             <FiChevronLeft size={14} />
           </button>
-          {perguntas.map((p, i) => {
-            const v = respostas[p.id];
-            const atual = i === index;
-            return (
-              <button
-                key={p.id}
-                onClick={() => irPara(i)}
-                aria-label={`Pergunta ${i + 1}${
-                  v !== undefined
-                    ? `, respondida: ${VALOR_INFO[v].label}`
-                    : ', sem resposta'
-                }`}
-                aria-current={atual ? 'step' : undefined}
-                className={`w-6 h-6 rounded-full text-[10px] font-extrabold transition-transform focus-visible:outline-2 focus-visible:outline-[#FF9F1C] ${
-                  v !== undefined
-                    ? VALOR_INFO[v].dot
-                    : 'bg-[#ECEAFB] text-[#8B84D6]'
-                } ${
-                  atual
-                    ? 'ring-2 ring-[#FF9F1C] ring-offset-1 scale-110'
-                    : 'hover:scale-105'
-                }`}
-              >
-                {i + 1}
-              </button>
-            );
-          })}
+
+          <div
+            ref={navRef}
+            className="relative flex-1 min-w-0 flex items-center gap-1 px-1 py-1 overflow-x-auto sm:overflow-visible sm:flex-wrap sm:justify-center [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          >
+            {perguntas.map((p, i) => {
+              const v = respostas[p.id];
+              const atual = i === index;
+              return (
+                <button
+                  key={p.id}
+                  onClick={() => irPara(i)}
+                  aria-label={`Pergunta ${i + 1}${
+                    v !== undefined
+                      ? `, respondida: ${VALOR_INFO[v].label}`
+                      : ', sem resposta'
+                  }`}
+                  aria-current={atual ? 'step' : undefined}
+                  className={`shrink-0 w-7 h-7 sm:w-6 sm:h-6 rounded-full text-[11px] sm:text-[10px] font-extrabold transition-transform focus-visible:outline-2 focus-visible:outline-[#FF9F1C] ${
+                    v !== undefined
+                      ? VALOR_INFO[v].dot
+                      : 'bg-[#ECEAFB] text-[#8B84D6]'
+                  } ${
+                    atual
+                      ? 'ring-2 ring-[#FF9F1C] ring-offset-1 scale-110'
+                      : 'hover:scale-105'
+                  }`}
+                >
+                  {i + 1}
+                </button>
+              );
+            })}
+          </div>
+
           <button
             onClick={() => irPara(index + 1)}
             disabled={index === total - 1}
             aria-label="Próxima pergunta"
-            className="w-6 h-6 rounded-full flex items-center justify-center text-[#6F68C9] hover:bg-[#F4F3FA] disabled:opacity-30 disabled:hover:bg-transparent"
+            className="shrink-0 w-7 h-7 sm:w-6 sm:h-6 rounded-full flex items-center justify-center text-[#6F68C9] hover:bg-[#F4F3FA] disabled:opacity-30 disabled:hover:bg-transparent"
           >
             <FiChevronRight size={14} />
           </button>
         </nav>
 
-        <div className="flex flex-col sm:flex-row gap-7 items-center sm:items-start flex-wrap">
+        <div className="flex flex-col sm:flex-row gap-4 sm:gap-7 items-center sm:items-start flex-wrap">
           <div className="w-[220px] sm:w-[240px]">
             <div className="relative w-[220px] sm:w-[240px] h-[268px]">
               {next2 && (
@@ -867,7 +909,7 @@ function QuizScreen({ perguntas, onAnswer, onFinish }: QuizScreenProps) {
                 <div className="absolute inset-0 rounded-[22px] bg-[#D2CDF2] [transform:translateY(7px)_rotate(-4deg)_scale(0.96)]" />
               )}
               <div
-                className="absolute inset-0 z-30 rounded-[22px] p-[18px] text-white flex flex-col justify-between cursor-grab touch-none select-none bg-[linear-gradient(160deg,_#6F68C9,_#8B84D6)]"
+                className="absolute inset-0 z-30 rounded-[22px] p-[18px] text-white flex flex-col justify-between cursor-grab touch-pan-y select-none bg-[linear-gradient(160deg,_#6F68C9,_#8B84D6)]"
                 style={{
                   transform:
                     exitTransform ||
@@ -881,6 +923,7 @@ function QuizScreen({ perguntas, onAnswer, onFinish }: QuizScreenProps) {
                 onPointerMove={onPointerMove}
                 onPointerUp={onPointerUp}
                 onPointerLeave={onPointerUp}
+                onPointerCancel={onPointerCancel}
               >
                 <span className="self-start bg-[#FFE1B0] text-[#7A4A00] text-[10px] font-bold tracking-[0.06em] px-[10px] py-[5px] rounded-full">
                   {question.categoria.toUpperCase()}
@@ -936,32 +979,33 @@ function QuizScreen({ perguntas, onAnswer, onFinish }: QuizScreenProps) {
               </RoundButton>
             </div>
           </div>
-
-          <div className="flex-1 min-w-[200px] flex flex-col items-center text-center gap-[10px] pt-[10px]">
-            <Pipo mood={mood} size={150} />
-            <div className="w-full max-w-[220px] h-2 bg-[#ECEAFB] rounded-full overflow-hidden">
-              <div
-                className="h-full bg-[#FF9F1C] transition-[width] duration-300"
-                style={{ width: `${progress}%` }}
-              />
+          <div className="order-first sm:order-none w-full sm:w-auto sm:flex-1 sm:min-w-[200px] flex flex-row sm:flex-col items-center justify-center gap-3 sm:gap-[10px] pt-0 sm:pt-[10px] text-left sm:text-center">
+            <Pipo mood={mood} size={isSm ? 150 : 72} />
+            <div className="flex-1 sm:flex-none min-w-0 max-w-[220px] flex flex-col items-start sm:items-center gap-[6px] sm:gap-[10px]">
+              <div className="w-full max-w-[220px] h-2 bg-[#ECEAFB] rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-[#FF9F1C] transition-[width] duration-300"
+                  style={{ width: `${progress}%` }}
+                />
+              </div>
+              <span className="text-[12px] text-[#8B84D6] font-bold">
+                {respondidas} de {total} respondidas
+              </span>
+              {tudoRespondido ? (
+                <button
+                  onClick={() => setRevisando(true)}
+                  className="[font-family:'Sora',sans-serif] font-bold text-[12px] text-white bg-[#FF9F1C] px-4 py-2 rounded-full hover:brightness-105 sm:mt-[6px]"
+                >
+                  Revisar e finalizar
+                </button>
+              ) : (
+                <h2 className="hidden sm:block [font-family:'Sora',sans-serif] text-[16px] text-[#2E2A47] mt-[6px]">
+                  Responda e descubra
+                  <br />
+                  seu representante ideal!
+                </h2>
+              )}
             </div>
-            <span className="text-[12px] text-[#8B84D6] font-bold">
-              {respondidas} de {total} respondidas
-            </span>
-            {tudoRespondido ? (
-              <button
-                onClick={() => setRevisando(true)}
-                className="[font-family:'Sora',sans-serif] font-bold text-[12px] text-white bg-[#FF9F1C] px-4 py-2 rounded-full hover:brightness-105 mt-[6px]"
-              >
-                Revisar e finalizar
-              </button>
-            ) : (
-              <h2 className="[font-family:'Sora',sans-serif] text-[16px] text-[#2E2A47] mt-[6px]">
-                Responda e descubra
-                <br />
-                seu representante ideal!
-              </h2>
-            )}
           </div>
         </div>
       </div>
@@ -991,8 +1035,6 @@ const NOME_SITE = 'EPOL';
 function carregarImagem(src: string): Promise<HTMLImageElement | null> {
   return new Promise((resolve) => {
     const img = new Image();
-    // Sem CORS no servidor da bandeira a imagem falha; aí caímos no
-    // círculo com a sigla (sem "sujar" o canvas).
     img.crossOrigin = 'anonymous';
     img.onload = () => resolve(img);
     img.onerror = () => resolve(null);
@@ -1046,8 +1088,6 @@ function escreverTexto(
   ctx.fillText(texto, x, y);
 }
 
-// Desenha a imagem dentro de uma caixa mantendo a proporção original
-// (sem achatar nem esticar).
 function desenharContido(
   ctx: CanvasRenderingContext2D,
   img: HTMLImageElement,
@@ -1095,9 +1135,7 @@ async function gerarImagemCompartilhamento(
 
   try {
     await document.fonts?.load(`800 40px Sora`);
-  } catch {
-    /* segue com a fonte de fallback */
-  }
+  } catch {}
 
   const [pipo, logoTop, logo2, logo3] = await Promise.all([
     carregarImagem(PipoCoracao),
@@ -1114,14 +1152,12 @@ async function gerarImagemCompartilhamento(
   const ctx = canvas.getContext('2d');
   if (!ctx) return null;
 
-  // Fundo
   const fundo = ctx.createLinearGradient(0, 0, W, H);
   fundo.addColorStop(0, '#3A3589');
   fundo.addColorStop(1, '#221E58');
   ctx.fillStyle = fundo;
   ctx.fillRect(0, 0, W, H);
 
-  // Bolhas decorativas
   const bolhas: [number, number, number, number][] = [
     [90, 120, 190, 0.3],
     [990, 300, 130, 0.25],
@@ -1137,7 +1173,6 @@ async function gerarImagemCompartilhamento(
     ctx.fill();
   });
 
-  // Pipo (mantendo a proporção) + título
   if (pipo) desenharContido(ctx, pipo, W / 2, 255, 320, 300);
   escreverTexto(ctx, 'MEU MATCH POLÍTICO', W / 2, 505, {
     tamanho: 64,
@@ -1145,7 +1180,6 @@ async function gerarImagemCompartilhamento(
     maxLargura: 940,
   });
 
-  // Cartão branco
   const cardX = 60;
   const cardY = 580;
   const cardW = W - 120;
@@ -1159,7 +1193,6 @@ async function gerarImagemCompartilhamento(
   ctx.fill();
   ctx.restore();
 
-  // Partido #1 — logo, sigla, nome e porcentagem (tamanhos moderados)
   const lado = 240;
   const lx = (W - lado) / 2;
   const ly = cardY + 50;
@@ -1193,7 +1226,6 @@ async function gerarImagemCompartilhamento(
     peso: 600,
   });
 
-  // Divisor + legenda
   const divY = ly + lado + 345;
   ctx.fillStyle = '#ECEAFB';
   ctx.fillRect(cardX + 80, divY, cardW - 160, 3);
@@ -1202,7 +1234,6 @@ async function gerarImagemCompartilhamento(
     cor: '#8B84D6',
   });
 
-  // 2º e 3º lugar — linhas empilhadas
   const linhas: [
     PartidoResultado | undefined,
     HTMLImageElement | null,
@@ -1222,8 +1253,6 @@ async function gerarImagemCompartilhamento(
     ctx.fillStyle = '#F4F3FA';
     caminhoArredondado(ctx, rx, ry, rw, rh, 32);
     ctx.fill();
-
-    // Número da posição
     ctx.fillStyle = p.cor;
     ctx.beginPath();
     ctx.arc(rx + 64, mid, 32, 0, Math.PI * 2);
@@ -1233,7 +1262,6 @@ async function gerarImagemCompartilhamento(
       cor: '#FFFFFF',
     });
 
-    // Logo, sigla e nome
     desenharLogo(ctx, img, p, rx + 170, mid, 84);
     escreverTexto(ctx, p.sigla, rx + 240, mid - 2, {
       tamanho: 38,
@@ -1249,7 +1277,6 @@ async function gerarImagemCompartilhamento(
       maxLargura: 360,
     });
 
-    // Porcentagem à direita
     escreverTexto(ctx, `${Math.round(p.pct)}%`, rx + rw - 40, mid + 20, {
       tamanho: 56,
       cor: p.cor,
@@ -1257,7 +1284,6 @@ async function gerarImagemCompartilhamento(
     });
   });
 
-  // Rodapé
   escreverTexto(ctx, `Descubra o seu no ${NOME_SITE}`, W / 2, 1728, {
     tamanho: 54,
     cor: '#FFFFFF',
@@ -1332,8 +1358,6 @@ function ShareModal({
     a.click();
   }
 
-  // Abre a folha de compartilhamento do sistema COM a imagem anexada
-  // (celulares e alguns navegadores). Retorna false se não for possível.
   async function compartilharArquivo(): Promise<boolean> {
     if (!blob) return false;
     const file = new File([blob], 'meu-match-politico.png', {
@@ -1343,7 +1367,6 @@ function ShareModal({
     try {
       await navigator.share({ files: [file], text: texto });
     } catch (err) {
-      // AbortError = a pessoa fechou a folha. Não é erro.
       if (!(err instanceof DOMException && err.name === 'AbortError')) {
         return false;
       }
@@ -1527,7 +1550,7 @@ function ResultScreen({ ranking, respostas, onRestart }: ResultScreenProps) {
   }
 
   return (
-    <div className="relative w-full h-full min-h-[640px] bg-[#2E2A6B] overflow-hidden flex items-center justify-center px-4 pt-28 pb-8">
+    <div className={TELA}>
       <Blobs />
       <div
         className={`relative z-10 bg-white rounded-[28px] p-7 min-h-[394px] w-full max-w-[680px] shadow-[0_30px_60px_rgba(15,12,60,0.35)] transition-all duration-[400ms] ease-[cubic-bezier(0.2,0.8,0.2,1)] ${
@@ -1550,7 +1573,7 @@ function ResultScreen({ ranking, respostas, onRestart }: ResultScreenProps) {
         </div>
         <div className="flex flex-col sm:flex-row gap-7 items-center sm:items-start flex-wrap">
           <div className="flex-[1.3_1_0%] min-w-[260px]">
-            <h2 className="[font-family:'Sora',sans-serif] text-[22px] tracking-[0.02em] mb-[14px] text-[#1B1B3A]">
+            <h2 className="[font-family:'Sora',sans-serif] text-[22px] tracking-[0.02em] mb-[14px] text-[#1B1B3A] sm:text-start text-center">
               SEU <em className="italic">MATCH</em> POLÍTICO
             </h2>
             <button
@@ -1561,7 +1584,7 @@ function ResultScreen({ ranking, respostas, onRestart }: ResultScreenProps) {
             >
               {top.nome.toUpperCase()} ({top.sigla})
             </button>
-            <div className="flex items-center gap-3 mb-[22px]">
+            <div className="flex items-center gap-3 mb-[22px] justify-center sm:justify-start">
               <span className="[font-family:'Sora',sans-serif] text-[52px] font-extrabold text-[#FF9F1C] leading-none min-w-[130px]">
                 {count}%
               </span>
@@ -1571,7 +1594,7 @@ function ResultScreen({ ranking, respostas, onRestart }: ResultScreenProps) {
                 com suas respostas
               </span>
             </div>
-            <div className="flex flex-wrap gap-2 mb-2">
+            <div className="flex flex-wrap gap-2 mb-2  justify-center sm:justify-start">
               {interesses.length > 0 ? (
                 interesses.map((t) => (
                   <span
@@ -1740,9 +1763,6 @@ export default function MatchPolitico() {
     }
   }
 
-  // Chamado a cada resposta, inclusive quando a pessoa troca uma resposta
-  // anterior. O backend precisa SUBSTITUIR a resposta da mesma pergunta
-  // (upsert) em vez de criar uma segunda.
   function handleAnswer(perguntaId: string, valor: Valor) {
     if (!token) return;
     salvarResposta(token, perguntaId, valor).catch((err) => {
@@ -1844,11 +1864,12 @@ export default function MatchPolitico() {
   }
 
   return (
-    <section className="w-full h-[100dvh]">
+    <section className="w-full">
       <div className="w-full fixed top-0 z-[1000]">
         <Header />
       </div>
-      <div className="w-full h-full">{conteudo}</div>
+
+      {conteudo}
 
       <Footer />
     </section>

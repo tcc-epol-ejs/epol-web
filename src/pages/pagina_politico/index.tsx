@@ -60,6 +60,14 @@ function PaginaPolitico() {
     typeof estadoNavegacao.voltarPara === 'string'
       ? estadoNavegacao.voltarPara
       : '/searchpol';
+  const slideAtualVolta =
+    estadoNavegacao &&
+    typeof estadoNavegacao === 'object' &&
+    'slideAtual' in estadoNavegacao &&
+    typeof estadoNavegacao.slideAtual === 'number' &&
+    Number.isInteger(estadoNavegacao.slideAtual)
+      ? estadoNavegacao.slideAtual
+      : null;
   const [candidato, setCandidato] = useState<Candidato | null>(null);
   const { favorito, salvando, alternar } = useFavorito(
     'candidato',
@@ -142,8 +150,14 @@ function PaginaPolitico() {
       <main className="relative z-10 mx-auto flex w-full max-w-[1500px] flex-col items-start gap-3 px-4 py-4 sm:flex-row sm:justify-center sm:gap-4 sm:px-6 sm:py-6 lg:py-10">
         <button
           type="button"
-          onClick={() => navigate(voltarPara)}
-          className="inline-flex shrink-0 items-center gap-2 rounded-lg px-3 py-2 font-bold text-[#2A2A72] transition-colors hover:bg-[#2A2A72]/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2A2A72] sm:sticky sm:top-4"
+          onClick={() => {
+            if (voltarPara === '/linha_do_tempo' && slideAtualVolta !== null) {
+              navigate(voltarPara, { state: { slideAtual: slideAtualVolta } });
+              return;
+            }
+            navigate(voltarPara);
+          }}
+          className="sticky top-4 inline-flex w-9 shrink-0 items-center justify-center rounded-lg px-1 py-2 font-bold text-[#2A2A72] transition-colors hover:bg-[#2A2A72]/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2A2A72] sm:w-auto sm:gap-2 sm:px-3"
         >
           <FiArrowLeft aria-hidden="true" className="text-lg" />
           <span>Voltar</span>
