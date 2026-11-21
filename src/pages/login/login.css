@@ -1,0 +1,70 @@
+.epol-login {
+  --escala-bolas: 0.5;
+}
+
+.epol-login-bandeira {
+  display: none;
+}
+
+.epol-login-cartao {
+  width: 100%;
+  max-width: 440px;
+  border-radius: 32px;
+  box-shadow: 0 20px 50px -15px rgb(42 42 114 / 45%);
+}
+
+.epol-login-form {
+  width: 100%;
+}
+
+.epol-login-logo {
+  width: 84px;
+}
+
+@media (pointer: coarse) {
+  .epol-login-form input {
+    font-size: 1rem;
+  }
+}
+
+@media (min-width: 640px) {
+  .epol-login {
+    --escala-bolas: 0.7;
+  }
+}
+
+@media (min-width: 768px) {
+  .epol-login {
+    --escala-bolas: 0.85;
+  }
+}
+
+@media (min-width: 1024px) {
+  .epol-login {
+    --escala-bolas: 1;
+  }
+}
+
+@media (min-width: 768px) and (orientation: landscape) {
+  .epol-login-bandeira {
+    display: block;
+  }
+}
+
+@media (min-width: 768px) and (min-height: 640px) {
+  .epol-login-cartao {
+    width: min(580px, 75vw, 75dvh);
+    min-height: min(580px, 75vw, 75dvh);
+    max-width: none;
+    border-radius: 50%;
+    box-shadow: none;
+  }
+
+  .epol-login-form {
+    width: 76%;
+  }
+
+  .epol-login-logo {
+    width: 100px;
+  }
+}
