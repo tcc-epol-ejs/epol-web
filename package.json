@@ -11,6 +11,7 @@
     "format": "prettier . --write"
   },
   "dependencies": {
+    "@react-map/brazil": "^1.0.9",
     "@supabase/supabase-js": "^2.109.0",
     "axios": "^1.17.0",
     "lucide-react": "^1.31.0",
