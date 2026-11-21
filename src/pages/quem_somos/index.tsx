@@ -46,7 +46,7 @@ const membros = [
     fotoPerfil: PerfilGui,
   },
   {
-    nome: 'Mikaella',
+    nome: 'Mikaela',
     cargo: 'Desenvolvedora Full-Stack',
     descricao: '"Epol é uma forma jovem de descobrir a política."',
     imagem: PipoMika,
@@ -80,72 +80,48 @@ const membros = [
 function QuemSomos() {
   return (
     <>
-      <div className="w-full fixed top-0 z-[1000]">
+      <div className="fixed top-0 z-[1000] w-full">
         <Header />
       </div>
 
-      <section className="w-full h-[100dvh]">
-        <div className="w-full h-full bg-[#e8f0fe] flex items-center justify-between px-16 gap-12">
-          <div className="flex flex-col gap-2">
-            <h2 className="text-black font-black uppercase text-5xl leading-tight">
-              CONHEÇA
-            </h2>
-            <h2 className="text-[#FFA400] font-black uppercase text-5xl leading-tight">
-              A EQUIPE
-            </h2>
-            <h2 className="text-black font-black uppercase text-5xl leading-tight border-b-4 border-black pb-2">
-              EPOL
-            </h2>
-          </div>
+      <main>
+        <section className="flex w-full flex-col items-center gap-8 bg-[#e8f0fe] px-4 pb-12 pt-24 sm:px-8 md:pt-[135px] xl:min-h-[100dvh] xl:flex-row xl:gap-8 xl:px-12 xl:pt-[155px] 2xl:px-16">
+          <h1 className="flex flex-col gap-1 self-start text-[clamp(2rem,7vw,3rem)] font-black uppercase leading-tight text-black xl:shrink-0 xl:self-center">
+            <span>CONHEÇA</span>
+            <span className="text-[#FFA400]">A EQUIPE</span>
+            <span className="border-b-4 border-black pb-2">EPOL</span>
+          </h1>
 
-          <div className="flex-1 flex flex-col items-center gap-4">
-            <div className="flex gap-4 justify-center">
-              {membros.slice(0, 3).map((membro, i) => (
-                <CardQuemSomos
-                  key={i}
-                  nome={membro.nome}
-                  cargo={membro.cargo}
-                  descricao={membro.descricao}
-                  imagem={membro.imagem}
-                  fotoPerfil={membro.fotoPerfil}
-                />
+          <div className="grid w-full min-w-0 max-w-[896px] grid-cols-1 gap-4 min-[480px]:grid-cols-2 md:grid-cols-3 xl:mx-auto xl:flex xl:flex-col">
+            <div className="contents xl:flex xl:justify-center xl:gap-4">
+              {membros.slice(0, 3).map((membro) => (
+                <CardQuemSomos key={membro.nome} {...membro} />
               ))}
             </div>
-            <div className="flex gap-4 justify-center">
-              {membros.slice(3).map((membro, i) => (
-                <CardQuemSomos
-                  key={i + 3}
-                  nome={membro.nome}
-                  cargo={membro.cargo}
-                  descricao={membro.descricao}
-                  imagem={membro.imagem}
-                  fotoPerfil={membro.fotoPerfil}
-                />
+            <div className="contents xl:flex xl:justify-center xl:gap-4">
+              {membros.slice(3).map((membro) => (
+                <CardQuemSomos key={membro.nome} {...membro} />
               ))}
             </div>
           </div>
-        </div>
+        </section>
 
-        <div className="w-full h-full bg-[#FFA400] flex">
-          <div className="w-[33%] h-full flex items-end overflow-hidden">
+        <section className="flex w-full flex-col bg-[#FFA400] lg:min-h-[100dvh] lg:flex-row">
+          <div className="order-last flex h-[clamp(11rem,55vw,22rem)] w-full items-end justify-center overflow-hidden lg:order-first lg:h-auto lg:w-1/3 lg:justify-start">
             <img
               src={PipoMascote}
               alt="Pipo, mascote do EPOL"
-              className="h-[90%] object-contain -ml-12"
-              style={{
-                transform: 'rotate(15deg)',
-                transformOrigin: 'bottom left',
-              }}
+              className="h-full w-full object-contain object-bottom lg:-ml-12 lg:h-[min(90dvh,52rem)] lg:w-auto lg:max-w-none lg:origin-bottom-left lg:rotate-[15deg]"
             />
           </div>
 
-          <div className="flex-1 flex flex-col justify-center gap-8 pr-16 pl-8">
-            <h2 className="text-[#2A2A72] font-black uppercase text-8xl tracking-wider">
+          <div className="flex min-w-0 flex-1 flex-col justify-center gap-6 px-4 pb-6 pt-12 sm:px-8 lg:gap-8 lg:py-16 lg:pr-16">
+            <h2 className="text-[clamp(3rem,9vw,6rem)] font-black uppercase tracking-wider text-[#2A2A72]">
               PIPO
             </h2>
 
             <div className="flex flex-col gap-4">
-              <div className="border-l-4 border-[#2A2A72] pl-4 flex flex-col gap-1">
+              <div className="flex flex-col gap-1 border-l-4 border-[#2A2A72] pl-4">
                 <p className="text-[#2A2A72] font-black text-xl uppercase tracking-wider">
                   De onde eu vim?
                 </p>
@@ -158,7 +134,7 @@ function QuemSomos() {
                 </p>
               </div>
 
-              <div className="border-l-4 border-[#2A2A72] pl-4 flex flex-col gap-2">
+              <div className="flex flex-col gap-2 border-l-4 border-[#2A2A72] pl-4">
                 <p className="text-[#2A2A72] font-black text-xl uppercase tracking-wider">
                   Quais são meus ideais?
                 </p>
@@ -194,7 +170,7 @@ function QuemSomos() {
                 </ul>
               </div>
 
-              <div className="border-l-4 border-[#2A2A72] pl-4 flex flex-col gap-1">
+              <div className="flex flex-col gap-1 border-l-4 border-[#2A2A72] pl-4">
                 <p className="text-[#2A2A72] font-black text-xl uppercase tracking-wider">
                   Qual a minha missão
                 </p>
@@ -208,17 +184,17 @@ function QuemSomos() {
               </div>
             </div>
           </div>
-        </div>
+        </section>
 
-        <div className="w-full h-full bg-[#e8f0fe] flex items-center justify-between px-16 gap-12">
-          <div className="flex-1 flex flex-col gap-6">
-            <div className="bg-[#FFA400] px-6 py-3 rounded-lg w-fit">
-              <h1 className="text-[#2A2A72] font-black uppercase text-4xl tracking-wider">
+        <section className="grid w-full grid-cols-1 content-center gap-10 bg-[#e8f0fe] px-4 py-12 sm:px-8 lg:min-h-[100dvh] lg:grid-cols-2 lg:items-center lg:gap-12 lg:px-16">
+          <div className="flex min-w-0 flex-col gap-6">
+            <div className="w-fit rounded-lg bg-[#FFA400] px-4 py-3 sm:px-6">
+              <h2 className="text-[clamp(1.5rem,5vw,2.25rem)] font-black uppercase tracking-wider text-[#2A2A72]">
                 QUEM SOMOS ?
-              </h1>
+              </h2>
             </div>
-            <div className="bg-[#2A2A72] rounded-2xl p-8">
-              <p className="text-white text-lg leading-8 font-semibold">
+            <div className="rounded-2xl bg-[#2A2A72] p-5 sm:p-8">
+              <p className="text-base font-semibold leading-7 text-white lg:text-lg lg:leading-8">
                 Sabe aquela sensação de não entender nada quando o assunto é
                 política? A gente também já passou por isso e percebeu algo
                 comum entre os jovens: o tema é pouco discutido, e mesmo já
@@ -231,13 +207,13 @@ function QuemSomos() {
             </div>
           </div>
 
-          <div className="flex-1 flex flex-col gap-8">
-            <h2 className="text-[#FFA400] font-black text-5xl tracking-wider">
+          <div className="flex min-w-0 flex-col gap-6 lg:gap-8">
+            <h2 className="text-[clamp(2rem,7vw,3rem)] font-black tracking-wider text-[#FFA400]">
               VALORES
             </h2>
 
             <div className="flex items-start gap-4">
-              <div className="w-16 h-16 rounded-full border-4 border-[#a9a9f6] bg-[#d0d0f0] flex-shrink-0 flex items-center justify-center">
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border-4 border-[#a9a9f6] bg-[#d0d0f0] sm:h-16 sm:w-16">
                 <FaScaleBalanced size={28} className="text-[#2A2A72]" />
               </div>
               <div>
@@ -252,7 +228,7 @@ function QuemSomos() {
             </div>
 
             <div className="flex items-start gap-4">
-              <div className="w-16 h-16 rounded-full border-4 border-[#a9a9f6] bg-[#d0d0f0] flex-shrink-0 flex items-center justify-center">
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border-4 border-[#a9a9f6] bg-[#d0d0f0] sm:h-16 sm:w-16">
                 <MdVerified size={28} className="text-[#2A2A72]" />
               </div>
               <div>
@@ -267,7 +243,7 @@ function QuemSomos() {
             </div>
 
             <div className="flex items-start gap-4">
-              <div className="w-16 h-16 rounded-full border-4 border-[#a9a9f6] bg-[#d0d0f0] flex-shrink-0 flex items-center justify-center">
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border-4 border-[#a9a9f6] bg-[#d0d0f0] sm:h-16 sm:w-16">
                 <TbAccessibleFilled size={28} className="text-[#2A2A72]" />
               </div>
               <div>
@@ -281,10 +257,9 @@ function QuemSomos() {
               </div>
             </div>
           </div>
-        </div>
-
-        <Footer />
-      </section>
+        </section>
+      </main>
+      <Footer />
     </>
   );
 }

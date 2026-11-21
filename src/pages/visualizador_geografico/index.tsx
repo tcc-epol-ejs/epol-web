@@ -1,218 +1,190 @@
 import { useMemo, useState } from 'react';
-import { FiSearch, FiSliders } from 'react-icons/fi';
-
-import Header from '../../components/header';
+import type { FormEvent } from 'react';
+import { FiSearch } from 'react-icons/fi';
 import Brazil from '@react-map/brazil';
+import Header from '../../components/header';
 
 interface Estado {
-  id: string;
   nome: string;
   sigla: string;
 }
 
 const ESTADOS: Estado[] = [
-  { id: 'AC', nome: 'Acre', sigla: 'AC' },
-  { id: 'AL', nome: 'Alagoas', sigla: 'AL' },
-  { id: 'AP', nome: 'Amapá', sigla: 'AP' },
-  { id: 'AM', nome: 'Amazonas', sigla: 'AM' },
-  { id: 'BA', nome: 'Bahia', sigla: 'BA' },
-  { id: 'CE', nome: 'Ceará', sigla: 'CE' },
-  { id: 'DF', nome: 'Distrito Federal', sigla: 'DF' },
-  { id: 'ES', nome: 'Espírito Santo', sigla: 'ES' },
-  { id: 'GO', nome: 'Goiás', sigla: 'GO' },
-  { id: 'MA', nome: 'Maranhão', sigla: 'MA' },
-  { id: 'MT', nome: 'Mato Grosso', sigla: 'MT' },
-  { id: 'MS', nome: 'Mato Grosso do Sul', sigla: 'MS' },
-  { id: 'MG', nome: 'Minas Gerais', sigla: 'MG' },
-  { id: 'PA', nome: 'Pará', sigla: 'PA' },
-  { id: 'PB', nome: 'Paraíba', sigla: 'PB' },
-  { id: 'PR', nome: 'Paraná', sigla: 'PR' },
-  { id: 'PE', nome: 'Pernambuco', sigla: 'PE' },
-  { id: 'PI', nome: 'Piauí', sigla: 'PI' },
-  { id: 'RJ', nome: 'Rio de Janeiro', sigla: 'RJ' },
-  { id: 'RN', nome: 'Rio Grande do Norte', sigla: 'RN' },
-  { id: 'RS', nome: 'Rio Grande do Sul', sigla: 'RS' },
-  { id: 'RO', nome: 'Rondônia', sigla: 'RO' },
-  { id: 'RR', nome: 'Roraima', sigla: 'RR' },
-  { id: 'SC', nome: 'Santa Catarina', sigla: 'SC' },
-  { id: 'SP', nome: 'São Paulo', sigla: 'SP' },
-  { id: 'SE', nome: 'Sergipe', sigla: 'SE' },
-  { id: 'TO', nome: 'Tocantins', sigla: 'TO' },
+  { nome: 'Acre', sigla: 'AC' },
+  { nome: 'Alagoas', sigla: 'AL' },
+  { nome: 'Amapá', sigla: 'AP' },
+  { nome: 'Amazonas', sigla: 'AM' },
+  { nome: 'Bahia', sigla: 'BA' },
+  { nome: 'Ceará', sigla: 'CE' },
+  { nome: 'Distrito Federal', sigla: 'DF' },
+  { nome: 'Espírito Santo', sigla: 'ES' },
+  { nome: 'Goiás', sigla: 'GO' },
+  { nome: 'Maranhão', sigla: 'MA' },
+  { nome: 'Mato Grosso', sigla: 'MT' },
+  { nome: 'Mato Grosso do Sul', sigla: 'MS' },
+  { nome: 'Minas Gerais', sigla: 'MG' },
+  { nome: 'Pará', sigla: 'PA' },
+  { nome: 'Paraíba', sigla: 'PB' },
+  { nome: 'Paraná', sigla: 'PR' },
+  { nome: 'Pernambuco', sigla: 'PE' },
+  { nome: 'Piauí', sigla: 'PI' },
+  { nome: 'Rio de Janeiro', sigla: 'RJ' },
+  { nome: 'Rio Grande do Norte', sigla: 'RN' },
+  { nome: 'Rio Grande do Sul', sigla: 'RS' },
+  { nome: 'Rondônia', sigla: 'RO' },
+  { nome: 'Roraima', sigla: 'RR' },
+  { nome: 'Santa Catarina', sigla: 'SC' },
+  { nome: 'São Paulo', sigla: 'SP' },
+  { nome: 'Sergipe', sigla: 'SE' },
+  { nome: 'Tocantins', sigla: 'TO' },
 ];
 
+const COR_ESTADO_ATIVO = '#2A82D7';
+
+function normalizarBusca(texto: string) {
+  return texto
+    .trim()
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '');
+}
+
 export default function VisualizadorGeografico() {
-  const [estadoHover, setEstadoHover] = useState<string | null>(null);
+  const [estadoSelecionado, setEstadoSelecionado] = useState<string | null>(
+    null,
+  );
   const [pesquisa, setPesquisa] = useState('');
+  const [versaoMapa, setVersaoMapa] = useState(0);
 
-  const estadoEncontrado = useMemo(() => {
-    const valor = pesquisa.trim().toLowerCase();
-    if (!valor) return null;
-    return (
-      ESTADOS.find(
-        (estado) =>
-          estado.nome.toLowerCase().includes(valor) ||
-          estado.sigla.toLowerCase() === valor,
-      ) ?? null
-    );
-  }, [pesquisa]);
+  const busca = normalizarBusca(pesquisa);
+  const siglaExata = ESTADOS.find(
+    (estado) => estado.sigla.toLowerCase() === busca,
+  );
+  const resultados = siglaExata
+    ? [siglaExata]
+    : ESTADOS.filter((estado) => normalizarBusca(estado.nome).includes(busca));
+  const estadoAtual = ESTADOS.find(
+    (estado) => estado.nome === estadoSelecionado,
+  );
+  const coresEstados = useMemo<Record<string, string>>(
+    () => (estadoSelecionado ? { [estadoSelecionado]: COR_ESTADO_ATIVO } : {}),
+    [estadoSelecionado],
+  );
 
-  const estadoAtual =
-    estadoEncontrado ??
-    ESTADOS.find(
-      (estado) =>
-        estado.nome === estadoHover ||
-        estado.sigla === estadoHover ||
-        estado.id === estadoHover,
-    ) ??
-    null;
-
-  function obterEstadoDoMapa(event: React.MouseEvent<SVGPathElement>) {
-    const target = event.currentTarget;
-    const id =
-      target.getAttribute('id') ??
-      target.getAttribute('name') ??
-      target.getAttribute('data-id');
-    if (!id) return;
-    setEstadoHover(id);
+  function escolherResultado(estado: Estado) {
+    setEstadoSelecionado(estado.nome);
+    setPesquisa('');
+    // Reinicia a seleção interna do mapa após uma escolha pela busca.
+    setVersaoMapa((versao) => versao + 1);
   }
 
-  function limparEstado() {
-    if (!pesquisa) {
-      setEstadoHover(null);
-    }
+  function enviarBusca(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (busca && resultados.length > 0) escolherResultado(resultados[0]);
   }
 
   return (
-    <main className="min-h-screen w-full bg-[#FFA400] overflow-hidden">
-      <style>{`
-        .epol-map {
-          width: 100%;
-          max-width: 620px;
-          height: auto;
-          display: block;
-          overflow: visible;
-        }
-
-        .epol-map path {
-          fill: #D5D5D5;
-          stroke: #B4B4B4;
-          stroke-width: 1.2;
-          cursor: pointer;
-          transition:
-            fill 0.2s ease,
-            transform 0.2s ease,
-            filter 0.2s ease;
-          transform-box: fill-box;
-          transform-origin: center;
-        }
-
-        .epol-map path:hover {
-          fill: #2A82D7;
-          filter: brightness(1.05);
-        }
-      `}</style>
-
-      {/* HEADER */}
-      <div className="fixed top-0 left-0 z-[1000] w-full">
+    <main className="min-h-[100dvh] w-full bg-[#FFA400]">
+      <div className="fixed inset-x-0 top-0 z-[1000]">
         <Header isBgWhite />
       </div>
 
-      {/* CONTEÚDO */}
-      <section className="min-h-screen w-full px-6 pb-10 pt-[155px] md:px-10 lg:px-[65px]">
-        <div className="mx-auto grid min-h-[calc(100vh-155px)] w-full max-w-[1600px] grid-cols-1 gap-8 lg:grid-cols-[250px_minmax(420px,1fr)_300px]">
-          {/* ESQUERDA */}
-          <div className="flex flex-col justify-center">
-            <div className="select-none">
-              <h1 className="font-[Fraunces] text-[43px] font-black italic uppercase leading-[0.95] tracking-[-0.03em] text-[#2A2A72] md:text-[48px]">
-                Visualizador
-              </h1>
-              <h2 className="mt-1 text-[28px] font-black uppercase leading-none tracking-wide text-[#2A2A72]">
-                Geográfico
-              </h2>
-            </div>
+      <section className="mx-auto grid min-h-[100dvh] w-full max-w-[1600px] grid-cols-1 content-start gap-4 px-4 pb-8 pt-24 sm:gap-6 sm:px-8 md:pt-[135px] xl:grid-cols-[minmax(0,1fr)_minmax(0,2fr)_minmax(0,1.2fr)] xl:grid-rows-[1fr_1fr] xl:gap-x-8 xl:gap-y-5 xl:px-[min(5vw,65px)] xl:pt-[155px]">
+        <h1 className="min-w-0 text-[#2A2A72] xl:col-start-1 xl:row-start-1 xl:self-end">
+          <span className="block font-[Fraunces] text-[clamp(2rem,7vw,3rem)] font-black italic uppercase leading-none tracking-[-0.03em] xl:text-[clamp(2rem,3.1vw,3rem)]">
+            Visualizador
+          </span>
+          <span className="mt-1 block text-[clamp(1.25rem,5vw,1.75rem)] font-black uppercase leading-none tracking-wide">
+            Geográfico
+          </span>
+        </h1>
 
-            <div className="mt-8 min-h-[220px]">
-              {estadoAtual && (
-                <div className="rounded-2xl border border-[#2A2A72]/10 bg-[#FFA400] p-1">
-                  {/* Espaço reservado para o futuro componente */}
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* MAPA */}
-          <div className="flex items-center justify-center">
-            <div className="w-full max-w-[620px]">
-              <div
-                className="epol-map w-full max-w-[620px]"
-                onMouseOver={
-                  obterEstadoDoMapa as unknown as React.MouseEventHandler<HTMLDivElement>
-                }
-                onMouseOut={limparEstado}
+        <form
+          role="search"
+          onSubmit={enviarBusca}
+          className="min-w-0 xl:col-start-3 xl:row-span-2 xl:row-start-1 xl:self-center"
+        >
+          <div className="flex min-h-12 items-center gap-2 rounded-full bg-[#FFFBF2] px-4 shadow-[0_8px_20px_rgba(0,0,0,0.12)] focus-within:ring-2 focus-within:ring-[#2A2A72]">
+            <FiSearch
+              size={20}
+              aria-hidden="true"
+              className="shrink-0 text-[#666]"
+            />
+            <input
+              type="search"
+              aria-label="Pesquisar estado"
+              autoComplete="off"
+              enterKeyHint="search"
+              value={pesquisa}
+              onChange={(event) => setPesquisa(event.target.value)}
+              placeholder="Pesquisar estado ou UF"
+              className="min-w-0 flex-1 bg-transparent text-base text-[#2A2A72] outline-none placeholder:text-[#666] [&::-webkit-search-cancel-button]:appearance-none"
+            />
+            {pesquisa && (
+              <button
+                type="button"
+                onClick={() => setPesquisa('')}
+                className="min-h-11 shrink-0 rounded-full px-2 text-xs font-bold text-[#2A2A72]"
               >
-                <Brazil type="select-single" />
-              </div>
-            </div>
+                Limpar
+              </button>
+            )}
           </div>
 
-          {/* DIREITA */}
-          <div className="flex flex-col justify-center gap-7">
-            <div className="w-full">
-              <div className="flex h-[48px] items-center gap-3 rounded-full bg-[#FFFBF2] px-4 shadow-[0_8px_20px_rgba(0,0,0,0.12)]">
-                <FiSearch size={20} className="shrink-0 text-[#888]" />
-                <input
-                  type="text"
-                  value={pesquisa}
-                  onChange={(event) => setPesquisa(event.target.value)}
-                  placeholder="Pesquisar..."
-                  className="min-w-0 flex-1 bg-transparent text-[13px] outline-none placeholder:text-[#A0A0A0]"
-                />
-                <FiSliders size={18} className="shrink-0 text-[#FFA400]" />
-                {pesquisa && (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setPesquisa('');
-                      setEstadoHover(null);
-                    }}
-                    className="text-[12px] font-bold text-[#2A2A72]"
-                  >
-                    Limpar
-                  </button>
-                )}
-              </div>
-
-              {pesquisa && (
-                <div className="mt-2 rounded-2xl bg-[#FFFBF2] p-3 shadow-lg">
-                  {estadoEncontrado ? (
-                    <button
-                      type="button"
-                      onClick={() => setEstadoHover(estadoEncontrado.sigla)}
-                      className="flex w-full items-center justify-between rounded-xl px-3 py-2 text-left transition-colors hover:bg-[#F1F1F1]"
-                    >
-                      <div>
-                        <p className="text-sm font-bold text-[#333]">
-                          {estadoEncontrado.nome}
-                        </p>
-                        <p className="text-xs text-[#777]">
-                          {estadoEncontrado.sigla}
-                        </p>
-                      </div>
-                      <span className="text-xs font-bold text-[#FFA400]">
-                        Ver estado
-                      </span>
-                    </button>
-                  ) : (
-                    <p className="px-3 py-2 text-sm text-[#777]">
-                      Nenhum estado encontrado.
-                    </p>
-                  )}
-                </div>
+          {busca && (
+            <div className="mt-2 max-h-52 overflow-y-auto rounded-2xl bg-[#FFFBF2] p-2 shadow-lg">
+              {resultados.length ? (
+                <ul className="flex flex-col gap-1">
+                  {resultados.map((estado) => (
+                    <li key={estado.sigla}>
+                      <button
+                        type="button"
+                        onClick={() => escolherResultado(estado)}
+                        className="flex min-h-11 w-full items-center justify-between gap-2 rounded-xl px-3 py-2 text-left text-sm font-bold text-[#2A2A72] hover:bg-[#e8f0fe] focus-visible:bg-[#e8f0fe]"
+                      >
+                        {estado.nome}
+                        <span className="shrink-0 text-xs">{estado.sigla}</span>
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p role="status" className="px-3 py-2 text-sm text-[#555]">
+                  Nenhum estado encontrado.
+                </p>
               )}
             </div>
+          )}
+        </form>
 
-            <div className="min-h-[220px]" />
-          </div>
+        <p
+          role="status"
+          className="min-h-11 rounded-xl bg-[#FFFBF2] px-4 py-3 text-sm text-[#2A2A72] xl:col-start-1 xl:row-start-2 xl:self-start"
+        >
+          {estadoAtual ? (
+            <strong>
+              {estadoAtual.nome} ({estadoAtual.sigla})
+            </strong>
+          ) : (
+            'Selecione um estado no mapa ou pela busca.'
+          )}
+        </p>
+
+        <div
+          aria-hidden="true"
+          className="mx-auto w-full min-w-0 max-w-[620px] px-1 xl:col-start-2 xl:row-span-2 xl:row-start-1 xl:self-center [&>.map]:!w-full [&_path]:transition-colors [&_svg]:block [&_svg]:h-auto [&_svg]:w-full [&_svg]:overflow-visible"
+        >
+          <Brazil
+            key={versaoMapa}
+            type="select-single"
+            mapColor="#D5D5D5"
+            strokeColor="#999"
+            strokeWidth={1.2}
+            hoverColor={COR_ESTADO_ATIVO}
+            selectColor={COR_ESTADO_ATIVO}
+            cityColors={coresEstados}
+            onSelect={setEstadoSelecionado}
+          />
         </div>
       </section>
     </main>
