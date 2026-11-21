@@ -165,9 +165,6 @@
     "@babel/helper-string-parser" "^7.29.7"
     "@babel/helper-validator-identifier" "^7.29.7"
 
-<<<<<<< HEAD
-"@esbuild/darwin-x64@0.18.20":
-=======
 "@esbuild/android-arm64@0.18.20":
   version "0.18.20"
   resolved "https://registry.yarnpkg.com/@esbuild/android-arm64/-/android-arm64-0.18.20.tgz#984b4f9c8d0377443cc2dfcef266d02244593622"
@@ -274,7 +271,6 @@
   integrity sha512-Wv7QBi3ID/rROT08SABTS7eV4hX26sVduqDOTe1MvGMjNd3EjOz4b7zeexIR62GTIEKrfJXKL9LFxTYgkyeu7g==
 
 "@esbuild/win32-x64@0.18.20":
->>>>>>> c6d1980bfb1568487faded8b784830efc6c5b990
   version "0.18.20"
   resolved "https://registry.npmjs.org/@esbuild/darwin-x64/-/darwin-x64-0.18.20.tgz"
   integrity sha512-pc5gxlMDxzm513qPGbCbDukOdsGtKhfxD1zJKXjCCcU7ju50O7MeAZ8c4krSJcOIJGFR+qx21yMMVYwiQvyTyQ==
@@ -384,6 +380,11 @@
   dependencies:
     "@nodelib/fs.scandir" "2.1.5"
     fastq "^1.6.0"
+
+"@react-map/brazil@^1.0.9":
+  version "1.0.9"
+  resolved "https://registry.yarnpkg.com/@react-map/brazil/-/brazil-1.0.9.tgz#f0fe5e1c8adcac9b87d5c6bbe967ea97d2e6b6bf"
+  integrity sha512-yxwdRMg+T6d2698ScDNGlfXuawJfQ/dy+yX+cBfLXaodtdidcnkBQFvZqL0IL+dpvKJMHoHX6cc9rxOTixpbiw==
 
 "@rolldown/pluginutils@1.0.0-beta.27":
   version "1.0.0-beta.27"
@@ -1174,11 +1175,7 @@ fs.realpath@^1.0.0:
 
 fsevents@~2.3.2:
   version "2.3.3"
-<<<<<<< HEAD
-  resolved "https://registry.npmjs.org/fsevents/-/fsevents-2.3.3.tgz"
-=======
   resolved "https://registry.yarnpkg.com/fsevents/-/fsevents-2.3.3.tgz#cac6407785d03675a2a5e1a5305c697b347d90d6"
->>>>>>> c6d1980bfb1568487faded8b784830efc6c5b990
   integrity sha512-5xoDfX+fL7faATnagmWPpbFtwh/R77WmMMqqHGS65C3vvB0YHrgF+B1YmZ3441tMj5n63k0212XNoJwzlhffQw==
 
 function-bind@^1.1.2:

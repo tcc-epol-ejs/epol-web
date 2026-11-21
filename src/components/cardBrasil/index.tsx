@@ -97,6 +97,10 @@ export default function CardBrasil({ candidatos }: CardBrasilProps) {
   const presidente = candidatos.find(ehPresidente) ?? null;
   const vice = candidatos.find(ehVicePresidente) ?? null;
 
+  // O vice normalmente não é um registro próprio: o nome vem no campo "vice"
+  // do presidente (igual ao vice-governador no cardEstado).
+  const nomeVice = vice ? null : (presidente?.vice?.trim() ?? '') || null;
+
   return (
     <div className="w-full rounded-2xl bg-white p-4 shadow-lg">
       <div className="mb-3 flex items-center gap-2">
@@ -109,7 +113,16 @@ export default function CardBrasil({ candidatos }: CardBrasilProps) {
       {presidente && <Pessoa pessoa={presidente} titulo="Presidente" />}
       {vice && <Pessoa pessoa={vice} titulo="Vice-Presidente" />}
 
-      {!presidente && !vice && (
+      {nomeVice && (
+        <div className="mb-3 last:mb-0">
+          <p className="mb-1 text-[10px] font-bold uppercase tracking-wider text-gray-400">
+            Vice-Presidente
+          </p>
+          <p className="text-xs font-bold text-[#2A2A72]">{nomeVice}</p>
+        </div>
+      )}
+
+      {!presidente && !vice && !nomeVice && (
         <p className="text-xs text-gray-400">Nenhum dado cadastrado.</p>
       )}
     </div>
