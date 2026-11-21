@@ -27,7 +27,23 @@ const bolasConfig = [
   { size: 300, bottom: '-60px', right: '-40px', opacity: 1 },
   { size: 160, bottom: '120px', right: '200px', opacity: 0.6 },
 ];
+const esc = (valor: string | number) => `calc(${valor}px * var(--s))`;
+const escPos = (valor: string) => `calc(${valor} * var(--s))`;
 
+function useMediaQuery(query: string) {
+  const [matches, setMatches] = useState(
+    () => window.matchMedia(query).matches,
+  );
+
+  useEffect(() => {
+    const mq = window.matchMedia(query);
+    const onChange = (e: MediaQueryListEvent) => setMatches(e.matches);
+    mq.addEventListener('change', onChange);
+    return () => mq.removeEventListener('change', onChange);
+  }, [query]);
+
+  return matches;
+}
 // E-mail: exige usuário + domínio com pelo menos um ponto (ex: nome@dominio.com)
 const EMAIL_REGEX =
   /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)+$/;
@@ -359,6 +375,14 @@ function BarraForcaSenha({ senha }: { senha: string }) {
 }
 
 function Cadastro() {
+  // Círculo só quando há largura E altura. Este formulário tem mais conteúdo
+  // que o de recuperar senha, então exijo um pouco mais de altura (720px).
+  const isCircle = useMediaQuery('(min-width: 768px) and (min-height: 720px)');
+
+  // O losango da bandeira só faz sentido em tela larga e deitada.
+  const mostrarBandeira = useMediaQuery(
+    '(min-width: 768px) and (orientation: landscape)',
+  );
   const circleSize = 'min(580px, 75vw, 75dvh)';
   const gap = '20px';
   const navigate = useNavigate();
@@ -465,7 +489,11 @@ function Cadastro() {
 
   return (
     <div>
-      <section className="w-full min-h-[100dvh] bg-[#2a2a72] flex items-center justify-center overflow-hidden relative">
+      <section
+        className={`w-full min-h-[100dvh] bg-[#2a2a72] flex items-center justify-center overflow-hidden relative [--s:0.5] sm:[--s:0.7] md:[--s:0.85] lg:[--s:1] ${
+          isCircle ? '' : 'px-4 py-10'
+        }`}
+      >
         <ToastContainer toasts={toasts} onFechar={fecharToast} />
 
         {bolasConfig.map((b, i) => (
@@ -473,12 +501,12 @@ function Cadastro() {
             key={i}
             className="absolute rounded-full"
             style={{
-              width: b.size,
-              height: b.size,
-              top: 'top' in b ? b.top : undefined,
-              bottom: 'bottom' in b ? b.bottom : undefined,
-              left: 'left' in b ? b.left : undefined,
-              right: 'right' in b ? b.right : undefined,
+              width: esc(b.size),
+              height: esc(b.size),
+              top: 'top' in b ? escPos(b.top) : undefined,
+              bottom: 'bottom' in b ? escPos(b.bottom) : undefined,
+              left: 'left' in b ? escPos(b.left) : undefined,
+              right: 'right' in b ? escPos(b.right) : undefined,
               backgroundColor: '#8888D3',
               opacity: b.opacity,
               zIndex: 0,
@@ -486,37 +514,54 @@ function Cadastro() {
           />
         ))}
 
-        <div
-          className="absolute inset-y-0 left-0 z-10"
-          style={{
-            width: '50vw',
-            backgroundColor: '#FFA400',
-            clipPath: `polygon(0% 50%, 100% 0%, calc(100% - ${gap}) 50%, 100% 100%)`,
-          }}
-        />
+        {mostrarBandeira && (
+          <>
+            <div
+              className="absolute inset-y-0 left-0 z-10"
+              style={{
+                width: '50vw',
+                backgroundColor: '#FFA400',
+                clipPath: `polygon(0% 50%, 100% 0%, calc(100% - ${gap}) 50%, 100% 100%)`,
+              }}
+            />
+            <div
+              className="absolute inset-y-0 right-0 z-10"
+              style={{
+                width: '50vw',
+                backgroundColor: '#FFA400',
+                clipPath: `polygon(${gap} 0%, 100% 50%, ${gap} 100%, 0% 50%)`,
+              }}
+            />
+          </>
+        )}
 
         <div
-          className="absolute inset-y-0 right-0 z-10"
-          style={{
-            width: '50vw',
-            backgroundColor: '#FFA400',
-            clipPath: `polygon(${gap} 0%, 100% 50%, ${gap} 100%, 0% 50%)`,
-          }}
-        />
-
-        <div
-          className="relative z-20 bg-[#2a2a72] rounded-full flex items-center justify-center flex-shrink-0"
-          style={{ width: circleSize, height: circleSize }}
+          className={
+            isCircle
+              ? 'relative z-20 bg-[#2a2a72] rounded-full flex items-center justify-center flex-shrink-0'
+              : 'relative z-20 w-[min(100%,440px)] bg-[#2a2a72] rounded-[32px] px-6 pb-8 pt-8 flex items-center justify-center ring-2 ring-[#8888D3]/60 shadow-[0_20px_50px_-15px_rgba(0,0,0,0.6)]'
+          }
+          style={
+            isCircle ? { width: circleSize, height: circleSize } : undefined
+          }
         >
-          <div className="flex flex-col items-center gap-4 w-[70%] pt-5 relative">
+          <div
+            className={`flex flex-col items-center gap-4 relative ${
+              isCircle ? 'w-[70%] pt-5' : 'w-full'
+            }`}
+          >
             <img
-              className="h-auto w-[100px] absolute -top-[50px]"
+              className={
+                isCircle
+                  ? 'h-auto w-[100px] absolute -top-[50px] cursor-pointer'
+                  : 'h-auto w-[84px] cursor-pointer'
+              }
               alt="Logo EPOL"
               src={LogoEpol}
               onClick={() => navigate('/')}
             />
 
-            <h1 className="text-[#FFA400] font-bold text-center text-[22px] leading-tight">
+            <h1 className="text-[#FFA400] font-bold text-center text-[20px] sm:text-[22px] leading-tight">
               Crie sua conta!
             </h1>
 
@@ -527,21 +572,29 @@ function Cadastro() {
               Passo {step} de {TOTAL_STEPS}
             </p>
 
-            <div className="relative w-full">
-              <div
-                aria-hidden="true"
-                className="invisible flex flex-col gap-4 w-full"
-              >
-                <Textbox
-                  placeholder="Nome completo"
-                  value=""
-                  onChange={() => {}}
-                />
-                <Textbox placeholder="Apelido" value="" onChange={() => {}} />
-                <DateField value="" onChange={() => {}} />
-              </div>
+            <div className={isCircle ? 'relative w-full' : 'w-full'}>
+              {isCircle && (
+                <div
+                  aria-hidden="true"
+                  className="invisible flex flex-col gap-4 w-full"
+                >
+                  <Textbox
+                    placeholder="Nome completo"
+                    value=""
+                    onChange={() => {}}
+                  />
+                  <Textbox placeholder="Apelido" value="" onChange={() => {}} />
+                  <DateField value="" onChange={() => {}} />
+                </div>
+              )}
 
-              <div className="absolute inset-x-0 top-0 flex flex-col gap-4 w-full">
+              <div
+                className={
+                  isCircle
+                    ? 'absolute inset-x-0 top-0 flex flex-col gap-4 w-full'
+                    : 'flex flex-col gap-4 w-full'
+                }
+              >
                 {step === 1 && (
                   <>
                     <Textbox
