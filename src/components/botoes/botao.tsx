@@ -4,6 +4,7 @@ interface BotaoRecuperarProps {
   textColor?: string;
   onClick?: () => void;
   className?: string;
+  type?: 'button' | 'submit' | 'reset';
 }
 
 export default function BotaoRecuperar({
@@ -12,9 +13,11 @@ export default function BotaoRecuperar({
   textColor = '#ffffff',
   onClick,
   className = '',
+  type,
 }: BotaoRecuperarProps) {
   return (
     <button
+      type={type}
       onClick={onClick}
       className={`w-full rounded-full font-bold py-[14px] px-[50px] text-[13px] uppercase whitespace-nowrap transition-all duration-300 hover:brightness-[.85] ${className}`.trim()}
       style={{ backgroundColor: bgColor, color: textColor }}
