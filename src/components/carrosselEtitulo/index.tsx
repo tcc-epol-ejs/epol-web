@@ -189,28 +189,46 @@ export default function StepCarousel() {
         {/* SETA DIREITA */}
         <button
           onClick={goNext}
-          className="arrow-right shrink-0 text-[#2a2a72] rounded-full p-[6px] hover:scale-125 hover:shadow-[0_0_16px_4px_rgba(42,42,114,0.4)] active:scale-95 transition-transform duration-200 ease-out"
+          className="arrow-right hidden sm:block shrink-0 text-[#2a2a72] rounded-full p-[6px] hover:scale-125 hover:shadow-[0_0_16px_4px_rgba(42,42,114,0.4)] active:scale-95 transition-transform duration-200 ease-out"
           aria-label="Próximo"
         >
           <FiChevronRight size={28} />
         </button>
       </div>
 
-      {/* BOLINHAS */}
-      <div className="flex gap-[8px]">
-        {steps.map((_, i) => (
-          <button
-            key={i}
-            onClick={() => setIndex(i)}
-            className="rounded-full transition-all"
-            style={{
-              width: i === index ? 10 : 8,
-              height: i === index ? 10 : 8,
-              backgroundColor: i === index ? '#FFA400' : '#c9c9e0',
-            }}
-            aria-label={`Ir para passo ${i + 1}`}
-          />
-        ))}
+      {/* SETAS + BOLINHAS */}
+      <div className="flex items-center gap-4">
+        <button
+          onClick={goPrev}
+          className="sm:hidden text-[#2a2a72] rounded-full p-2 active:scale-90 transition-transform"
+          aria-label="Anterior"
+        >
+          <FiChevronLeft size={28} />
+        </button>
+
+        <div className="flex gap-[8px] flex-wrap justify-center max-w-[180px] sm:max-w-none">
+          {steps.map((_, i) => (
+            <button
+              key={i}
+              onClick={() => setIndex(i)}
+              className="rounded-full transition-all"
+              style={{
+                width: i === index ? 10 : 8,
+                height: i === index ? 10 : 8,
+                backgroundColor: i === index ? '#FFA400' : '#c9c9e0',
+              }}
+              aria-label={`Ir para passo ${i + 1}`}
+            />
+          ))}
+        </div>
+
+        <button
+          onClick={goNext}
+          className="sm:hidden text-[#2a2a72] rounded-full p-2 active:scale-90 transition-transform"
+          aria-label="Próximo"
+        >
+          <FiChevronRight size={28} />
+        </button>
       </div>
     </div>
   );

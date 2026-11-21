@@ -38,33 +38,71 @@ function Etitulo() {
         </div>
 
         {/* PRIMEIRA PARTE SEÇÃO */}
-
-        {/* PRIMEIRA PARTE SEÇÃO */}
-        <div className="relative w-full min-h-[100dvh] bg-[#eaf6ff] flex flex-col md:flex-row justify-center md:justify-between items-center md:items-start overflow-hidden pt-24 sm:pt-32 md:pt-40 lg:pt-[8vw] pb-24 md:pb-20 px-4 sm:px-8 md:pl-[0vw] gap-8 md:gap-6">
+        <div className="relative w-full min-h-[100dvh] bg-[#eaf6ff] flex flex-col md:flex-row justify-center md:justify-between items-center md:items-start overflow-hidden pt-24 sm:pt-32 md:pt-40 lg:pt-[8vw] pb-24 md:pb-20 px-5 sm:px-8 md:pl-[0vw] gap-8 md:gap-6">
           {/* COLUNA ESQUERDA */}
-          <div className="flex flex-col items-center md:items-start w-full md:max-w-[55%] md:mt-[4vw] -mx-4 sm:mx-0">
+          <div className="flex flex-col items-center md:items-start w-full md:max-w-[55%] md:mt-[4vw]">
+            {/* Desktop: imagem original */}
             <img
               src={etitulo}
               alt="etitulo"
-              className="w-[calc(100%+2rem)] max-w-none sm:w-full sm:max-w-[520px] md:max-w-none md:w-[115%] lg:w-[130%] h-auto"
+              className="hidden md:block md:max-w-none md:w-[115%] lg:w-[130%] h-auto"
             />
+            {/* Celular: selo + texto */}
+            <div className="md:hidden flex w-full max-w-[480px] flex-col items-start gap-5">
+              <h1 className="rounded-full bg-[#FFA400] px-6 py-2 text-lg font-black text-[#1f2a52] shadow-sm">
+                O QUE É?
+              </h1>
+
+              <div className="space-y-4 text-[15px] leading-relaxed text-[#1f2a52]">
+                <p>
+                  O{' '}
+                  <strong className="text-[#D98200]">título de eleitor</strong>{' '}
+                  é um documento oficial que comprova que uma pessoa está
+                  registrada na Justiça Eleitoral e, portanto, tem o direito de
+                  votar nas eleições. No Brasil, ele é essencial para o
+                  exercício da cidadania, pois permite que o cidadão escolha
+                  seus representantes, como presidente, governadores, prefeitos
+                  e vereadores.
+                </p>
+                <p>
+                  Esse documento contém informações importantes, como o{' '}
+                  <strong className="text-[#D98200]">nome do eleitor</strong>,{' '}
+                  <strong className="text-[#D98200]">
+                    número de inscrição
+                  </strong>
+                  , <strong className="text-[#D98200]">zona eleitoral</strong> e{' '}
+                  <strong className="text-[#D98200]">seção</strong> onde a
+                  pessoa deve votar. O voto é obrigatório para cidadãos entre 18
+                  e 70 anos, e facultativo para jovens de 16 e 17 anos, pessoas
+                  com mais de 70 anos e analfabetos.
+                </p>
+                <p>
+                  Além de ser necessário para votar, o título de eleitor também
+                  pode ser exigido em diversas situações, como para tirar
+                  passaporte, se inscrever em concursos públicos ou assumir
+                  cargos públicos. Atualmente, ele também pode ser acessado em
+                  formato digital, por meio de aplicativos oficiais, facilitando
+                  ainda mais o acesso dos eleitores.
+                </p>
+              </div>
+            </div>
           </div>
 
-          {/* COLUNA DIREITA - MASCOTE */}
-          <div className="shrink-0 flex justify-center md:justify-end w-full md:w-[38%] md:max-w-[560px]">
+          {/* COLUNA DIREITA - MASCOTE (só desktop) */}
+          <div className="hidden md:flex shrink-0 justify-end w-[38%] max-w-[560px]">
             <div
               ref={trackRef}
-              className="relative w-[70%] max-w-[260px] aspect-square md:w-full md:max-w-none md:aspect-[480/500] md:mt-8"
+              className="relative w-full aspect-[480/500] mt-8"
             >
               <img
                 src={retanguloazul}
                 alt="retanguloazul"
-                className="absolute inset-0 w-full h-full object-contain md:inset-auto md:top-0 md:left-[30%]"
+                className="absolute top-0 left-[30%] w-full h-full object-contain"
               />
               <img
                 src={pipo_fechado}
                 alt="pipo_fechado"
-                className="absolute inset-0 w-full h-full object-contain md:inset-auto md:bottom-[-30%] md:left-[25%] md:w-[200%] md:h-[140%] md:object-cover"
+                className="absolute bottom-[-30%] left-[25%] w-[200%] h-[140%] object-cover"
               />
             </div>
           </div>
