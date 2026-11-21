@@ -11,6 +11,7 @@ import SearchPol from './pages/searchpol';
 import SimuladorUrna from './pages/simulador-urna';
 import PaginaPartido from './pages/pagina_partido';
 import PaginaPolitico from './pages/pagina_politico';
+import LinhaDoTempo from './pages/linha_do_tempo';
 
 function App() {
   return (
@@ -28,6 +29,7 @@ function App() {
         <Route path="/simulador-urna" element={<SimuladorUrna />} />
         <Route path="/pagina_partido" element={<PaginaPartido />} />
         <Route path="/pagina_politico" element={<PaginaPolitico />} />
+        <Route path="/linha_do_tempo" element={<LinhaDoTempo />} />
       </Routes>
     </BrowserRouter>
   );
