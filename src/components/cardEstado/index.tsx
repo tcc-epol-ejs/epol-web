@@ -55,23 +55,20 @@ export default function CardEstado({
     ) ?? null;
 
   return (
-    <div className="w-full max-w-[340px] rounded-[16px] bg-white px-6 py-5 shadow-[0_5px_15px_rgba(0,0,0,0.15)]">
-      {/* CABEÇALHO */}
+    <div className="w-full min-w-0 max-w-[340px] rounded-[16px] bg-white px-4 py-5 shadow-[0_5px_15px_rgba(0,0,0,0.15)] sm:px-6">
       <div className="mb-4 flex items-center gap-3 border-b border-gray-200 pb-3">
         <BandeiraEstado sigla={sigla} className="h-[34px] w-[50px] shrink-0" />
 
-        <div className="leading-none">
-          <p className="text-[17px] font-black uppercase text-[#2A2A72]">
+        <div className="min-w-0 leading-none">
+          <p className="text-[17px] font-black uppercase text-[#2A2A72] [overflow-wrap:anywhere]">
             {nomeEstado}
           </p>
-
           <p className="mt-[3px] text-[12px] font-bold text-gray-400">
             {sigla}
           </p>
         </div>
       </div>
 
-      {/* GOVERNADOR */}
       <div className="mb-4">
         <p className="mb-2 text-[10px] font-extrabold uppercase tracking-wide text-[#555]">
           Governador(a):
@@ -100,7 +97,7 @@ export default function CardEstado({
             )}
 
             <div className="min-w-0 flex-1">
-              <p className="truncate text-[13px] font-black leading-tight text-[#2A2A72]">
+              <p className="text-[13px] font-black leading-tight text-[#2A2A72] [overflow-wrap:anywhere] xl:truncate">
                 {governador.nome_politico}
               </p>
 
@@ -120,7 +117,6 @@ export default function CardEstado({
         )}
       </div>
 
-      {/* VICE GOVERNADOR */}
       <div>
         <p className="mb-2 text-[10px] font-extrabold uppercase tracking-wide text-[#555]">
           Vice-Governador(a):
@@ -128,7 +124,7 @@ export default function CardEstado({
 
         <div className="flex items-center justify-end">
           {governador?.vice ? (
-            <p className="max-w-[240px] text-right text-[12px] font-bold leading-tight text-[#2A2A72]">
+            <p className="min-w-0 max-w-[240px] text-right text-[12px] font-bold leading-tight text-[#2A2A72] [overflow-wrap:anywhere]">
               {governador.vice}
             </p>
           ) : (
