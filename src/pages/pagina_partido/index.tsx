@@ -308,7 +308,7 @@ function PaginaPartido() {
         />
       </div>
 
-      <main className="relative z-10 mx-auto flex min-h-0 w-full max-w-[1500px] flex-1 items-stretch gap-3 px-4 py-6 sm:gap-4 sm:px-6 lg:py-10">
+      <main className="relative z-10 mx-auto flex min-h-0 w-full max-w-[1500px] flex-1 flex-col items-stretch gap-2 px-4 py-4 sm:flex-row sm:gap-4 sm:px-6 sm:py-6 lg:py-10">
         <button
           type="button"
           onClick={() => navigate(voltarPara)}
