@@ -15,9 +15,8 @@ interface TimeLeft {
 
 function getTimeLeft(target: Date): TimeLeft {
   const diff = target.getTime() - Date.now();
-  if (diff <= 0) {
-    return { days: 0, hours: 0, minutes: 0 };
-  }
+  if (diff <= 0) return { days: 0, hours: 0, minutes: 0 };
+
   const days = Math.floor(diff / (1000 * 60 * 60 * 24));
   const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
   const minutes = Math.floor((diff / (1000 * 60)) % 60);
@@ -30,7 +29,7 @@ function useElectionCountdown(target: Date): TimeLeft {
   useEffect(() => {
     const interval = setInterval(() => {
       setTimeLeft(getTimeLeft(target));
-    }, 30 * 1000); // atualiza a cada 30s, suficiente pra um contador em minutos
+    }, 30 * 1000);
 
     return () => clearInterval(interval);
   }, [target]);
@@ -40,7 +39,7 @@ function useElectionCountdown(target: Date): TimeLeft {
 
 function CountdownBox({ value, label }: { value: number; label: string }) {
   return (
-    <div className="flex flex-col items-center gap-1 bg-[#33355C] rounded-lg px-4 py-2.5 min-w-[64px]">
+    <div className="flex min-w-0 flex-1 flex-col items-center gap-1 rounded-lg bg-[#33355C] px-1 py-2.5">
       <span className="text-xl md:text-2xl font-bold text-[#A5A9F0] tabular-nums">
         {String(value).padStart(2, '0')}
       </span>
@@ -61,8 +60,8 @@ export default function Footer() {
   }, []);
 
   return (
-    <footer className="w-full bg-[#232528] text-white py-16 px-8 md:py-20 md:px-16 lg:px-24 flex flex-col gap-12">
-      <div className="flex flex-col md:flex-row gap-10 md:gap-16 lg:gap-24 justify-between">
+    <footer className="flex w-full flex-col gap-12 bg-[#232528] px-4 py-12 text-white sm:px-8 md:px-16 md:py-20 lg:px-24">
+      <div className="flex flex-col justify-between gap-10 md:flex-row md:flex-wrap lg:flex-nowrap lg:gap-12 xl:gap-24">
         <div className="flex flex-col gap-2.5 max-w-xs">
           <p className="font-bold text-lg">EPOL</p>
           <p className="text-gray-300 text-sm leading-relaxed">
@@ -106,7 +105,7 @@ export default function Footer() {
               Match Político
             </button>
             <button
-              onClick={() => navigate('/visualizador-geografico')}
+              onClick={() => navigate('/visualizador')}
               className="text-sm text-gray-300 text-left hover:text-white transition-colors"
             >
               Visualizador Geográfico

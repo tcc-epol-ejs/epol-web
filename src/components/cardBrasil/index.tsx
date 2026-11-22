@@ -63,23 +63,24 @@ function Pessoa({ pessoa, titulo }: { pessoa: Candidato; titulo: string }) {
         {titulo}
       </p>
       <button
+        type="button"
         onClick={() =>
           navigate(`/pagina_politico?id=${encodeURIComponent(pessoa.id)}`, {
             state: { voltarPara: '/visualizador' },
           })
         }
         aria-label={`Ver perfil de ${pessoa.nome_politico}`}
-        className="flex w-full items-center gap-2 text-left transition-opacity hover:opacity-80"
+        className="flex min-h-11 w-full items-center gap-2 text-left transition-opacity hover:opacity-80"
       >
         {pessoa.foto_url && (
           <img
             src={pessoa.foto_url}
             alt={pessoa.nome_politico}
-            className="h-10 w-10 flex-shrink-0 rounded-full object-cover"
+            className="h-10 w-10 shrink-0 rounded-full object-cover"
           />
         )}
-        <div>
-          <p className="text-xs font-bold text-[#2A2A72]">
+        <div className="min-w-0 flex-1">
+          <p className="text-xs font-bold text-[#2A2A72] [overflow-wrap:anywhere]">
             {pessoa.nome_politico}
           </p>
           {pessoa.partidos && (
@@ -96,13 +97,10 @@ function Pessoa({ pessoa, titulo }: { pessoa: Candidato; titulo: string }) {
 export default function CardBrasil({ candidatos }: CardBrasilProps) {
   const presidente = candidatos.find(ehPresidente) ?? null;
   const vice = candidatos.find(ehVicePresidente) ?? null;
-
-  // O vice normalmente não é um registro próprio: o nome vem no campo "vice"
-  // do presidente (igual ao vice-governador no cardEstado).
   const nomeVice = vice ? null : (presidente?.vice?.trim() ?? '') || null;
 
   return (
-    <div className="w-full rounded-2xl bg-white p-4 shadow-lg">
+    <div className="w-full min-w-0 max-w-[340px] rounded-2xl bg-white p-4 shadow-lg">
       <div className="mb-3 flex items-center gap-2">
         <BandeiraBrasil />
         <p className="text-sm font-black uppercase tracking-wide text-[#2A2A72]">
@@ -118,7 +116,9 @@ export default function CardBrasil({ candidatos }: CardBrasilProps) {
           <p className="mb-1 text-[10px] font-bold uppercase tracking-wider text-gray-400">
             Vice-Presidente
           </p>
-          <p className="text-xs font-bold text-[#2A2A72]">{nomeVice}</p>
+          <p className="text-xs font-bold text-[#2A2A72] [overflow-wrap:anywhere]">
+            {nomeVice}
+          </p>
         </div>
       )}
 

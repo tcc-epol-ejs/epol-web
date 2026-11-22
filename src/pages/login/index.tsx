@@ -1,11 +1,13 @@
-import { ChangeEvent, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+import type { ChangeEvent, FormEvent } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { login } from '../../services/api';
 import { useAuth } from '../../contexts/AuthContext';
 import Textbox from '../../components/inputs';
 import Botao from '../../components/botoes/botao';
 import Footer from '../../components/footer/footer';
 import LogoEpol from '../../assets/Imagens/Logos/LogoEPOLPreta.png';
+import './login.css';
 
 const bolasConfig = [
   { size: 280, top: '-40px', left: '-30px', opacity: 1 },
@@ -39,105 +41,99 @@ const bolasConfig = [
 ];
 
 export default function Login() {
-  const circleSize = 'min(580px, 75vw, 75dvh)';
-  const gap = '20px';
   const navigate = useNavigate();
   const { salvarSessao } = useAuth();
 
   const [emailOuUsuario, setEmailOuUsuario] = useState('');
   const [senha, setSenha] = useState('');
-  const [showError, setShowError] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
   function handleEmailOuUsuarioChange(event: ChangeEvent<HTMLInputElement>) {
     setEmailOuUsuario(event.target.value);
-    setShowError(false);
+    setErrorMessage('');
   }
 
   function handleSenhaChange(event: ChangeEvent<HTMLInputElement>) {
     setSenha(event.target.value);
-    setShowError(false);
+    setErrorMessage('');
   }
 
-  async function handleLogin() {
+  async function handleLogin(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
     if (!emailOuUsuario.trim()) {
       setErrorMessage('Informe seu e-mail');
-      setShowError(true);
       return;
     }
+
     if (!senha.trim()) {
       setErrorMessage('Informe sua senha');
-      setShowError(true);
       return;
     }
+
     try {
       const { usuario, token } = await login(emailOuUsuario, senha);
       salvarSessao(usuario, token);
       navigate('/main');
-    } catch (err: any) {
-      setErrorMessage(err.message || 'E-mail ou senha inválidos');
-      setShowError(true);
+    } catch (err) {
+      setErrorMessage(
+        err instanceof Error && err.message
+          ? err.message
+          : 'E-mail ou senha inválidos',
+      );
     }
   }
 
   return (
     <div>
-      <section className="w-full min-h-[100dvh] bg-[#e8f0fe] flex items-center justify-center overflow-hidden relative">
-        {bolasConfig.map((b, i) => (
-          <div
-            key={i}
-            className="absolute rounded-full"
-            style={{
-              width: b.size,
-              height: b.size,
-              top: 'top' in b ? b.top : undefined,
-              bottom: 'bottom' in b ? b.bottom : undefined,
-              left: 'left' in b ? b.left : undefined,
-              right: 'right' in b ? b.right : undefined,
-              backgroundColor: b.bgColor || '#7b6bb5',
-              opacity: b.opacity,
-              zIndex: 0,
-            }}
-          />
-        ))}
-
+      <main className="epol-login relative flex min-h-[100dvh] w-full items-center justify-center overflow-hidden bg-[#e8f0fe] px-4 py-8">
         <div
-          className="absolute inset-y-0 left-0 z-10"
-          style={{
-            width: '50vw',
-            backgroundColor: '#FFA400',
-            clipPath: `polygon(0% 50%, 100% 0%, calc(100% - ${gap}) 50%, 100% 100%)`,
-          }}
-        />
-
-        <div
-          className="absolute inset-y-0 right-0 z-10"
-          style={{
-            width: '50vw',
-            backgroundColor: '#FFA400',
-            clipPath: `polygon(${gap} 0%, 100% 50%, ${gap} 100%, 0% 50%)`,
-          }}
-        />
-
-        <div
-          className="relative z-20 bg-[#e8f0fe] rounded-full flex items-center justify-center flex-shrink-0"
-          style={{ width: circleSize, height: circleSize }}
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0"
         >
-          <div className="flex flex-col items-center gap-4 w-[70%] pt-5 relative">
-            <img
-              className="h-auto w-[100px] absolute -top-[60px]"
-              alt="Logo EPOL"
-              src={LogoEpol}
-              onClick={() => navigate('/')}
+          {bolasConfig.map((b, i) => (
+            <div
+              key={i}
+              className="absolute rounded-full"
+              style={{
+                width: `calc(${b.size}px * var(--escala-bolas))`,
+                height: `calc(${b.size}px * var(--escala-bolas))`,
+                top: b.top && `calc(${b.top} * var(--escala-bolas))`,
+                bottom: b.bottom && `calc(${b.bottom} * var(--escala-bolas))`,
+                left: b.left && `calc(${b.left} * var(--escala-bolas))`,
+                right: b.right && `calc(${b.right} * var(--escala-bolas))`,
+                backgroundColor: b.bgColor || '#7b6bb5',
+                opacity: b.opacity,
+              }}
             />
+          ))}
+          <div className="epol-login-bandeira absolute inset-y-0 left-0 w-1/2 bg-[#FFA400] [clip-path:polygon(0_50%,100%_0,calc(100%-20px)_50%,100%_100%)]" />
+          <div className="epol-login-bandeira absolute inset-y-0 right-0 w-1/2 bg-[#FFA400] [clip-path:polygon(20px_0,100%_50%,20px_100%,0_50%)]" />
+        </div>
 
-            <h1 className="text-[#2d2d6b] font-bold text-center text-[22px] leading-tight">
+        <div className="epol-login-cartao relative flex items-center justify-center bg-[#e8f0fe] px-6 py-8">
+          <form
+            onSubmit={handleLogin}
+            className="epol-login-form flex flex-col items-center gap-4"
+          >
+            <Link
+              to="/"
+              aria-label="Página inicial do EPOL"
+              className="rounded-md"
+            >
+              <img className="epol-login-logo h-auto" alt="" src={LogoEpol} />
+            </Link>
+
+            <h1 className="text-center text-xl font-bold leading-tight text-[#2d2d6b] sm:text-[22px]">
               Bem-vindo de volta!
             </h1>
 
-            <div className="flex flex-col gap-4 w-full">
+            <div className="flex w-full flex-col gap-4">
               <Textbox
                 placeholder="E-mail"
+                aria-label="E-mail"
+                autoComplete="username"
+                inputMode="email"
                 value={emailOuUsuario}
                 onChange={handleEmailOuUsuarioChange}
               />
@@ -145,43 +141,44 @@ export default function Login() {
                 showToggle
                 type="password"
                 placeholder="Senha"
+                aria-label="Senha"
+                autoComplete="current-password"
                 value={senha}
                 onChange={handleSenhaChange}
               />
-              {showError && (
-                <p className="text-red-500 text-[10px] font-semibold text-center">
+              {errorMessage && (
+                <p
+                  role="alert"
+                  className="break-words text-center text-xs font-semibold text-red-700"
+                >
                   {errorMessage}
                 </p>
               )}
             </div>
 
-            <Botao bgColor="#2d2d6b" textColor="#fff" onClick={handleLogin}>
+            <Botao bgColor="#2d2d6b" textColor="#fff" type="submit">
               entrar
             </Botao>
 
-            <p
-              className="text-[#2d2d6b] text-center cursor-pointer font-semibold hover:underline"
-              style={{ fontSize: 'clamp(11px, 2vw, 14px)' }}
-              onClick={() => navigate('/recuperar-senha')}
+            <Link
+              className="inline-flex min-h-8 items-center justify-center text-center text-sm font-semibold text-[#2d2d6b] hover:underline"
+              to="/recuperar-senha"
             >
               Esqueceu a senha?
-            </p>
+            </Link>
 
-            <p
-              className="text-[#2d2d6b] text-center"
-              style={{ fontSize: 'clamp(11px, 2vw, 14px)' }}
-            >
+            <p className="text-center text-sm text-[#2d2d6b]">
               Não tem uma conta?{' '}
-              <span
-                onClick={() => navigate('/cadastro')}
-                className="text-[#2d2d6b] font-semibold cursor-pointer hover:underline"
+              <Link
+                to="/cadastro"
+                className="inline-block py-1 font-semibold hover:underline"
               >
                 Cadastre-se
-              </span>
+              </Link>
             </p>
-          </div>
+          </form>
         </div>
-      </section>
+      </main>
       <Footer />
     </div>
   );

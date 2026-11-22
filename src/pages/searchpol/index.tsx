@@ -9,7 +9,7 @@ import {
 } from 'react-icons/fi';
 import { FormEvent, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Header from '../../components/header';
+import Header from '../../components/header/index';
 import { obterPaletaPartido } from '../../data/partidoPaletas';
 import {
   type Candidato,
@@ -877,7 +877,7 @@ function SearchPol() {
       </div>
 
       <div className="relative z-10 w-full">
-        <Header isBgWhite disableScrollHide />
+        <Header isBgWhite disableScrollHide reservarEspaco />
       </div>
 
       <section className="relative z-10 isolate overflow-clip bg-transparent lg:h-[calc(100dvh-122px)]">

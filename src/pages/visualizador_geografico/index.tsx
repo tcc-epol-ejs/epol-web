@@ -547,64 +547,72 @@ export default function VisualizadorGeografico() {
 
   return (
     <>
-      <main className="min-h-screen w-full bg-[#FFA400] overflow-hidden">
+      <main className="min-h-[100dvh] w-full bg-[#FFA400]">
         <style>{`
-        .epol-map { width: 100%; max-width: 600px; height: auto; display: block; overflow: visible; margin: 0 auto; }
-        .epol-map .map { width: 100% !important; }
-        .epol-map svg { width: 100%; height: auto; }
-        .epol-map svg path { stroke: #B4B4B4; stroke-width: 1.2; transition: fill 0.2s ease; cursor: pointer !important; }
-        .epol-map svg text.epol-sigla { fill: #2A2A72; stroke: none; font-weight: 800; font-family: 'Montserrat', sans-serif; pointer-events: none; user-select: none; transition: fill 0.2s ease; }
-        .epol-map svg text.epol-sigla.epol-branca { fill: #FFFFFF; }
-      `}</style>
+          .epol-map {
+            display: block;
+            width: 100%;
+            max-width: 600px;
+            height: auto;
+            margin: 0 auto;
+            overflow: visible;
+          }
 
-        <div className="fixed top-0 left-0 z-[1000] w-full">
+          .epol-map .map { width: 100% !important; }
+          .epol-map svg { display: block; width: 100%; height: auto; }
+
+          .epol-map svg path {
+            stroke: #B4B4B4;
+            stroke-width: 1.2;
+            transition: fill 0.2s ease;
+            cursor: pointer !important;
+          }
+
+          .epol-map svg text.epol-sigla {
+            fill: #2A2A72;
+            stroke: none;
+            font-weight: 800;
+            font-family: 'Montserrat', sans-serif;
+            pointer-events: none;
+            user-select: none;
+            transition: fill 0.2s ease;
+          }
+
+          .epol-map svg text.epol-sigla.epol-branca { fill: #FFFFFF; }
+
+          @media (max-width: 1279px) and (max-height: 520px) and (orientation: landscape) {
+            .epol-map { max-width: min(600px, 72dvh); }
+          }
+        `}</style>
+
+        <div className="fixed inset-x-0 top-0 z-[1000]">
           <Header isBgWhite />
         </div>
 
-        <section className="min-h-screen w-full px-6 pb-10 pt-[155px] md:px-10 lg:px-[65px]">
-          <div className="mx-auto grid min-h-[calc(100vh-155px)] w-full max-w-[1600px] grid-cols-1 gap-8 lg:grid-cols-[340px_minmax(0,1fr)_340px] items-start pt-8">
-            {/*ESQUERDA*/}
-            <div className="flex flex-col justify-center gap-32">
-              <div className="select-none">
-                <h1 className="font-[Fraunces] text-[43px] font-black italic uppercase leading-[0.95] tracking-[-0.03em] text-[#2A2A72] md:text-[48px]">
+        <section className="min-h-[100dvh] w-full px-4 pb-10 pt-32 sm:px-6 md:px-10 md:pt-[135px] xl:px-[65px] xl:pt-[155px]">
+          <div className="mx-auto grid w-full max-w-[1600px] grid-cols-1 items-start gap-5 xl:grid-cols-[340px_minmax(0,1fr)_340px] xl:grid-rows-[auto_1fr] xl:gap-x-8 xl:gap-y-0 xl:pt-8">
+            <div className="min-w-0 select-none xl:col-start-1 xl:row-start-1">
+              <h1 className="text-[#2A2A72]">
+                <span className="block font-[Fraunces] text-[clamp(2rem,7vw,3rem)] font-black italic uppercase leading-[0.95] tracking-[-0.03em]">
                   Visualizador
-                </h1>
-                <h2 className="mt-1 text-[28px] font-black uppercase leading-none tracking-wide text-[#2A2A72]">
+                </span>
+                <span className="mt-1 block text-[clamp(1.25rem,5vw,1.75rem)] font-black uppercase leading-none tracking-wide">
                   Geográfico
-                </h2>
-              </div>
-
-              {estadoAtual && (
-                <CardEstado
-                  nomeEstado={estadoAtual.nome}
-                  sigla={estadoAtual.sigla}
-                  candidatos={candidatos}
-                />
-              )}
+                </span>
+              </h1>
             </div>
 
-            {/* MAPA */}
-            <div className="flex items-center justify-center">
-              <div className="w-full max-w-[800px]">
-                <div
-                  ref={mapaRef}
-                  className="epol-map w-full max-w-[800px]"
-                  onMouseOver={obterEstadoDoMapa}
-                  onMouseOut={limparEstado}
-                  onClick={clicarEstadoNoMapa}
-                >
-                  {mapa}
-                </div>
-              </div>
-            </div>
-
-            {/* DIREITA */}
-            <div className="flex flex-col justify-center gap-7">
+            <div className="min-w-0 xl:col-start-3 xl:row-start-1">
               <div className="relative w-full" ref={barraRef}>
-                <div className="flex h-[52px] items-center gap-3 rounded-full bg-[#FFFBF2] px-5 shadow-[0_8px_20px_rgba(0,0,0,0.12)]">
-                  <FiSearch size={20} className="shrink-0 text-[#888]" />
+                <div className="flex min-h-[52px] items-center gap-1 rounded-full bg-[#FFFBF2] px-3 shadow-[0_8px_20px_rgba(0,0,0,0.12)] sm:gap-3 sm:px-5">
+                  <FiSearch
+                    size={20}
+                    aria-hidden="true"
+                    className="shrink-0 text-[#888]"
+                  />
                   <input
                     type="text"
+                    aria-label="Pesquisar estado, político ou partido"
                     value={pesquisa}
                     onChange={(e) => aoDigitar(e.target.value)}
                     onFocus={() => {
@@ -613,7 +621,7 @@ export default function VisualizadorGeografico() {
                     }}
                     onKeyDown={aoPressionarTecla}
                     placeholder="Pesquisar estado, político ou partido..."
-                    className="min-w-0 flex-1 bg-transparent text-[13px] outline-none placeholder:text-[#A0A0A0]"
+                    className="min-w-0 flex-1 bg-transparent text-base outline-none placeholder:text-[#A0A0A0] xl:text-[13px]"
                   />
 
                   {pesquisa && (
@@ -624,7 +632,7 @@ export default function VisualizadorGeografico() {
                         setAtivo(0);
                       }}
                       aria-label="Limpar pesquisa"
-                      className="shrink-0 text-[#888] transition-colors hover:text-[#2A2A72]"
+                      className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-[#888] transition-colors hover:text-[#2A2A72] xl:h-8 xl:w-8"
                     >
                       <FiX size={18} />
                     </button>
@@ -637,11 +645,12 @@ export default function VisualizadorGeografico() {
                       setBuscaAberta(false);
                     }}
                     aria-label="Filtros"
-                    className="relative shrink-0 text-[#FFA400]"
+                    aria-expanded={filtrosAbertos}
+                    className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-[#FFA400] xl:h-8 xl:w-8"
                   >
                     <FiSliders size={20} />
                     {qtdFiltros > 0 && (
-                      <span className="absolute -right-2 -top-2 flex h-4 w-4 items-center justify-center rounded-full bg-[#2A2A72] text-[9px] font-bold text-white">
+                      <span className="absolute right-0 top-0 flex h-4 w-4 items-center justify-center rounded-full bg-[#2A2A72] text-[9px] font-bold text-white xl:-right-1 xl:-top-1">
                         {qtdFiltros}
                       </span>
                     )}
@@ -649,7 +658,7 @@ export default function VisualizadorGeografico() {
                 </div>
 
                 {filtrosAbertos && (
-                  <div className="absolute left-0 right-0 top-full z-50 mt-2 rounded-2xl bg-[#FFFBF2] p-4 shadow-xl">
+                  <div className="mt-2 max-h-[min(55dvh,30rem)] overflow-y-auto rounded-2xl bg-[#FFFBF2] p-4 shadow-xl xl:absolute xl:inset-x-0 xl:top-full xl:z-50 xl:max-h-[min(65dvh,34rem)]">
                     <div className="mb-3 flex items-center justify-between">
                       <p className="text-sm font-black uppercase tracking-wide text-[#2A2A72]">
                         Filtros
@@ -695,7 +704,7 @@ export default function VisualizadorGeografico() {
                     <p className="mb-1.5 text-[10px] font-extrabold uppercase tracking-wider text-[#999]">
                       Partido do governador
                     </p>
-                    <div className="mb-4 flex max-h-28 flex-wrap gap-1.5 overflow-y-auto">
+                    <div className="mb-4 flex flex-wrap gap-1.5 xl:max-h-28 xl:overflow-y-auto">
                       {partidosDosGovernos.length === 0 && (
                         <span className="text-xs text-[#999]">
                           Carregando partidos...
@@ -725,7 +734,7 @@ export default function VisualizadorGeografico() {
                     <p className="mb-1.5 text-[10px] font-extrabold uppercase tracking-wider text-[#999]">
                       Vice-governador
                     </p>
-                    <div className="mb-4 flex gap-1.5">
+                    <div className="mb-4 flex flex-wrap gap-1.5">
                       {(
                         [
                           ['todos', 'Todos'],
@@ -748,7 +757,7 @@ export default function VisualizadorGeografico() {
                       ))}
                     </div>
 
-                    <div className="flex items-center justify-between border-t border-gray-200 pt-3">
+                    <div className="flex flex-wrap items-center justify-between gap-2 border-t border-gray-200 pt-3">
                       <span className="text-xs text-[#777]">
                         {estadosFiltrados
                           ? `${estadosFiltrados.size} ${estadosFiltrados.size === 1 ? 'estado' : 'estados'} no mapa`
@@ -766,7 +775,7 @@ export default function VisualizadorGeografico() {
                 )}
 
                 {buscaAberta && pesquisa.trim() && !filtrosAbertos && (
-                  <div className="absolute left-0 right-0 top-full z-50 mt-2 max-h-[420px] overflow-y-auto rounded-2xl bg-[#FFFBF2] p-2 shadow-xl">
+                  <div className="mt-2 max-h-[min(50dvh,420px)] overflow-y-auto rounded-2xl bg-[#FFFBF2] p-2 shadow-xl xl:absolute xl:inset-x-0 xl:top-full xl:z-50 xl:max-h-[min(60dvh,420px)]">
                     {itens.length === 0 ? (
                       <p className="px-3 py-3 text-sm text-[#777]">
                         Nenhum resultado para “{pesquisa.trim()}”.
@@ -784,7 +793,7 @@ export default function VisualizadorGeografico() {
                             type="button"
                             onClick={() => escolher(item)}
                             onMouseEnter={() => setAtivo(i)}
-                            className={`flex w-full items-center gap-3 rounded-xl px-3 py-2 text-left transition-colors ${
+                            className={`flex min-h-11 w-full items-center gap-3 rounded-xl px-3 py-2 text-left transition-colors ${
                               i === ativo ? 'bg-[#F1F1F1]' : ''
                             }`}
                           >
@@ -872,7 +881,7 @@ export default function VisualizadorGeografico() {
               </div>
 
               {rotulosFiltros.length > 0 && (
-                <div className="flex flex-wrap items-center gap-1.5">
+                <div className="mt-3 flex flex-wrap items-center gap-1.5">
                   {rotulosFiltros.map((r) => (
                     <button
                       key={r.chave}
@@ -890,11 +899,32 @@ export default function VisualizadorGeografico() {
                   </span>
                 </div>
               )}
+            </div>
 
-              {/* mt-16 afasta o card da barra de pesquisa; aumente ou diminua à vontade */}
-              <div className="mt-16">
-                <CardBrasil candidatos={candidatos} />
+            <div className="min-w-0 xl:col-start-2 xl:row-span-2 xl:row-start-1">
+              <div
+                ref={mapaRef}
+                className="epol-map"
+                onMouseOver={obterEstadoDoMapa}
+                onMouseOut={limparEstado}
+                onClick={clicarEstadoNoMapa}
+              >
+                {mapa}
               </div>
+            </div>
+
+            {estadoAtual && (
+              <div className="flex min-w-0 justify-center xl:col-start-1 xl:row-start-2 xl:pt-32">
+                <CardEstado
+                  nomeEstado={estadoAtual.nome}
+                  sigla={estadoAtual.sigla}
+                  candidatos={candidatos}
+                />
+              </div>
+            )}
+
+            <div className="flex min-w-0 justify-center xl:col-start-3 xl:row-start-2 xl:pt-16">
+              <CardBrasil candidatos={candidatos} />
             </div>
           </div>
         </section>
