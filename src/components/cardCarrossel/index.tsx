@@ -3,8 +3,8 @@ import { useNavigate } from 'react-router-dom';
 interface CardCarrosselProps {
   asset: string;
   borderColor?: string;
-  width?: number;
-  height?: number;
+  width?: number | string;
+  height?: number | string;
   path?: string;
   classNameSection?: string;
   classNameImg?: string;

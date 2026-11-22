@@ -38,21 +38,61 @@ function Etitulo() {
         </div>
 
         {/* PRIMEIRA PARTE SEÇÃO */}
-        <div className="relative w-full min-h-[100dvh] bg-[#eaf6ff] flex flex-col md:flex-row justify-between items-center md:items-start overflow-hidden pt-24 sm:pt-32 md:pt-40 lg:pt-[8vw] pb-16 md:pb-20 px-4 sm:px-8 md:pl-[0vw] gap-10 md:gap-6">
-          {/* COLUNA ESQUERDA - IMAGEM COM TEXTO */}
-          <div className="flex flex-col items-center md:items-start w-full md:max-w-[55%] mt-4 md:mt-[4vw]">
+        <div className="relative w-full min-h-[100dvh] bg-[#eaf6ff] flex flex-col md:flex-row justify-center md:justify-between items-center md:items-start overflow-hidden pt-24 sm:pt-32 md:pt-40 lg:pt-[8vw] pb-24 md:pb-20 px-5 sm:px-8 md:pl-[0vw] gap-8 md:gap-6">
+          {/* COLUNA ESQUERDA */}
+          <div className="flex flex-col items-center md:items-start w-full md:max-w-[55%] md:mt-[4vw]">
+            {/* Desktop: imagem original */}
             <img
               src={etitulo}
               alt="etitulo"
-              className="w-full max-w-[720px] md:max-w-none md:w-[115%] lg:w-[130%] h-auto "
+              className="hidden md:block md:max-w-none md:w-[115%] lg:w-[130%] h-auto"
             />
+            {/* Celular: selo + texto */}
+            <div className="md:hidden flex w-full max-w-[480px] flex-col items-start gap-5">
+              <h1 className="rounded-full bg-[#FFA400] px-6 py-2 text-lg font-black text-[#1f2a52] shadow-sm">
+                O QUE É?
+              </h1>
+
+              <div className="space-y-4 text-[15px] leading-relaxed text-[#1f2a52]">
+                <p>
+                  O{' '}
+                  <strong className="text-[#D98200]">título de eleitor</strong>{' '}
+                  é um documento oficial que comprova que uma pessoa está
+                  registrada na Justiça Eleitoral e, portanto, tem o direito de
+                  votar nas eleições. No Brasil, ele é essencial para o
+                  exercício da cidadania, pois permite que o cidadão escolha
+                  seus representantes, como presidente, governadores, prefeitos
+                  e vereadores.
+                </p>
+                <p>
+                  Esse documento contém informações importantes, como o{' '}
+                  <strong className="text-[#D98200]">nome do eleitor</strong>,{' '}
+                  <strong className="text-[#D98200]">
+                    número de inscrição
+                  </strong>
+                  , <strong className="text-[#D98200]">zona eleitoral</strong> e{' '}
+                  <strong className="text-[#D98200]">seção</strong> onde a
+                  pessoa deve votar. O voto é obrigatório para cidadãos entre 18
+                  e 70 anos, e facultativo para jovens de 16 e 17 anos, pessoas
+                  com mais de 70 anos e analfabetos.
+                </p>
+                <p>
+                  Além de ser necessário para votar, o título de eleitor também
+                  pode ser exigido em diversas situações, como para tirar
+                  passaporte, se inscrever em concursos públicos ou assumir
+                  cargos públicos. Atualmente, ele também pode ser acessado em
+                  formato digital, por meio de aplicativos oficiais, facilitando
+                  ainda mais o acesso dos eleitores.
+                </p>
+              </div>
+            </div>
           </div>
 
-          {/* COLUNA DIREITA - MASCOTE */}
-          <div className="shrink-0 flex justify-center md:justify-end w-full md:w-[38%] max-w-[380px] md:max-w-[560px]">
+          {/* COLUNA DIREITA - MASCOTE (só desktop) */}
+          <div className="hidden md:flex shrink-0 justify-end w-[38%] max-w-[560px]">
             <div
               ref={trackRef}
-              className="relative w-full aspect-[480/500] mt-4 md:mt-8"
+              className="relative w-full aspect-[480/500] mt-8"
             >
               <img
                 src={retanguloazul}
@@ -62,14 +102,7 @@ function Etitulo() {
               <img
                 src={pipo_fechado}
                 alt="pipo_fechado"
-                className="absolute"
-                style={{
-                  bottom: '-30%',
-                  left: '25%',
-                  width: '200%',
-                  height: '140%',
-                  objectFit: 'cover',
-                }}
+                className="absolute bottom-[-30%] left-[25%] w-[200%] h-[140%] object-cover"
               />
             </div>
           </div>
@@ -78,7 +111,7 @@ function Etitulo() {
           <button
             onClick={scrollToNextSection}
             aria-label="Rolar para a próxima seção"
-            className="absolute bottom-6 sm:bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center animate-bounce z-[1] cursor-pointer"
+            className="absolute bottom-4 sm:bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center animate-bounce z-[1] cursor-pointer"
           >
             <svg
               width="28"
@@ -113,10 +146,10 @@ function Etitulo() {
           {bolasConfig.map((b, i) => (
             <div
               key={i}
-              className="absolute rounded-full hidden sm:block"
+              className="absolute rounded-full"
               style={{
-                width: `min(${b.size}px, 22vw)`,
-                height: `min(${b.size}px, 22vw)`,
+                width: `min(${b.size}px, 28vw)`,
+                height: `min(${b.size}px, 28vw)`,
                 top: 'top' in b ? b.top : undefined,
                 bottom: 'bottom' in b ? b.bottom : undefined,
                 left: 'left' in b ? b.left : undefined,

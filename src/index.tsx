@@ -8,7 +8,13 @@ import MatchPolitico from './pages/matchPolitico';
 import QuemSomos from './pages/quem_somos';
 import Main from './pages/main';
 import Admin from './pages/admin';
+import VisualizadorGeografico from './pages/visualizador_geografico';
+import Perfil from './pages/perfil';
 import SearchPol from './pages/searchpol';
+import SimuladorUrna from './pages/simulador-urna';
+import PaginaPartido from './pages/pagina_partido';
+import PaginaPolitico from './pages/pagina_politico';
+import LinhaDoTempo from './pages/linha_do_tempo';
 
 function App() {
   return (
@@ -19,12 +25,17 @@ function App() {
         <Route path="/cadastro" element={<Cadastro />} />
         <Route path="/recuperar-senha" element={<RecuperarSenha />} />
         <Route path="/etitulo" element={<Etitulo />} />
+        <Route path="/visualizador" element={<VisualizadorGeografico />} />
         <Route path="/match-politico" element={<MatchPolitico />} />
         <Route path="/quem-somos" element={<QuemSomos />} />
         <Route path="/main" element={<Main />} />
         <Route path="/admin" element={<Admin />} />
+        <Route path="/perfil" element={<Perfil />} />
         <Route path="/searchpol" element={<SearchPol />} />
-        <Route path="/main" element={<Main />} />
+        <Route path="/simulador-urna" element={<SimuladorUrna />} />
+        <Route path="/pagina_partido" element={<PaginaPartido />} />
+        <Route path="/pagina_politico" element={<PaginaPolitico />} />
+        <Route path="/linha_do_tempo" element={<LinhaDoTempo />} />
       </Routes>
     </BrowserRouter>
   );

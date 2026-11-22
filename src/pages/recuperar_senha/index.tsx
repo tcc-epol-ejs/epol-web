@@ -1,5 +1,6 @@
-import { ChangeEvent, useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { ChangeEvent, useEffect, useState } from 'react';
+import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
+import { useAuth } from '../../contexts/AuthContext';
 import Textbox from '../../components/inputs';
 import Botao from '../../components/botoes/botao';
 import Confirmar from '../../components/botoes/botaoRecuperar/confirmar';
@@ -31,12 +32,41 @@ const bolasConfig = [
   { size: 160, bottom: '120px', right: '200px', opacity: 0.6 },
 ];
 
+// Escala as bolinhas decorativas (tamanho E posição) pela variável CSS --s,
+// que muda conforme a largura da tela (veja as classes na <section>).
+// Antes elas tinham px fixos pensados para telas largas e, no celular,
+// ficavam enormes e amontoadas.
+const esc = (valor: string | number) => `calc(${valor}px * var(--s))`;
+const escPos = (valor: string) => `calc(${valor} * var(--s))`;
+
+// Hook genérico para media queries
+function useMediaQuery(query: string) {
+  const [matches, setMatches] = useState(
+    () => window.matchMedia(query).matches,
+  );
+
+  useEffect(() => {
+    const mq = window.matchMedia(query);
+    const onChange = (e: MediaQueryListEvent) => setMatches(e.matches);
+    mq.addEventListener('change', onChange);
+    return () => mq.removeEventListener('change', onChange);
+  }, [query]);
+
+  return matches;
+}
+
 function RecuperarSenha({ onSuccess }: RecuperarSenhaProps) {
   const [searchParams] = useSearchParams();
   const token = searchParams.get('token');
   const isResetStep = Boolean(token);
+  const location = useLocation();
+  const { usuario } = useAuth();
+  const veioDoPerfil =
+    (location.state as { origem?: string } | null)?.origem === 'perfil';
 
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState(
+    veioDoPerfil ? (usuario?.email ?? '') : '',
+  );
   const [novaSenha, setNovaSenha] = useState('');
   const [confirmarSenha, setConfirmarSenha] = useState('');
 
@@ -45,6 +75,20 @@ function RecuperarSenha({ onSuccess }: RecuperarSenhaProps) {
   const [errorMessage, setErrorMessage] = useState('');
 
   const navigate = useNavigate();
+
+  // O círculo só funciona quando há espaço: precisa de largura E altura.
+  // Em celular (ou celular deitado) o círculo ficava com ~280px e o conteúdo
+  // estourava para fora dele; nesses casos o formulário vira um cartão
+  // arredondado que cresce conforme o conteúdo.
+  const isCircle = useMediaQuery('(min-width: 768px) and (min-height: 640px)');
+
+  // As duas formas amarelas formam o losango da bandeira do Brasil (com o
+  // círculo como o globo). Isso só funciona em tela larga e deitada; em tela
+  // vertical elas viram triângulos finos e perdem o sentido, então ali o
+  // fundo fica só com as bolinhas.
+  const mostrarBandeira = useMediaQuery(
+    '(min-width: 768px) and (orientation: landscape)',
+  );
 
   const circleSize = 'min(580px, 75vw, 75dvh)';
   const gap = '20px';
@@ -107,6 +151,8 @@ function RecuperarSenha({ onSuccess }: RecuperarSenhaProps) {
     setConfirmarSenha('');
     if (isResetStep) {
       navigate('/login');
+    } else if (veioDoPerfil) {
+      navigate('/perfil');
     } else if (onSuccess) {
       onSuccess();
     }
@@ -114,18 +160,22 @@ function RecuperarSenha({ onSuccess }: RecuperarSenhaProps) {
 
   return (
     <div>
-      <section className="w-full min-h-[100dvh] bg-[#e8f0fe] flex items-center justify-center overflow-hidden relative">
+      <section
+        className={`w-full min-h-[100dvh] bg-[#e8f0fe] flex items-center justify-center overflow-hidden relative [--s:0.5] sm:[--s:0.7] md:[--s:0.85] lg:[--s:1] ${
+          isCircle ? '' : 'px-4 py-10'
+        }`}
+      >
         {bolasConfig.map((b, i) => (
           <div
             key={i}
             className="absolute rounded-full"
             style={{
-              width: b.size,
-              height: b.size,
-              top: 'top' in b ? b.top : undefined,
-              bottom: 'bottom' in b ? b.bottom : undefined,
-              left: 'left' in b ? b.left : undefined,
-              right: 'right' in b ? b.right : undefined,
+              width: esc(b.size),
+              height: esc(b.size),
+              top: b.top !== undefined ? escPos(b.top) : undefined,
+              bottom: b.bottom !== undefined ? escPos(b.bottom) : undefined,
+              left: b.left !== undefined ? escPos(b.left) : undefined,
+              right: b.right !== undefined ? escPos(b.right) : undefined,
               backgroundColor: b.bgColor || '#7b6bb5',
               opacity: b.opacity,
               zIndex: 0,
@@ -133,37 +183,62 @@ function RecuperarSenha({ onSuccess }: RecuperarSenhaProps) {
           />
         ))}
 
-        <div
-          className="absolute inset-y-0 left-0 z-10"
-          style={{
-            width: '50vw',
-            backgroundColor: '#FFA400',
-            clipPath: `polygon(0% 50%, 100% 0%, calc(100% - ${gap}) 50%, 100% 100%)`,
-          }}
-        />
+        {mostrarBandeira && (
+          <>
+            <div
+              className="absolute inset-y-0 left-0 z-10"
+              style={{
+                width: '50vw',
+                backgroundColor: '#FFA400',
+                clipPath: `polygon(0% 50%, 100% 0%, calc(100% - ${gap}) 50%, 100% 100%)`,
+              }}
+            />
 
-        <div
-          className="absolute inset-y-0 right-0 z-10"
-          style={{
-            width: '50vw',
-            backgroundColor: '#FFA400',
-            clipPath: `polygon(${gap} 0%, 100% 50%, ${gap} 100%, 0% 50%)`,
-          }}
-        />
+            <div
+              className="absolute inset-y-0 right-0 z-10"
+              style={{
+                width: '50vw',
+                backgroundColor: '#FFA400',
+                clipPath: `polygon(${gap} 0%, 100% 50%, ${gap} 100%, 0% 50%)`,
+              }}
+            />
+          </>
+        )}
 
+        {/* Desktop/tablet com altura suficiente: círculo (layout original).
+            Celular ou tela baixa: cartão arredondado com altura automática. */}
         <div
-          className="relative z-20 bg-[#e8f0fe] rounded-full flex items-center justify-center flex-shrink-0"
-          style={{ width: circleSize, height: circleSize }}
+          className={
+            isCircle
+              ? 'relative z-20 bg-[#e8f0fe] rounded-full flex items-center justify-center flex-shrink-0'
+              : 'relative z-20 w-[min(100%,440px)] bg-[#e8f0fe] rounded-[32px] px-6 pb-8 pt-8 flex items-center justify-center shadow-[0_20px_50px_-15px_rgba(42,42,114,0.45)]'
+          }
+          style={
+            isCircle ? { width: circleSize, height: circleSize } : undefined
+          }
         >
-          <div className="flex flex-col items-center gap-4 w-[70%] pt-5 relative">
+          <div
+            className={`flex flex-col items-center gap-4 relative ${
+              isCircle ? 'w-[70%] pt-5' : 'w-full'
+            }`}
+          >
+            {/* No círculo a logo "sai" por cima; no cartão ela fica no fluxo */}
             <img
-              className="h-auto w-[100px] absolute -top-[60px]"
+              className={
+                isCircle
+                  ? 'h-auto w-[100px] absolute -top-[60px]'
+                  : 'h-auto w-[84px]'
+              }
               alt="Logo EPOL"
               src={LogoEpol}
             />
 
-            <h1 className="text-[#2d2d6b] font-bold text-center text-[22px] leading-tight">
-              {isResetStep ? 'Defina sua nova senha!' : 'Recupere sua senha!'}
+            <h1 className="text-[#2d2d6b] font-bold text-center text-[20px] sm:text-[22px] leading-tight">
+              {isResetStep
+                ? 'Defina sua nova senha!'
+                : veioDoPerfil
+                  ? 'Altere sua senha!'
+                  : 'Recupere sua senha!'}
             </h1>
 
             {isResetStep ? (
@@ -183,7 +258,10 @@ function RecuperarSenha({ onSuccess }: RecuperarSenhaProps) {
                   onChange={handleConfirmarSenhaChange}
                 />
                 {showError && (
-                  <p className="text-red-500 text-[10px] font-semibold text-center">
+                  <p
+                    role="alert"
+                    className="text-red-500 text-[12px] sm:text-[10px] font-semibold text-center"
+                  >
                     {errorMessage}
                   </p>
                 )}
@@ -198,7 +276,10 @@ function RecuperarSenha({ onSuccess }: RecuperarSenhaProps) {
                   Digite seu E-mail
                 </Textbox>
                 {showError && (
-                  <p className="text-red-500 text-[10px] font-semibold text-center">
+                  <p
+                    role="alert"
+                    className="text-red-500 text-[12px] sm:text-[10px] font-semibold text-center"
+                  >
                     {errorMessage}
                   </p>
                 )}
@@ -206,28 +287,42 @@ function RecuperarSenha({ onSuccess }: RecuperarSenhaProps) {
             )}
 
             <Botao onClick={isResetStep ? handleResetPassword : handleRecover}>
-              {isResetStep ? 'REDEFINIR SENHA' : 'ENVIAR LINK DE RECUPERAÇÃO'}
+              {isResetStep
+                ? 'REDEFINIR SENHA'
+                : veioDoPerfil
+                  ? 'ENVIAR LINK PARA ALTERAR SENHA'
+                  : 'ENVIAR LINK DE RECUPERAÇÃO'}
             </Botao>
 
-            <Voltar onClick={() => navigate('/login')}>Voltar</Voltar>
+            <Voltar
+              onClick={() => navigate(veioDoPerfil ? '/perfil' : '/login')}
+            >
+              Voltar
+            </Voltar>
           </div>
         </div>
       </section>
       <Footer />
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
-          <div className="relative w-full max-w-md rounded-[32px] bg-white p-6 text-[#2d2d6b] shadow-[0_35px_60px_-15px_rgba(0,0,0,0.45)]">
+          <div className="relative w-full max-w-md max-h-[90dvh] overflow-y-auto rounded-[32px] bg-white p-6 text-[#2d2d6b] shadow-[0_35px_60px_-15px_rgba(0,0,0,0.45)]">
             <div className="mt-8 text-center">
               <p className="text-lg font-bold">
-                {isResetStep ? 'Senha redefinida!' : 'Recuperação iniciada'}
+                {isResetStep
+                  ? 'Senha redefinida!'
+                  : veioDoPerfil
+                    ? 'Link enviado'
+                    : 'Recuperação iniciada'}
               </p>
               <p className="mt-4 text-base leading-7 text-[#7b6bb5]">
                 {isResetStep ? (
                   'Sua senha foi alterada com sucesso. Você já pode fazer login normalmente.'
                 ) : (
                   <>
-                    Um link de recuperação foi enviado para o e-mail:{' '}
-                    <strong>{email}</strong>
+                    {veioDoPerfil
+                      ? 'Enviamos um link para alterar sua senha para o e-mail: '
+                      : 'Um link de recuperação foi enviado para o e-mail: '}
+                    <strong className="break-all">{email}</strong>
                   </>
                 )}
               </p>

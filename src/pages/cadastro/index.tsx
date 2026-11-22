@@ -1,7 +1,11 @@
 import { ChangeEvent, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { cadastrar, listarPartidos } from '../../services/api';
-import type { Partido } from '../../services/api';
+import { cadastrar } from '../../services/api';
+import {
+  uploadFotoPerfil,
+  FOTO_MAX_BYTES,
+  FOTO_TIPOS,
+} from '../../services/supabase';
 import { useAuth } from '../../contexts/AuthContext';
 import Textbox from '../../components/inputs';
 import Botao from '../../components/botoes/botao';
@@ -9,6 +13,7 @@ import LogoEpol from '../../assets/Imagens/Logos/logoepol.png';
 import { ToastContainer, useToasts } from '../../components/toast';
 import DateField from '../../components/inputs/data';
 import Footer from '../../components/footer/footer';
+import SeletorPfpModal from '../../components/seletorPfpModal/index';
 
 const bolasConfig = [
   { size: 280, top: '-40px', left: '-30px', opacity: 1 },
@@ -22,7 +27,23 @@ const bolasConfig = [
   { size: 300, bottom: '-60px', right: '-40px', opacity: 1 },
   { size: 160, bottom: '120px', right: '200px', opacity: 0.6 },
 ];
+const esc = (valor: string | number) => `calc(${valor}px * var(--s))`;
+const escPos = (valor: string) => `calc(${valor} * var(--s))`;
 
+function useMediaQuery(query: string) {
+  const [matches, setMatches] = useState(
+    () => window.matchMedia(query).matches,
+  );
+
+  useEffect(() => {
+    const mq = window.matchMedia(query);
+    const onChange = (e: MediaQueryListEvent) => setMatches(e.matches);
+    mq.addEventListener('change', onChange);
+    return () => mq.removeEventListener('change', onChange);
+  }, [query]);
+
+  return matches;
+}
 // E-mail: exige usuário + domínio com pelo menos um ponto (ex: nome@dominio.com)
 const EMAIL_REGEX =
   /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)+$/;
@@ -36,7 +57,6 @@ interface FormData {
   data_nascimento: string;
   email: string;
   confirmEmail: string;
-  partido_id: string;
   senha: string;
   confirmSenha: string;
   estado: string;
@@ -48,7 +68,6 @@ const initialFormData: FormData = {
   data_nascimento: '',
   email: '',
   confirmEmail: '',
-  partido_id: '',
   senha: '',
   confirmSenha: '',
   estado: '',
@@ -130,7 +149,7 @@ function validarCampo(
   }
 }
 
-// Campos que pertencem a cada passo (partido não entra aqui: é opcional, sem validação)
+// Campos que pertencem a cada passo (a foto de perfil é opcional, sem validação)
 const CAMPOS_POR_PASSO: Record<Passo, (keyof FormData)[]> = {
   1: ['nome', 'apelido', 'data_nascimento'],
   2: ['email', 'confirmEmail', 'estado'],
@@ -252,173 +271,59 @@ function EstadoField({
   );
 }
 
-// Seletor de partido customizado (mesmo estilo visual do calendário/estado)
+// Seletor de foto de perfil (opcional)
 
-// Círculo com as iniciais da sigla, usado quando o partido não tem bandeira_url
-// (ou quando a imagem falha ao carregar)
-function IniciaisPartido({ sigla }: { sigla: string }) {
-  return (
-    <span className="w-6 h-6 rounded-full flex-shrink-0 bg-white/70 flex items-center justify-center text-[9px] font-bold text-[#2a2a72]">
-      {sigla.slice(0, 3)}
-    </span>
-  );
-}
-
-function PartidoField({
-  partidos,
-  carregando,
-  value,
-  onChange,
-  placeholder = 'Partido de preferência (opcional)',
+function FotoPerfilField({
+  preview,
+  onAbrir,
+  onRemover,
 }: {
-  partidos: Partido[];
-  carregando?: boolean;
-  value: string;
-  onChange: (idPartido: string) => void;
-  placeholder?: string;
+  preview: string | null;
+  onAbrir: () => void;
+  onRemover: () => void;
 }) {
-  const [aberto, setAberto] = useState(false);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const partidoSelecionado = partidos.find((p) => p.id === value);
-
-  useEffect(() => {
-    function aoClicarFora(event: MouseEvent) {
-      if (
-        containerRef.current &&
-        !containerRef.current.contains(event.target as Node)
-      ) {
-        setAberto(false);
-      }
-    }
-    document.addEventListener('mousedown', aoClicarFora);
-    return () => document.removeEventListener('mousedown', aoClicarFora);
-  }, []);
-
-  function selecionar(idPartido: string) {
-    onChange(idPartido);
-    setAberto(false);
-  }
-
   return (
-    <div className="relative w-full" ref={containerRef}>
+    <div className="flex flex-col items-center gap-2">
       <button
         type="button"
-        onClick={() => setAberto((prev) => !prev)}
-        className="w-full flex items-center justify-between gap-2 rounded-full border border-[#a9a9f6] bg-[#a9a9f6] px-4 py-2.5 font-medium text-sm outline-none transition-all duration-300 focus:brightness-[1.2]"
+        onClick={onAbrir}
+        aria-label="Escolher foto de perfil"
+        className="w-28 h-28 rounded-full overflow-hidden bg-[#a9a9f6] flex items-center justify-center transition-all duration-300 hover:brightness-[1.15]"
       >
-        <span className="flex items-center gap-2 min-w-0">
-          {partidoSelecionado &&
-            (partidoSelecionado.numero_legenda ? (
-              <div
-                className="w-5 h-5 text-[12px] text-[#2A2A72] font-semibold rounded-full object-cover flex-shrink-0 bg-[#F3C994]"
-                onError={(e) => {
-                  (e.currentTarget as HTMLImageElement).style.display = 'none';
-                }}
-              >
-                {partidoSelecionado.numero_legenda}
-              </div>
-            ) : (
-              // <img
-              //   src={partidoSelecionado.bandeira_url}
-              //   alt=""
-              //   className="w-5 h-5 rounded-full object-cover flex-shrink-0 bg-white"
-              //   onError={(e) => {
-              //     (e.currentTarget as HTMLImageElement).style.display = 'none';
-              //   }}
-              // />
-              <IniciaisPartido sigla={partidoSelecionado.sigla} />
-            ))}
-          <span
-            className={`truncate ${value ? 'text-[#1f2a52]' : 'text-[#5A5A70]'}`}
+        {preview ? (
+          <img
+            src={preview}
+            alt="Pré-visualização da foto de perfil"
+            className="w-full h-full object-cover"
+          />
+        ) : (
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="#2a2a72"
+            strokeWidth={1.8}
+            className="w-10 h-10"
           >
-            {partidoSelecionado
-              ? `${partidoSelecionado.nome_completo} - ${partidoSelecionado.sigla}`
-              : placeholder}
-          </span>
-        </span>
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="#2a2a72"
-          strokeWidth={2}
-          className="w-4 h-4 flex-shrink-0"
-        >
-          <path d="M6 9l6 6 6-6" />
-        </svg>
+            <path d="M12 5v14M5 12h14" strokeLinecap="round" />
+          </svg>
+        )}
       </button>
 
-      {aberto && (
-        <div className="absolute z-50 top-full left-0 mt-2 w-full max-h-72 overflow-y-auto rounded-2xl bg-[#A9A9F6] border border-[#8888D3] p-2 shadow-xl custom-scroll">
-          <div className="flex flex-col gap-0.5">
-            <button
-              type="button"
-              onClick={() => selecionar('')}
-              className={`text-left px-3 py-2 rounded-lg text-xs font-semibold transition-colors ${
-                value === ''
-                  ? 'bg-[#FFA400] text-white'
-                  : 'text-[#2a2a72] hover:bg-[#6262AD]/60'
-              }`}
-            >
-              Ainda não tenho um partido
-            </button>
+      <p className="text-[#CBCBEC] text-[11px] text-center">
+        {preview
+          ? 'Toque na foto para trocar'
+          : 'Escolha uma foto de perfil (opcional)'}
+      </p>
 
-            {carregando && (
-              <p className="px-3 py-2 text-xs text-[#2a2a72]">
-                Carregando partidos...
-              </p>
-            )}
-
-            {!carregando && partidos.length === 0 && (
-              <p className="px-3 py-2 text-xs text-[#2a2a72]">
-                Não foi possível carregar os partidos.
-              </p>
-            )}
-
-            {!carregando &&
-              partidos.map((partido) => {
-                const selecionado = partido.id === value;
-                return (
-                  <button
-                    key={partido.id}
-                    type="button"
-                    onClick={() => selecionar(partido.id)}
-                    className={`flex items-center gap-2 text-left px-3 py-2 rounded-lg text-xs font-medium transition-colors ${
-                      selecionado
-                        ? 'bg-[#FFA400] text-white font-semibold'
-                        : 'text-[#2a2a72] hover:bg-[#6262AD]/60'
-                    }`}
-                  >
-                    {partido.numero_legenda ? (
-                      <div
-                        className="w-5 h-5 text-[11px] rounded-full flex items-center justify-center flex-shrink-0 bg-[#F3C994]"
-                        onError={(e) => {
-                          (e.currentTarget as HTMLImageElement).style.display =
-                            'none';
-                        }}
-                      >
-                        {partido.numero_legenda}
-                      </div>
-                    ) : (
-                      // <img
-                      //   src={partido.bandeira_url}
-                      //   alt=""
-                      //   className="w-6 h-6 rounded-full object-cover flex-shrink-0 bg-white"
-                      //   onError={(e) => {
-                      //     (e.currentTarget as HTMLImageElement).style.display =
-                      //       'none';
-                      //   }}
-                      // />
-                      <IniciaisPartido sigla={partido.sigla} />
-                    )}
-                    <span className="truncate">
-                      {partido.nome_completo} - {partido.sigla}
-                    </span>
-                  </button>
-                );
-              })}
-          </div>
-        </div>
+      {preview && (
+        <button
+          type="button"
+          onClick={onRemover}
+          className="text-[11px] font-semibold text-[#FFA400] hover:underline"
+        >
+          Remover foto
+        </button>
       )}
     </div>
   );
@@ -470,6 +375,14 @@ function BarraForcaSenha({ senha }: { senha: string }) {
 }
 
 function Cadastro() {
+  // Círculo só quando há largura E altura. Este formulário tem mais conteúdo
+  // que o de recuperar senha, então exijo um pouco mais de altura (720px).
+  const isCircle = useMediaQuery('(min-width: 768px) and (min-height: 560px)');
+
+  // O losango da bandeira só faz sentido em tela larga e deitada.
+  const mostrarBandeira = useMediaQuery(
+    '(min-width: 768px) and (orientation: landscape)',
+  );
   const circleSize = 'min(580px, 75vw, 75dvh)';
   const gap = '20px';
   const navigate = useNavigate();
@@ -480,23 +393,16 @@ function Cadastro() {
   const { toasts, mostrarErro, fecharToast } = useToasts();
   const [enviando, setEnviando] = useState(false);
 
-  const [partidos, setPartidos] = useState<Partido[]>([]);
-  const [carregandoPartidos, setCarregandoPartidos] = useState(true);
+  const [modalFoto, setModalFoto] = useState(false);
+  const [fotoFile, setFotoFile] = useState<File | null>(null);
+  const [fotoPreview, setFotoPreview] = useState<string | null>(null);
 
+  // libera a URL temporária quando a foto muda ou o componente desmonta
   useEffect(() => {
-    listarPartidos()
-      .then((data: Partido[]) => setPartidos(data))
-      .catch((err: any) => {
-        console.error('Erro ao buscar partidos:', err);
-        mostrarErro(
-          err?.message
-            ? `Não foi possível carregar os partidos: ${err.message}`
-            : 'Não foi possível carregar a lista de partidos.',
-        );
-      })
-      .finally(() => setCarregandoPartidos(false));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    return () => {
+      if (fotoPreview) URL.revokeObjectURL(fotoPreview);
+    };
+  }, [fotoPreview]);
 
   function handleChange(campo: keyof FormData) {
     return (event: ChangeEvent<HTMLInputElement>) => {
@@ -513,8 +419,22 @@ function Cadastro() {
     setFormData((prev) => ({ ...prev, estado: nomeEstado }));
   }
 
-  function handlePartidoChange(idPartido: string) {
-    setFormData((prev) => ({ ...prev, partido_id: idPartido }));
+  function handleFotoSelecionada(file: File) {
+    if (!FOTO_TIPOS.includes(file.type)) {
+      mostrarErro('Use uma imagem JPG, PNG ou WEBP.');
+      return;
+    }
+    if (file.size > FOTO_MAX_BYTES) {
+      mostrarErro('A foto deve ter no máximo 2 MB.');
+      return;
+    }
+    setFotoFile(file);
+    setFotoPreview(URL.createObjectURL(file));
+  }
+
+  function handleRemoverFoto() {
+    setFotoFile(null);
+    setFotoPreview(null);
   }
 
   function validarPasso(passo: Passo): boolean {
@@ -546,14 +466,18 @@ function Cadastro() {
     setEnviando(true);
 
     try {
+      const foto_perfil_url = fotoFile
+        ? await uploadFotoPerfil(fotoFile)
+        : null;
+
       await cadastrar({
         nome: formData.nome.trim(),
         apelido: formData.apelido.trim(),
         data_nascimento: formData.data_nascimento,
         email: formData.email.trim(),
-        partido_preferencia_id: formData.partido_id || null,
         senha: formData.senha,
         estado: formData.estado.trim(),
+        foto_perfil_url,
       });
       navigate('/login');
     } catch (err: any) {
@@ -565,7 +489,11 @@ function Cadastro() {
 
   return (
     <div>
-      <section className="w-full min-h-[100dvh] bg-[#2a2a72] flex items-center justify-center overflow-hidden relative">
+      <section
+        className={`w-full min-h-[100dvh] bg-[#2a2a72] flex items-center justify-center overflow-hidden relative [--s:0.5] sm:[--s:0.7] md:[--s:0.85] lg:[--s:1] ${
+          isCircle ? '' : 'px-4 py-10'
+        }`}
+      >
         <ToastContainer toasts={toasts} onFechar={fecharToast} />
 
         {bolasConfig.map((b, i) => (
@@ -573,12 +501,12 @@ function Cadastro() {
             key={i}
             className="absolute rounded-full"
             style={{
-              width: b.size,
-              height: b.size,
-              top: 'top' in b ? b.top : undefined,
-              bottom: 'bottom' in b ? b.bottom : undefined,
-              left: 'left' in b ? b.left : undefined,
-              right: 'right' in b ? b.right : undefined,
+              width: esc(b.size),
+              height: esc(b.size),
+              top: b.top !== undefined ? escPos(b.top) : undefined,
+              bottom: b.bottom !== undefined ? escPos(b.bottom) : undefined,
+              left: b.left !== undefined ? escPos(b.left) : undefined,
+              right: b.right !== undefined ? escPos(b.right) : undefined,
               backgroundColor: '#8888D3',
               opacity: b.opacity,
               zIndex: 0,
@@ -586,37 +514,54 @@ function Cadastro() {
           />
         ))}
 
-        <div
-          className="absolute inset-y-0 left-0 z-10"
-          style={{
-            width: '50vw',
-            backgroundColor: '#FFA400',
-            clipPath: `polygon(0% 50%, 100% 0%, calc(100% - ${gap}) 50%, 100% 100%)`,
-          }}
-        />
+        {mostrarBandeira && (
+          <>
+            <div
+              className="absolute inset-y-0 left-0 z-10"
+              style={{
+                width: '50vw',
+                backgroundColor: '#FFA400',
+                clipPath: `polygon(0% 50%, 100% 0%, calc(100% - ${gap}) 50%, 100% 100%)`,
+              }}
+            />
+            <div
+              className="absolute inset-y-0 right-0 z-10"
+              style={{
+                width: '50vw',
+                backgroundColor: '#FFA400',
+                clipPath: `polygon(${gap} 0%, 100% 50%, ${gap} 100%, 0% 50%)`,
+              }}
+            />
+          </>
+        )}
 
         <div
-          className="absolute inset-y-0 right-0 z-10"
-          style={{
-            width: '50vw',
-            backgroundColor: '#FFA400',
-            clipPath: `polygon(${gap} 0%, 100% 50%, ${gap} 100%, 0% 50%)`,
-          }}
-        />
-
-        <div
-          className="relative z-20 bg-[#2a2a72] rounded-full flex items-center justify-center flex-shrink-0"
-          style={{ width: circleSize, height: circleSize }}
+          className={
+            isCircle
+              ? 'relative z-20 bg-[#2a2a72] rounded-full flex items-center justify-center flex-shrink-0'
+              : 'relative z-20 w-[min(100%,440px)] bg-[#2a2a72] rounded-[32px] px-6 pb-8 pt-8 flex items-center justify-center ring-2 ring-[#8888D3]/60 shadow-[0_20px_50px_-15px_rgba(0,0,0,0.6)]'
+          }
+          style={
+            isCircle ? { width: circleSize, height: circleSize } : undefined
+          }
         >
-          <div className="flex flex-col items-center gap-4 w-[70%] pt-5 relative">
+          <div
+            className={`flex flex-col items-center gap-4 relative ${
+              isCircle ? 'w-[70%] pt-5' : 'w-full'
+            }`}
+          >
             <img
-              className="h-auto w-[100px] absolute -top-[50px]"
+              className={
+                isCircle
+                  ? 'h-auto w-[100px] absolute -top-[50px] cursor-pointer'
+                  : 'h-auto w-[84px] cursor-pointer'
+              }
               alt="Logo EPOL"
               src={LogoEpol}
               onClick={() => navigate('/')}
             />
 
-            <h1 className="text-[#FFA400] font-bold text-center text-[22px] leading-tight">
+            <h1 className="text-[#FFA400] font-bold text-center text-[20px] sm:text-[22px] leading-tight">
               Crie sua conta!
             </h1>
 
@@ -627,21 +572,29 @@ function Cadastro() {
               Passo {step} de {TOTAL_STEPS}
             </p>
 
-            <div className="relative w-full">
-              <div
-                aria-hidden="true"
-                className="invisible flex flex-col gap-4 w-full"
-              >
-                <Textbox
-                  placeholder="Nome completo"
-                  value=""
-                  onChange={() => {}}
-                />
-                <Textbox placeholder="Apelido" value="" onChange={() => {}} />
-                <DateField value="" onChange={() => {}} />
-              </div>
+            <div className={isCircle ? 'relative w-full' : 'w-full'}>
+              {isCircle && (
+                <div
+                  aria-hidden="true"
+                  className="invisible flex flex-col gap-4 w-full"
+                >
+                  <Textbox
+                    placeholder="Nome completo"
+                    value=""
+                    onChange={() => {}}
+                  />
+                  <Textbox placeholder="Apelido" value="" onChange={() => {}} />
+                  <DateField value="" onChange={() => {}} />
+                </div>
+              )}
 
-              <div className="absolute inset-x-0 top-0 flex flex-col gap-4 w-full">
+              <div
+                className={
+                  isCircle
+                    ? 'absolute inset-x-0 top-0 flex flex-col gap-4 w-full'
+                    : 'flex flex-col gap-4 w-full'
+                }
+              >
                 {step === 1 && (
                   <>
                     <Textbox
@@ -684,11 +637,10 @@ function Cadastro() {
                 )}
 
                 {step === 3 && (
-                  <PartidoField
-                    partidos={partidos}
-                    carregando={carregandoPartidos}
-                    value={formData.partido_id}
-                    onChange={handlePartidoChange}
+                  <FotoPerfilField
+                    preview={fotoPreview}
+                    onAbrir={() => setModalFoto(true)}
+                    onRemover={handleRemoverFoto}
                   />
                 )}
 
@@ -779,6 +731,12 @@ function Cadastro() {
       </section>
 
       <Footer />
+
+      <SeletorPfpModal
+        aberto={modalFoto}
+        onFechar={() => setModalFoto(false)}
+        onEscolher={handleFotoSelecionada}
+      />
     </div>
   );
 }

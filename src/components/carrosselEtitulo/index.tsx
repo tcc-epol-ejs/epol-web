@@ -105,7 +105,7 @@ export default function StepCarousel() {
   const step = steps[index];
 
   return (
-    <div className="w-full flex flex-col items-center gap-[24px] mt-[60px]">
+    <div className="w-full flex flex-col items-center gap-4 sm:gap-[24px] mt-6 sm:mt-[60px]">
       {/* Animações customizadas das setas */}
       <style>{`
         @keyframes pulseLeft {
@@ -129,29 +129,24 @@ export default function StepCarousel() {
 
       {/* mt-[60px] empurra o carrossel inteiro pra baixo */}
       <div className="relative w-full max-w-[1100px] flex items-center gap-[16px]">
-        {/* era max-w-[900px] -> agora maior */}
-
-        {/* SETA ESQUERDA */}
+        {/* SETA ESQUERDA - só desktop */}
         <button
           onClick={goPrev}
-          className="arrow-left shrink-0 text-[#2a2a72] rounded-full p-[6px] hover:scale-125 hover:shadow-[0_0_16px_4px_rgba(42,42,114,0.4)] active:scale-95 transition-transform duration-200 ease-out"
+          className="arrow-left hidden sm:block shrink-0 text-[#2a2a72] rounded-full p-[6px] hover:scale-125 hover:shadow-[0_0_16px_4px_rgba(42,42,114,0.4)] active:scale-95 transition-transform duration-200 ease-out"
           aria-label="Anterior"
         >
           <FiChevronLeft size={28} />
         </button>
-
         {/* CARD */}
-        <div className="relative flex-1 bg-white rounded-[24px] border-[10px] border-[#2a2a72] overflow-hidden shadow-md">
-          <div className="flex items-stretch min-h-[500px]">
-            {/* era min-h-[400px] -> agora maior */}
-
+        <div className="relative flex-1 min-w-0 bg-white rounded-[16px] sm:rounded-[24px] border-[6px] sm:border-[10px] border-[#2a2a72] overflow-hidden shadow-md">
+          <div className="flex flex-col-reverse sm:flex-row items-stretch sm:min-h-[500px]">
             {/* TEXTO */}
-            <div className="flex-1 flex flex-col justify-center gap-[16px] px-[40px] py-[32px]">
-              <h3 className="text-[26px] font-bold text-[#232528]">
+            <div className="flex-1 flex flex-col justify-center gap-3 sm:gap-[16px] px-5 py-5 sm:px-[40px] sm:py-[32px]">
+              <h3 className="text-xl sm:text-[26px] font-bold text-[#232528]">
                 {step.number}. {step.title}
               </h3>
 
-              <p className="text-[18px] leading-[1.7] text-[#232528] indent-6 text-justify">
+              <p className="text-[15px] sm:text-[18px] leading-[1.6] sm:leading-[1.7] text-[#232528] sm:indent-6 text-left sm:text-justify">
                 {step.textBefore}
                 {step.link && (
                   <a
@@ -166,14 +161,13 @@ export default function StepCarousel() {
               </p>
 
               {step.textAfter && (
-                <p className="text-[18px] leading-[1.7] text-[#232528] indent-6 text-justify">
+                <p className="text-[15px] sm:text-[18px] leading-[1.6] sm:leading-[1.7] text-[#232528] sm:indent-6 text-left sm:text-justify">
                   {step.textAfter}
                 </p>
               )}
             </div>
 
-            {/* IMAGEM */}
-            <div className="relative w-[340px] shrink-0 bg-[#f2f2f7] flex items-center justify-center p-4">
+            <div className="relative w-full h-[200px] sm:h-auto sm:w-[340px] shrink-0 bg-[#f2f2f7] flex items-center justify-center p-3 sm:p-4">
               <img
                 src={step.image}
                 alt={step.title}
@@ -184,7 +178,7 @@ export default function StepCarousel() {
                 }
               />
               {step.tagLabel && (
-                <span className="absolute bottom-4 left-4 bg-[#2a2a72] text-white text-[12px] font-medium px-[14px] py-[6px] rounded-full">
+                <span className="absolute bottom-3 left-3 sm:bottom-4 sm:left-4 bg-[#2a2a72] text-white text-[11px] sm:text-[12px] font-medium px-3 sm:px-[14px] py-1 sm:py-[6px] rounded-full">
                   {step.tagLabel}
                 </span>
               )}
@@ -195,28 +189,46 @@ export default function StepCarousel() {
         {/* SETA DIREITA */}
         <button
           onClick={goNext}
-          className="arrow-right shrink-0 text-[#2a2a72] rounded-full p-[6px] hover:scale-125 hover:shadow-[0_0_16px_4px_rgba(42,42,114,0.4)] active:scale-95 transition-transform duration-200 ease-out"
+          className="arrow-right hidden sm:block shrink-0 text-[#2a2a72] rounded-full p-[6px] hover:scale-125 hover:shadow-[0_0_16px_4px_rgba(42,42,114,0.4)] active:scale-95 transition-transform duration-200 ease-out"
           aria-label="Próximo"
         >
           <FiChevronRight size={28} />
         </button>
       </div>
 
-      {/* BOLINHAS */}
-      <div className="flex gap-[8px]">
-        {steps.map((_, i) => (
-          <button
-            key={i}
-            onClick={() => setIndex(i)}
-            className="rounded-full transition-all"
-            style={{
-              width: i === index ? 10 : 8,
-              height: i === index ? 10 : 8,
-              backgroundColor: i === index ? '#FFA400' : '#c9c9e0',
-            }}
-            aria-label={`Ir para passo ${i + 1}`}
-          />
-        ))}
+      {/* SETAS + BOLINHAS */}
+      <div className="flex items-center gap-4">
+        <button
+          onClick={goPrev}
+          className="sm:hidden text-[#2a2a72] rounded-full p-2 active:scale-90 transition-transform"
+          aria-label="Anterior"
+        >
+          <FiChevronLeft size={28} />
+        </button>
+
+        <div className="flex gap-[8px] flex-wrap justify-center max-w-[180px] sm:max-w-none">
+          {steps.map((_, i) => (
+            <button
+              key={i}
+              onClick={() => setIndex(i)}
+              className="rounded-full transition-all"
+              style={{
+                width: i === index ? 10 : 8,
+                height: i === index ? 10 : 8,
+                backgroundColor: i === index ? '#FFA400' : '#c9c9e0',
+              }}
+              aria-label={`Ir para passo ${i + 1}`}
+            />
+          ))}
+        </div>
+
+        <button
+          onClick={goNext}
+          className="sm:hidden text-[#2a2a72] rounded-full p-2 active:scale-90 transition-transform"
+          aria-label="Próximo"
+        >
+          <FiChevronRight size={28} />
+        </button>
       </div>
     </div>
   );
