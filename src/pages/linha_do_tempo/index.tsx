@@ -81,6 +81,12 @@ function normalizarNome(nome: string) {
     .toLocaleLowerCase('pt-BR');
 }
 
+const classeBotaoNav =
+  'flex shrink-0 items-center justify-center rounded-full border-2 border-white bg-[#16803C] text-white transition focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-[#2A2A72]';
+
+const classeCard =
+  'mx-auto w-full rounded-[20px] border-4 border-white bg-white text-[#2A2A72] shadow-[5px_5px_0_#FFA400] sm:rounded-[28px] sm:shadow-[10px_10px_0_#FFA400] h-[clamp(20rem,calc(100dvh-20rem),38rem)] md:h-[clamp(20rem,calc(100dvh-14.5rem),30rem)] lg:h-auto lg:min-h-0 lg:max-h-[40rem] lg:flex-1';
+
 function LinhaDoTempo() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -142,12 +148,13 @@ function LinhaDoTempo() {
       >
         <div
           className="flex h-full w-full transition-transform duration-700 ease-in-out"
-          style={{ transform: `translateX(-${slideAtual * 100}vw)` }}
+          style={{ transform: `translateX(-${slideAtual * 100}%)` }}
           aria-live="polite"
         >
+          {/* SLIDE 0: capa */}
           <section
             aria-hidden={slideAtual !== 0}
-            className="relative isolate flex h-full w-screen shrink-0 flex-col items-center justify-center overflow-hidden bg-[#f5f5f5] px-16 pb-8 pt-[130px] text-center"
+            className="relative isolate flex h-full w-full shrink-0 basis-full overflow-y-auto overflow-x-hidden bg-[#f5f5f5] px-6 pb-10 pt-28 text-center sm:px-10 md:pt-[130px] lg:overflow-hidden lg:px-16"
           >
             <img
               src={Brasil}
@@ -155,23 +162,24 @@ function LinhaDoTempo() {
               aria-hidden="true"
               className="pointer-events-none absolute inset-0 z-0 h-full w-full scale-105 object-cover opacity-30 blur-[2px]"
             />
-            <div className="relative z-10 flex flex-col items-center">
-              <h1 className="text-5xl font-bold text-white [text-shadow:4px_4px_0_#16803C] sm:text-6xl md:text-7xl">
+            <div className="relative z-10 m-auto flex flex-col items-center">
+              <h1 className="text-balance break-words text-[clamp(2rem,9vw,4.5rem)] font-bold leading-[1.05] text-white [text-shadow:2px_2px_0_#16803C] sm:[text-shadow:4px_4px_0_#16803C]">
                 LINHA DO TEMPO PRESIDENCIAL
               </h1>
-              <p className="mt-4 text-lg text-[#2A2A72] md:text-xl">
+              <p className="mt-4 max-w-xl text-base text-[#2A2A72] sm:text-lg md:text-xl">
                 Conheça alguns dos principais líderes políticos do Brasil!
               </p>
               <button
                 type="button"
                 onClick={avancar}
-                className="mt-10 rounded-full border-2 border-white bg-[#16803C] px-9 py-4 text-sm font-extrabold tracking-[0.12em] text-white transition hover:translate-y-[-2px] focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-[#2A2A72]"
+                className="mt-8 rounded-full border-2 border-white bg-[#16803C] px-8 py-3.5 text-sm font-extrabold tracking-[0.12em] text-white transition hover:translate-y-[-2px] focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-[#2A2A72] sm:mt-10 sm:px-9 sm:py-4"
               >
                 DESCOBRIR
               </button>
             </div>
           </section>
 
+          {/* SLIDES DOS PERÍODOS */}
           {PERIODOS_PRESIDENCIAIS.map((periodo, index) => {
             const politico = politicos.find(
               (pessoa) =>
@@ -180,6 +188,7 @@ function LinhaDoTempo() {
             );
             const fundo = index % 2 === 0 ? 'bg-[#2A2A72]' : 'bg-[#16803C]';
             const periodoAtivo = slideAtual === index + 1;
+            const ultimo = index === PERIODOS_PRESIDENCIAIS.length - 1;
 
             return (
               <section
@@ -187,43 +196,46 @@ function LinhaDoTempo() {
                 aria-hidden={!periodoAtivo}
                 aria-label={`Presidência no período ${periodo.periodo}`}
                 aria-roledescription="slide"
-                className={`flex h-full w-screen shrink-0 items-center justify-center overflow-hidden px-20 pb-8 pt-[90px] text-white sm:px-24 ${fundo}`}
+                className={`flex h-full w-full shrink-0 basis-full overflow-y-auto overflow-x-hidden px-4 pb-8 pt-24 text-white sm:px-8 md:pt-[90px] lg:overflow-hidden lg:px-24 ${fundo}`}
               >
-                <div className="w-full max-w-5xl">
-                  <div className="mb-5 flex items-center justify-center gap-3">
+                <div className="m-auto w-full max-w-5xl lg:m-0 lg:mx-auto lg:flex lg:h-full lg:flex-col lg:justify-center">
+                  <div className="mb-4 flex shrink-0 items-center justify-center gap-3 md:mb-5">
                     <img
                       src={Brasil}
                       alt="Bandeira do Brasil"
-                      className="h-6 w-9 rounded-sm object-cover shadow-sm"
+                      className="h-5 w-8 rounded-sm object-cover shadow-sm sm:h-6 sm:w-9"
                     />
-                    <p className="text-center text-3xl font-black text-[#FFA400] md:text-5xl">
+                    <p className="text-center text-2xl font-black text-[#FFA400] sm:text-3xl md:text-5xl">
                       {periodo.periodo}
                     </p>
                   </div>
-                  <div className="relative mx-auto w-full max-w-[60rem]">
+
+                  <div className="relative mx-auto w-full max-w-[60rem] lg:flex lg:min-h-0 lg:flex-1 lg:flex-col">
+                    {/* Setas laterais: só no desktop */}
                     {periodoAtivo && (
                       <>
                         <button
                           type="button"
                           onClick={voltar}
                           aria-label="Voltar para o período anterior"
-                          className="absolute left-[-5rem] top-1/2 z-20 flex h-[8rem] w-[8rem] -translate-y-1/2 items-center justify-center rounded-full border-2 border-white bg-[#16803C] text-white transition hover:-translate-x-1 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-[#2A2A72] sm:left-[-10rem] sm:h-20 sm:w-25 "
+                          className={`${classeBotaoNav} absolute left-[-6rem] top-[calc(50%-1.5rem)] z-20 hidden h-16 w-16 -translate-y-1/2 hover:-translate-x-1 lg:flex`}
                         >
                           <FiArrowLeft
                             aria-hidden="true"
-                            className="text-4xl"
+                            className="text-3xl"
                           />
                         </button>
-                        {index < PERIODOS_PRESIDENCIAIS.length - 1 ? (
+
+                        {!ultimo ? (
                           <button
                             type="button"
                             onClick={avancar}
                             aria-label={`Avançar para o período ${PERIODOS_PRESIDENCIAIS[index + 1].periodo}`}
-                            className="absolute right-[-5rem] top-1/2 z-20 flex h-[8rem] w-[8rem] -translate-y-1/2 items-center justify-center rounded-full border-2 border-white bg-[#16803C] text-white transition hover:translate-x-1 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-[#2A2A72] sm:right-[-10rem] sm:h-20 sm:w-25"
+                            className={`${classeBotaoNav} absolute right-[-6rem] top-[calc(50%-1.5rem)] z-20 hidden h-16 w-16 -translate-y-1/2 hover:translate-x-1 lg:flex`}
                           >
                             <FiArrowRight
                               aria-hidden="true"
-                              className="text-4xl"
+                              className="text-3xl"
                             />
                           </button>
                         ) : (
@@ -231,7 +243,7 @@ function LinhaDoTempo() {
                             type="button"
                             onClick={reiniciar}
                             aria-label="Reiniciar linha do tempo"
-                            className="group absolute right-[-5rem] top-1/2 z-20 flex h-[8rem] w-[8rem] -translate-y-1/2 items-center justify-center text-white focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-[#2A2A72] sm:right-[-10rem] sm:h-20 sm:w-25"
+                            className="group absolute right-[-6rem] top-[calc(50%-1.5rem)] z-20 hidden h-16 w-16 -translate-y-1/2 items-center justify-center text-white focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-[#2A2A72] lg:flex"
                           >
                             <FiRotateCcw
                               aria-hidden="true"
@@ -241,11 +253,12 @@ function LinhaDoTempo() {
                         )}
                       </>
                     )}
+
                     {carregando ? (
                       <div
                         role="status"
                         aria-label="Carregando dados da linha do tempo"
-                        className="mx-auto flex h-[min(38rem,calc(100dvh_-_230px))] w-full items-center justify-center rounded-[28px] border-4 border-white bg-white text-[#2A2A72] shadow-[10px_10px_0_#FFA400] md:h-[min(30rem,calc(100dvh_-_230px))]"
+                        className={`${classeCard} flex items-center justify-center`}
                       >
                         <span className="h-12 w-12 animate-spin rounded-full border-4 border-[#2A2A72]/20 border-t-[#2A2A72]" />
                         <span className="sr-only">
@@ -253,8 +266,10 @@ function LinhaDoTempo() {
                         </span>
                       </div>
                     ) : (
-                      <article className="mx-auto flex h-[min(38rem,calc(100dvh_-_230px))] w-full flex-col overflow-hidden rounded-[28px] border-4 border-white bg-white text-[#2A2A72] shadow-[10px_10px_0_#FFA400] md:h-[min(30rem,calc(100dvh_-_230px))] md:flex-row">
-                        <div className="flex h-40 shrink-0 items-center justify-center overflow-hidden bg-[#e8e8f5] sm:h-48 md:h-auto md:w-[38%]">
+                      <article
+                        className={`${classeCard} flex flex-col overflow-hidden md:flex-row`}
+                      >
+                        <div className="flex h-32 shrink-0 items-center justify-center overflow-hidden bg-[#e8e8f5] sm:h-44 md:h-auto md:w-[38%]">
                           {politico?.foto_url ? (
                             <img
                               src={politico.foto_url}
@@ -269,7 +284,8 @@ function LinhaDoTempo() {
                             </span>
                           )}
                         </div>
-                        <div className="flex min-h-0 flex-1 flex-col justify-center overflow-y-auto p-5 sm:p-7 md:p-9">
+
+                        <div className="flex min-h-0 flex-1 flex-col overflow-y-auto p-4 sm:p-6 md:justify-center md:p-9">
                           {erro ? (
                             <p
                               role="alert"
@@ -279,19 +295,19 @@ function LinhaDoTempo() {
                             </p>
                           ) : politico ? (
                             <>
-                              <h2 className="text-2xl font-black leading-tight sm:text-3xl">
+                              <h2 className="text-xl font-black leading-tight sm:text-2xl md:text-3xl">
                                 {politico.nome_completo}
                               </h2>
-                              <p className="mt-4 text-xs font-extrabold uppercase tracking-[0.12em] text-[#16803C]">
+                              <p className="mt-3 text-xs font-extrabold uppercase tracking-[0.12em] text-[#16803C] md:mt-4">
                                 Contexto histórico
                               </p>
-                              <p className="mt-1 text-sm leading-relaxed text-[#333] sm:text-base">
+                              <p className="mt-1 text-sm leading-relaxed text-[#333] md:text-base">
                                 {periodo.contexto}
                               </p>
-                              <p className="mt-4 text-xs font-extrabold uppercase tracking-[0.12em] text-[#16803C]">
+                              <p className="mt-3 text-xs font-extrabold uppercase tracking-[0.12em] text-[#16803C] md:mt-4">
                                 Destaques do governo
                               </p>
-                              <ul className="mt-1 list-disc space-y-1 pl-5 text-sm leading-relaxed text-[#333] sm:text-base">
+                              <ul className="mt-1 list-disc space-y-1 pl-5 text-sm leading-relaxed text-[#333] md:text-base">
                                 {periodo.destaques.map((destaque) => (
                                   <li key={destaque}>{destaque}</li>
                                 ))}
@@ -306,25 +322,69 @@ function LinhaDoTempo() {
                         </div>
                       </article>
                     )}
-                    {politico && !carregando && !erro && (
+
+                    {/* Barra de ações: setas + "Saiba mais" no celular/tablet; só "Saiba mais" no desktop */}
+                    <div
+                      aria-hidden={!periodoAtivo}
+                      className={`mt-4 flex h-12 shrink-0 items-center justify-between gap-3 lg:mt-5 lg:justify-center ${
+                        periodoAtivo ? '' : 'invisible'
+                      }`}
+                    >
                       <button
                         type="button"
-                        onClick={() =>
-                          navigate(
-                            `/pagina_politico?id=${encodeURIComponent(politico.id)}`,
-                            {
-                              state: {
-                                voltarPara: '/linha_do_tempo',
-                                slideAtual,
-                              },
-                            },
-                          )
-                        }
-                        className="mt-5 rounded-full border-2 border-white bg-[#FFA400] px-5 py-2 text-sm font-bold text-[#2A2A72] transition hover:-translate-y-0.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+                        onClick={voltar}
+                        aria-label="Voltar para o período anterior"
+                        className={`${classeBotaoNav} h-12 w-12 lg:hidden`}
                       >
-                        Saiba mais
+                        <FiArrowLeft aria-hidden="true" className="text-2xl" />
                       </button>
-                    )}
+
+                      {politico && !carregando && !erro && (
+                        <button
+                          type="button"
+                          onClick={() =>
+                            navigate(
+                              `/pagina_politico?id=${encodeURIComponent(politico.id)}`,
+                              {
+                                state: {
+                                  voltarPara: '/linha_do_tempo',
+                                  slideAtual,
+                                },
+                              },
+                            )
+                          }
+                          className="rounded-full border-2 border-white bg-[#FFA400] px-5 py-2.5 text-sm font-bold text-[#2A2A72] transition hover:-translate-y-0.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+                        >
+                          Saiba mais
+                        </button>
+                      )}
+
+                      {!ultimo ? (
+                        <button
+                          type="button"
+                          onClick={avancar}
+                          aria-label={`Avançar para o período ${PERIODOS_PRESIDENCIAIS[index + 1].periodo}`}
+                          className={`${classeBotaoNav} h-12 w-12 lg:hidden`}
+                        >
+                          <FiArrowRight
+                            aria-hidden="true"
+                            className="text-2xl"
+                          />
+                        </button>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={reiniciar}
+                          aria-label="Reiniciar linha do tempo"
+                          className={`${classeBotaoNav} h-12 w-12 lg:hidden`}
+                        >
+                          <FiRotateCcw
+                            aria-hidden="true"
+                            className="text-2xl"
+                          />
+                        </button>
+                      )}
+                    </div>
                   </div>
                 </div>
               </section>
@@ -332,6 +392,7 @@ function LinhaDoTempo() {
           })}
         </div>
       </main>
+
       <div
         role="progressbar"
         aria-label="Progresso da linha do tempo"

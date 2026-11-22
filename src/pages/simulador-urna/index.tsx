@@ -820,7 +820,7 @@ function SimuladorEtapa3({
               <Tecla
                 label="Confirma"
                 onClick={confirma}
-                className="row-span-2 bg-[#4caf50] text-sm text-black"
+                className="row-span-2 bg-[#4caf50] text-[.75rem] text-black"
               >
                 CONFIRMA
               </Tecla>

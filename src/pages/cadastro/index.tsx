@@ -377,7 +377,7 @@ function BarraForcaSenha({ senha }: { senha: string }) {
 function Cadastro() {
   // Círculo só quando há largura E altura. Este formulário tem mais conteúdo
   // que o de recuperar senha, então exijo um pouco mais de altura (720px).
-  const isCircle = useMediaQuery('(min-width: 768px) and (min-height: 720px)');
+  const isCircle = useMediaQuery('(min-width: 768px) and (min-height: 560px)');
 
   // O losango da bandeira só faz sentido em tela larga e deitada.
   const mostrarBandeira = useMediaQuery(

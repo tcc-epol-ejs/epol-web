@@ -33,6 +33,7 @@ const cards = [
   },
   {
     asset: VisualizadorGeografico,
+    path: '/visualizador',
     title: 'visualizador geográfico',
     text: 'Navegue pelo mapa do Brasil e conheça os representantes de cada estado.',
   },
@@ -427,28 +428,29 @@ export default function Main() {
         </div>
 
         {/* QUARTA PARTE SEÇÃO */}
-        <div className="relative flex h-full w-full overflow-hidden bg-[#16803C]">
+        <div className="relative w-full min-h-[100dvh] bg-[#16803C] flex overflow-hidden ">
+          {/* Fundo decorativo (só desktop) */}
           <svg
             aria-hidden="true"
-            className="pointer-events-none absolute inset-0 z-0 h-full w-full"
+            className="pointer-events-none absolute inset-0 z-0 hidden h-full w-full lg:block"
             viewBox="0 0 1400 900"
             preserveAspectRatio="none"
             fill="none"
           >
             <path
               d="M 950 -80
-                 C 860 35, 1010 145, 900 260
-                 C 790 375, 690 405, 790 530
-                 C 890 655, 760 760, 690 980
-                 L 1400 980
-                 L 1400 -80 Z"
+         C 860 35, 1010 145, 900 260
+         C 790 375, 690 405, 790 530
+         C 890 655, 760 760, 690 980
+         L 1400 980
+         L 1400 -80 Z"
               fill="#2A2A72"
             />
             <path
               d="M 950 -80
-                 C 860 35, 1010 145, 900 260
-                 C 790 375, 690 405, 790 530
-                 C 890 655, 760 760, 690 980"
+         C 860 35, 1010 145, 900 260
+         C 790 375, 690 405, 790 530
+         C 890 655, 760 760, 690 980"
               stroke="#FFCA28"
               strokeWidth="7"
               strokeOpacity="0.95"
@@ -472,36 +474,39 @@ export default function Main() {
             src={SetaLinhaTempo}
             alt=""
             aria-hidden="true"
-            className="pointer-events-none absolute inset-0 z-10 h-full w-full object-contain object-left-top"
+            className="pointer-events-none absolute inset-0 z-10 hidden h-full w-full object-contain object-left-top lg:block"
           />
 
-          <div className="relative z-20 grid w-full grid-cols-[62%_38%]">
-            <div className="flex -translate-y-10 flex-col justify-center pb-5 px-[clamp(64px,7vw,120px)]">
-              <h2 className="max-w-[760px] font-[Fraunces] text-[clamp(76px,7.2vw,118px)] leading-[0.82] tracking-[-0.055em] text-[#FFFBF2]">
+          <div className="relative z-20 flex w-full flex-col lg:grid lg:grid-cols-[62%_38%]">
+            {/* Texto */}
+            <div className="flex flex-1 flex-col justify-center px-6 pb-10 pt-28 md:px-12 lg:flex-none lg:-translate-y-10 lg:px-[clamp(64px,7vw,120px)] lg:pb-5 lg:pt-0">
+              <h2 className="max-w-[760px] font-[Fraunces] text-[clamp(44px,13vw,88px)] leading-[0.85] tracking-[-0.05em] text-[#FFFBF2] lg:text-[clamp(76px,7.2vw,118px)] lg:leading-[0.82] lg:tracking-[-0.055em]">
                 Linha do
-                <span className="mt-3 flex items-baseline whitespace-nowrap">
+                <span className="mt-2 flex flex-wrap items-baseline gap-x-3 lg:mt-3 lg:flex-nowrap lg:gap-x-0 lg:whitespace-nowrap">
                   <span>Tempo</span>
-                  <span className="ml-5 italic font-semibold text-[#FFCA28]">
+                  <span className="italic font-semibold text-[#FFCA28] lg:ml-5">
                     Presidencial
                   </span>
                 </span>
               </h2>
 
-              <div className="mt-6 flex items-center gap-5">
-                <span className="block h-[74px] w-[4px] flex-none bg-[#2A2A72]" />
-                <p className="max-w-[590px] text-[22px] font-semibold leading-[1.5] text-[#FFFBF2]/90">
+              <div className="mt-6 flex items-center gap-4 lg:gap-5">
+                <span className="block h-[56px] w-[4px] flex-none bg-[#2A2A72] lg:h-[74px]" />
+                <p className="max-w-[590px] text-[16px] font-semibold leading-[1.5] text-[#FFFBF2]/90 sm:text-[18px] lg:text-[22px]">
                   Entenda a história do Brasil pelos presidentes que fizeram
                   parte de cada momento do país.
                 </p>
               </div>
             </div>
-            <div className="relative flex items-end justify-start pl-36 pb-[40%]">
+
+            {/* Botão */}
+            <div className="relative flex items-center justify-center rounded-t-[40px] border-t-[6px] border-[#FFCA28] bg-[#2A2A72] px-6 py-10 lg:items-end lg:justify-start lg:rounded-none lg:border-0 lg:bg-transparent lg:p-0 lg:pb-[40%] lg:pl-36">
               <button
                 onClick={() => navigate('/linha_do_tempo')}
-                className="group relative z-10 -translate-y-10 flex h-[104px] w-[310px] items-center justify-between rounded-full border-[3px] border-[#FFFFFF] bg-[#16803C] px-9 text-[30px] font-black text-[#FFFBF2] shadow-none transition-all duration-500 ease-out hover:-translate-y-[52px] hover:bg-[#106d32]"
+                className="group relative z-10 flex h-[68px] w-full max-w-[300px] items-center justify-between rounded-full border-[3px] border-[#FFFFFF] bg-[#16803C] px-6 text-[22px] font-black text-[#FFFBF2] transition-all duration-500 ease-out hover:bg-[#106d32] sm:h-[84px] sm:text-[26px] lg:h-[104px] lg:w-[310px] lg:max-w-none lg:-translate-y-10 lg:px-9 lg:text-[30px] lg:hover:-translate-y-[52px]"
               >
                 <span>Acessar já!</span>
-                <span className="flex h-12 w-12 items-center justify-center rounded-full bg-[#FFCA28] text-[#FFFFFF] transition-transform duration-300 group-hover:translate-x-1">
+                <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[#FFCA28] text-[#FFFFFF] transition-transform duration-300 group-hover:translate-x-1 sm:h-10 sm:w-10 lg:h-12 lg:w-12">
                   <FaArrowRightLong size={21} />
                 </span>
               </button>

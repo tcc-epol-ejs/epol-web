@@ -1,7 +1,13 @@
-import { useEffect, useId, useRef, useState } from 'react';
+import {
+  useEffect,
+  useId,
+  useRef,
+  useState,
+  useSyncExternalStore,
+} from 'react';
 import { createPortal } from 'react-dom';
 import { FiX } from 'react-icons/fi';
-import { NavLink, useLocation } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 import LogoEPOL from '../../assets/Imagens/logo-atual-preta.png';
 import LogoEpolBranco from '../../assets/Imagens/logo-atual-branca.png';
 import Pipo from '../../assets/Imagens/cabeca-pipo.png';
@@ -29,6 +35,30 @@ const LINKS_VISITANTE = [
   { label: 'Cadastre-se', path: '/cadastro' },
 ];
 
+// -----------------------------------------------------------------------------
+// ESTADO DO MENU (fora do componente)
+// Cada página renderiza o próprio <Header />, então o componente é recriado a
+// cada troca de página. Guardando o "aberto" aqui fora, o menu continua aberto
+// ao navegar e só fecha quando o usuário pedir (botão X ou Esc).
+// -----------------------------------------------------------------------------
+let menuAberto = false;
+const ouvintes = new Set<() => void>();
+
+function definirMenuAberto(valor: boolean) {
+  if (menuAberto === valor) return;
+  menuAberto = valor;
+  ouvintes.forEach((fn) => fn());
+}
+
+function assinar(fn: () => void) {
+  ouvintes.add(fn);
+  return () => {
+    ouvintes.delete(fn);
+  };
+}
+
+const lerMenuAberto = () => menuAberto;
+
 export default function Header({
   isBgWhite,
   disableScrollHide = true,
@@ -36,25 +66,17 @@ export default function Header({
   borderColor,
   reservarEspaco = false,
 }: HeaderProps) {
-  const [aberto, setAberto] = useState(false);
+  const aberto = useSyncExternalStore(assinar, lerMenuAberto, () => false);
   const [pertoDoTopo, setPertoDoTopo] = useState(true);
-  const headerRef = useRef<HTMLElement>(null);
   const botaoRef = useRef<HTMLButtonElement>(null);
   const menuId = useId();
-  const { key: rotaAtual } = useLocation();
   const { usuario, carregando } = useAuth();
-
-  useEffect(() => {
-    setAberto(false);
-  }, [rotaAtual]);
 
   useEffect(() => {
     if (disableScrollHide) return;
 
     function aoRolar() {
-      const mostrar = window.scrollY < 20;
-      setPertoDoTopo(mostrar);
-      if (!mostrar) setAberto(false);
+      setPertoDoTopo(window.scrollY < 20);
     }
 
     aoRolar();
@@ -62,32 +84,19 @@ export default function Header({
     return () => window.removeEventListener('scroll', aoRolar);
   }, [disableScrollHide]);
 
+  // Só o Esc fecha pelo teclado (clicar fora ou em um link NÃO fecha)
   useEffect(() => {
     if (!aberto) return;
 
-    function aoClicarFora(event: PointerEvent) {
-      if (
-        event.target instanceof Node &&
-        !headerRef.current?.contains(event.target)
-      ) {
-        setAberto(false);
-      }
-    }
-
     function aoPressionarTecla(event: KeyboardEvent) {
       if (event.key === 'Escape') {
-        setAberto(false);
+        definirMenuAberto(false);
         botaoRef.current?.focus();
       }
     }
 
-    document.addEventListener('pointerdown', aoClicarFora);
     document.addEventListener('keydown', aoPressionarTecla);
-
-    return () => {
-      document.removeEventListener('pointerdown', aoClicarFora);
-      document.removeEventListener('keydown', aoPressionarTecla);
-    };
+    return () => document.removeEventListener('keydown', aoPressionarTecla);
   }, [aberto]);
 
   const tema = isBgWhite
@@ -97,143 +106,142 @@ export default function Header({
   const foco =
     'focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-[#FFA400]';
 
-  const link = `flex min-h-10 shrink-0 items-center whitespace-nowrap rounded-full px-2 text-xs font-semibold transition-colors hover:text-[#FFA400] aria-[current=page]:text-[#FFA400] sm:text-sm ${foco}`;
+  // Responsivo (< xl): item de lista vertical, largura total.
+  // Desktop (xl+): link horizontal em pílula, igual ao original.
+  const itemMenu = `flex min-h-11 w-full items-center gap-3 rounded-xl px-3 text-sm font-semibold transition-colors hover:bg-[#FFA400]/15 hover:text-[#FFA400] aria-[current=page]:bg-[#FFA400]/15 aria-[current=page]:text-[#FFA400] xl:min-h-10 xl:w-auto xl:shrink-0 xl:gap-0 xl:whitespace-nowrap xl:rounded-full xl:px-2 xl:text-sm xl:hover:bg-transparent xl:aria-[current=page]:bg-transparent ${foco}`;
 
   const logado = !carregando && Boolean(usuario);
   const nomeExibido = usuario?.apelido || usuario?.nome || 'Meu perfil';
+
+  // Botão do Pipo acompanha a variável --d (tamanho do header fechado)
+  const tamanhoBotao = 'h-[calc(var(--d)-4px)] w-[calc(var(--d)-4px)]';
 
   return (
     <>
       {reservarEspaco && (
         <div
           aria-hidden="true"
-          className={logado ? 'h-24 shrink-0 lg:h-20' : 'h-20 shrink-0'}
+          className="h-[4.5rem] shrink-0 sm:h-20 xl:h-28"
         />
       )}
 
       {createPortal(
         <header
-          ref={headerRef}
           hidden={!disableScrollHide && !pertoDoTopo}
-          className={`fixed left-4 top-4 z-40 h-[var(--altura-header)] overflow-hidden border-2 border-[#FFA400] shadow-xl transition-[width,border-radius] duration-300 ease-out motion-reduce:transition-none xl:left-[62px] xl:top-[42px] xl:[--altura-header:5rem] ${tema} ${
-            logado ? '[--altura-header:6.5rem]' : '[--altura-header:4rem]'
-          } ${
+          className={`fixed left-3 top-3 z-[1000] flex flex-col overflow-hidden border-2 border-[#FFA400] shadow-xl transition-[width,border-radius] duration-300 ease-out motion-reduce:transition-none [--d:3rem] sm:left-4 sm:top-4 sm:[--d:3.5rem] xl:left-[62px] xl:top-[42px] xl:h-[var(--d)] xl:flex-row xl:items-center xl:[--d:5rem] ${tema} ${
             aberto
-              ? 'w-[calc(100%-2rem)] rounded-[26px] xl:w-[calc(100%-124px)] xl:rounded-full'
-              : 'w-[var(--altura-header)] rounded-full'
+              ? 'w-[min(18rem,calc(100vw-1.5rem))] rounded-[26px] xl:w-[calc(100%-124px)] xl:rounded-full'
+              : 'w-[var(--d)] rounded-full'
           }`}
           style={{ backgroundColor, borderColor }}
         >
-          <button
-            ref={botaoRef}
-            type="button"
-            aria-label={aberto ? 'Fechar menu' : 'Abrir menu'}
-            aria-controls={menuId}
-            aria-expanded={aberto}
-            onClick={() => setAberto((atual) => !atual)}
-            className={`absolute z-10 flex items-center justify-center rounded-full ${foco} ${
-              aberto
-                ? `left-2 h-11 w-11 hover:bg-[#FFA400]/15 sm:left-3 xl:top-1/2 xl:-translate-y-1/2 ${
-                    logado ? 'top-0' : 'top-1/2 -translate-y-1/2'
-                  }`
-                : 'left-0 top-0 h-full w-[calc(var(--altura-header)-4px)] overflow-hidden'
-            }`}
-          >
-            {aberto ? (
-              <FiX size={22} aria-hidden="true" />
-            ) : (
+          {/* Botão (Pipo / X) + logo */}
+          <div className="flex h-[calc(var(--d)-4px)] shrink-0 items-center">
+            <button
+              ref={botaoRef}
+              type="button"
+              aria-label={aberto ? 'Fechar menu' : 'Abrir menu'}
+              aria-controls={menuId}
+              aria-expanded={aberto}
+              onClick={() => definirMenuAberto(!aberto)}
+              className={`flex shrink-0 items-center justify-center rounded-full hover:bg-[#FFA400]/15 ${tamanhoBotao} ${foco}`}
+            >
+              {aberto ? (
+                <FiX size={22} aria-hidden="true" />
+              ) : (
+                <img
+                  src={Pipo}
+                  alt=""
+                  draggable={false}
+                  className="pointer-events-none block h-[90%] w-[90%] object-contain"
+                />
+              )}
+            </button>
+
+            {aberto && (
               <img
-                src={Pipo}
-                alt=""
-                draggable={false}
-                className="pointer-events-none block h-[90%] w-[90%] object-contain"
+                src={isBgWhite ? LogoEpolBranco : LogoEPOL}
+                alt="EPOL"
+                className="ml-2 w-[70px] shrink-0 sm:w-[80px] xl:ml-3 xl:w-[90px]"
               />
             )}
-          </button>
+          </div>
+
+          {/* Menu: vertical no responsivo, horizontal no desktop */}
           <nav
             id={menuId}
             aria-label="Navegação principal"
-            className={
+            className={`grid transition-[grid-template-rows] duration-300 ease-out motion-reduce:transition-none xl:min-w-0 xl:flex-1 ${
               aberto
-                ? `grid h-full grid-cols-[2.75rem_auto_minmax(0,1fr)] items-center gap-x-1 px-2 sm:gap-x-2 sm:px-3 xl:grid-cols-[2.75rem_auto_minmax(0,1fr)_auto] xl:grid-rows-1 xl:gap-x-4 xl:pr-6 ${
-                    logado ? 'grid-rows-[2.75rem_1fr]' : 'grid-rows-1'
-                  }`
-                : 'hidden'
-            }
+                ? 'grid-rows-[1fr] xl:flex xl:items-center'
+                : 'invisible grid-rows-[0fr] xl:hidden'
+            }`}
           >
-            <img
-              src={isBgWhite ? LogoEpolBranco : LogoEPOL}
-              alt="EPOL"
-              className="col-start-2 row-start-1 w-[60px] shrink-0 sm:w-[78px] xl:w-[90px]"
-            />
-
-            {carregando ? (
-              <p
-                role="status"
-                className="col-start-3 row-start-1 justify-self-end text-xs font-semibold xl:col-start-4"
-              >
-                Carregando sessão...
-              </p>
-            ) : usuario ? (
-              <>
-                <div className="col-span-full row-start-2 flex min-w-0 items-center gap-1 overflow-x-auto overscroll-x-contain pb-1 [scrollbar-width:thin] xl:col-span-1 xl:col-start-3 xl:row-start-1 xl:gap-2 xl:pb-0 2xl:gap-4">
-                  {LINKS_USUARIO.map(({ label, path }) => (
-                    <NavLink
-                      key={path}
-                      to={path}
-                      end
-                      className={link}
-                      onClick={() => setAberto(false)}
-                    >
-                      {label}
-                    </NavLink>
-                  ))}
-                </div>
-
-                <NavLink
-                  to="/perfil"
-                  end
-                  aria-label="Meu perfil"
-                  className={`col-start-3 row-start-1 min-w-0 justify-self-end gap-2 xl:col-start-4 ${link}`}
-                  onClick={() => setAberto(false)}
-                >
-                  <span className="max-w-[6rem] truncate sm:max-w-[8rem]">
-                    {nomeExibido}
-                  </span>
-                  <span className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full border-2 border-[#FFA400] bg-[#FFA400] font-bold text-[#2A2A72]">
-                    {usuario.foto_perfil_url ? (
-                      <img
-                        src={usuario.foto_perfil_url}
-                        alt=""
-                        className="h-full w-full object-cover"
-                      />
-                    ) : (
-                      <span aria-hidden="true">
-                        {nomeExibido.charAt(0).toUpperCase()}
-                      </span>
-                    )}
-                  </span>
-                </NavLink>
-              </>
-            ) : (
-              <div className="col-start-3 row-start-1 flex min-w-0 items-center justify-end gap-1 sm:gap-3 xl:col-start-4">
-                {LINKS_VISITANTE.map(({ label, path }) => (
-                  <NavLink
-                    key={path}
-                    to={path}
-                    end
-                    className={`${link} ${
-                      path === '/cadastro'
-                        ? 'bg-[#FFA400] text-[#333] hover:text-[#333] hover:brightness-95'
-                        : 'text-[#FFA400]'
-                    }`}
-                    onClick={() => setAberto(false)}
+            <div className="min-h-0 overflow-hidden xl:min-w-0 xl:flex-1 xl:overflow-visible">
+              <div className="max-h-[calc(100dvh-7rem)] overflow-y-auto px-2 pb-3 pt-1 xl:flex xl:max-h-none xl:items-center xl:justify-between xl:gap-4 xl:overflow-visible xl:p-0 xl:pl-4 xl:pr-6">
+                {carregando ? (
+                  <p
+                    role="status"
+                    className="px-3 py-2 text-xs font-semibold xl:ml-auto xl:p-0"
                   >
-                    {label}
-                  </NavLink>
-                ))}
+                    Carregando sessão...
+                  </p>
+                ) : usuario ? (
+                  <>
+                    <div className="flex flex-col gap-1 xl:min-w-0 xl:flex-1 xl:flex-row xl:items-center xl:gap-2 xl:overflow-x-auto xl:overscroll-x-contain xl:[scrollbar-width:thin] 2xl:gap-4">
+                      {LINKS_USUARIO.map(({ label, path }) => (
+                        <NavLink key={path} to={path} end className={itemMenu}>
+                          {label}
+                        </NavLink>
+                      ))}
+                    </div>
+
+                    <div className="my-2 border-t border-current/15 xl:hidden" />
+
+                    <NavLink
+                      to="/perfil"
+                      end
+                      aria-label="Meu perfil"
+                      className={`${itemMenu} xl:gap-2`}
+                    >
+                      <span className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full border-2 border-[#FFA400] bg-[#FFA400] font-bold text-[#2A2A72]">
+                        {usuario.foto_perfil_url ? (
+                          <img
+                            src={usuario.foto_perfil_url}
+                            alt=""
+                            className="h-full w-full object-cover"
+                          />
+                        ) : (
+                          <span aria-hidden="true">
+                            {nomeExibido.charAt(0).toUpperCase()}
+                          </span>
+                        )}
+                      </span>
+                      <span className="ml-2 min-w-0 flex-1 truncate xl:max-w-[8rem] xl:flex-none">
+                        {nomeExibido}
+                      </span>
+                    </NavLink>
+                  </>
+                ) : (
+                  <div className="flex flex-col gap-1 xl:ml-auto xl:flex-row xl:items-center xl:gap-3">
+                    {LINKS_VISITANTE.map(({ label, path }) => (
+                      <NavLink
+                        key={path}
+                        to={path}
+                        end
+                        className={`${itemMenu} ${
+                          path === '/cadastro'
+                            ? 'justify-center bg-[#FFA400] text-[#333] hover:bg-[#FFA400] hover:text-[#333] hover:brightness-95 aria-[current=page]:bg-[#FFA400] aria-[current=page]:text-[#333] xl:bg-[#FFA400] xl:hover:bg-[#FFA400] xl:aria-[current=page]:bg-[#FFA400]'
+                            : 'text-[#FFA400]'
+                        }`}
+                      >
+                        {label}
+                      </NavLink>
+                    ))}
+                  </div>
+                )}
               </div>
-            )}
+            </div>
           </nav>
         </header>,
         document.body,

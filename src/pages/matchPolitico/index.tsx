@@ -1580,7 +1580,7 @@ function ResultScreen({ ranking, respostas, onRestart }: ResultScreenProps) {
               type="button"
               onClick={() => abrirPartido(top.id)}
               aria-label={`Ver informações do partido ${top.nome}`}
-              className="inline-block bg-[#2E2A47] text-white font-bold text-[12px] tracking-[0.04em] px-[18px] py-[10px] rounded-full mb-5 transition hover:brightness-125 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#FF9F1C]"
+              className="block mx-auto sm:mx-0 bg-[#2E2A47] text-white font-bold text-[12px] tracking-[0.04em] px-[18px] py-[10px] rounded-full mb-5 transition hover:brightness-125 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#FF9F1C]"
             >
               {top.nome.toUpperCase()} ({top.sigla})
             </button>

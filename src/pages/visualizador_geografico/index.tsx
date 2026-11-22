@@ -81,6 +81,7 @@ const CENTRO_VISUAL = new Set(['PI', 'RJ', 'SC']);
 function centroVisual(path: SVGPathElement): { x: number; y: number } {
   const b = path.getBBox();
   const total = path.getTotalLength();
+  const svg = path.ownerSVGElement;
 
   const borda: { x: number; y: number }[] = [];
   const amostras = 160;
@@ -92,11 +93,19 @@ function centroVisual(path: SVGPathElement): { x: number; y: number } {
   let melhor = { x: b.x + b.width / 2, y: b.y + b.height / 2, d: -1 };
   const passos = 24;
 
+  // Reaproveita um único ponto SVG (compatível com todos os navegadores)
+  const ponto = svg?.createSVGPoint();
+
   for (let i = 0; i <= passos; i++) {
     for (let j = 0; j <= passos; j++) {
       const x = b.x + (b.width * i) / passos;
       const y = b.y + (b.height * j) / passos;
-      if (!path.isPointInFill(new DOMPoint(x, y))) continue;
+
+      if (ponto) {
+        ponto.x = x;
+        ponto.y = y;
+        if (!path.isPointInFill(ponto)) continue;
+      }
 
       let menor = Infinity;
       for (const p of borda) {
@@ -352,7 +361,7 @@ export default function VisualizadorGeografico() {
         }
       });
 
-      // Tamanho vem do mapa inteiro. Para aumentar/diminuir as siglas, mude o 0.02
+      // Tamanho vem do mapa inteiro. Para aumentar/diminuir as siglas, mude o 0.017
       const tamanhoFonte = svg.getBBox().width * 0.017;
 
       maiores.forEach((path, sigla) => {
@@ -363,9 +372,17 @@ export default function VisualizadorGeografico() {
         );
         texto.setAttribute('class', 'epol-sigla');
         texto.setAttribute('data-sigla', sigla);
-        const centro = CENTRO_VISUAL.has(sigla)
-          ? centroVisual(path)
-          : { x: b.x + b.width / 2, y: b.y + b.height / 2 };
+
+        // Se o cálculo do centro falhar, usa o centro da caixa (não quebra a página)
+        let centro = { x: b.x + b.width / 2, y: b.y + b.height / 2 };
+        if (CENTRO_VISUAL.has(sigla)) {
+          try {
+            centro = centroVisual(path);
+          } catch (err) {
+            console.error(`Falha ao centralizar ${sigla}:`, err);
+          }
+        }
+
         texto.setAttribute('x', String(centro.x));
         texto.setAttribute('y', String(centro.y));
         texto.setAttribute('text-anchor', 'middle');
@@ -580,6 +597,16 @@ export default function VisualizadorGeografico() {
 
           .epol-map svg text.epol-sigla.epol-branca { fill: #FFFFFF; }
 
+          /* Desktop: mapa maior */
+          @media (min-width: 1280px) {
+            .epol-map { max-width: 780px; }
+          }
+
+          /* Monitores largos: ainda maior */
+          @media (min-width: 1536px) {
+            .epol-map { max-width: 900px; }
+          }
+
           @media (max-width: 1279px) and (max-height: 520px) and (orientation: landscape) {
             .epol-map { max-width: min(600px, 72dvh); }
           }
@@ -589,14 +616,14 @@ export default function VisualizadorGeografico() {
           <Header isBgWhite />
         </div>
 
-        <section className="min-h-[100dvh] w-full px-4 pb-10 pt-32 sm:px-6 md:px-10 md:pt-[135px] xl:px-[65px] xl:pt-[155px]">
-          <div className="mx-auto grid w-full max-w-[1600px] grid-cols-1 items-start gap-5 xl:grid-cols-[340px_minmax(0,1fr)_340px] xl:grid-rows-[auto_1fr] xl:gap-x-8 xl:gap-y-0 xl:pt-8">
+        <section className="min-h-[100dvh] w-full px-4 pb-10 pt-32 sm:px-6 md:px-10 md:pt-[135px] xl:px-[65px] xl:pt-[135px]">
+          <div className="mx-auto grid w-full max-w-[1600px] grid-cols-1 items-start gap-5 xl:grid-cols-[300px_minmax(0,1fr)_300px] xl:grid-rows-[auto_1fr] xl:gap-x-8 xl:gap-y-0 xl:pt-4">
             <div className="min-w-0 select-none xl:col-start-1 xl:row-start-1">
               <h1 className="text-[#2A2A72]">
-                <span className="block font-[Fraunces] text-[clamp(2rem,7vw,3rem)] font-black italic uppercase leading-[0.95] tracking-[-0.03em]">
+                <span className="block font-[Fraunces] text-[clamp(1.5rem,5vw,2rem)] font-black italic uppercase leading-[0.95] tracking-[-0.03em]">
                   Visualizador
                 </span>
-                <span className="mt-1 block text-[clamp(1.25rem,5vw,1.75rem)] font-black uppercase leading-none tracking-wide">
+                <span className="mt-1 block text-[clamp(0.95rem,3.5vw,1.1rem)] font-black uppercase leading-none tracking-wide">
                   Geográfico
                 </span>
               </h1>
