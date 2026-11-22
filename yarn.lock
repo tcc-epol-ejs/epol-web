@@ -276,6 +276,11 @@
     "@nodelib/fs.scandir" "2.1.5"
     fastq "^1.6.0"
 
+"@react-map/brazil@^1.0.9":
+  version "1.0.9"
+  resolved "https://registry.yarnpkg.com/@react-map/brazil/-/brazil-1.0.9.tgz#f0fe5e1c8adcac9b87d5c6bbe967ea97d2e6b6bf"
+  integrity sha512-yxwdRMg+T6d2698ScDNGlfXuawJfQ/dy+yX+cBfLXaodtdidcnkBQFvZqL0IL+dpvKJMHoHX6cc9rxOTixpbiw==
+
 "@rolldown/pluginutils@1.0.0-beta.27":
   version "1.0.0-beta.27"
   resolved "https://registry.npmjs.org/@rolldown/pluginutils/-/pluginutils-1.0.0-beta.27.tgz"
